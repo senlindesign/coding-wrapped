@@ -1,6 +1,6 @@
 # Coding Wrapped Skill evaluation
 
-Generated: `2026-07-29T08:20:30.703941+00:00`
+Generated: `2026-07-29T08:27:07.781380+00:00`
 
 Automated result: **14 passed / 0 failed**
 
@@ -17,7 +17,7 @@ Automated result: **14 passed / 0 failed**
 | privacy | Generation brief excludes raw private markers | PASS | {'locale': 'zh', 'count': 4} |
 | persistence | Four-at-a-time replacement and append persistence | PASS | {'batches': 2, 'insights': 8} |
 | validation | Rejects one-card, duplicate-composition, and unknown-source batches | PASS | ['Insight batches must contain exactly four items', 'All four insights must use different compositions', 'Every source ID must exist in sources.json'] |
-| persistence | Overview watermark and source validation | PASS | overview-20260729082029544064 |
+| persistence | Overview watermark and source validation | PASS | overview-20260729082706613780 |
 | privacy | Portable export excludes transcripts and private markers | PASS | {'archive': 'coding-wrapped-eval.zip', 'files': 48} |
 | compatibility | Fresh-directory copy compiles and scans | PASS | {'compiled_scripts': 8, 'portable_sessions': 2} |
 

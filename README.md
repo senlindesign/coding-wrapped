@@ -29,7 +29,35 @@ how the agent responds, and what kind of builder you are becoming.
 It is **not** a transcript viewer, productivity score, employee-monitoring
 tool, or cloud analytics service.
 
+## See the complete experience
+
+Every screenshot below uses deterministic synthetic data. The dashboard text is
+native HTML, while the pixel-art illustration is generated and stored locally.
+
+### One insight, end to end
+
+An insight is more than its illustration. Each card includes the behavior that
+triggered it, how the agent responded, the working style it suggests, and one
+practical next step.
+
+![A complete Coding Wrapped insight with illustration, behavior, style, and light tip](docs/images/insight-detail.png)
+
+### Customizable coding behavior
+
+The factual section can show up to eight modules. People choose which modules
+remain visible; the responsive grid reflows around that selection.
+
+![Eight synthetic coding behavior metrics with the customization panel open](docs/images/behavior-metrics.png)
+
+### Four distinct visual stories
+
 ![Four distinct Coding Wrapped illustrations](docs/images/insights.jpg)
+
+### Responsive local dashboard
+
+The same Overview, insights, and data remain usable on a narrow screen.
+
+<img src="docs/images/mobile.png" alt="Coding Wrapped mobile dashboard using synthetic data" width="390">
 
 ## Install
 

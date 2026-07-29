@@ -27,7 +27,34 @@ Coding Wrapped 会读取本地的 Claude Code 和 Codex 记录，把你与 AI
 
 它**不是**原始对话浏览器、生产力评分、员工监控工具或云端分析服务。
 
+## 看完整的产品内容
+
+以下截图全部使用确定性的合成数据。Dashboard 中的文字由原生 HTML
+渲染，只有像素插画会生成并保存在本地。
+
+### 一条完整的 Insight
+
+Insight 不只是一张插画。每张卡还会解释触发它的行为、Agent
+如何回应、它反映出的协作风格，以及一条可以立刻尝试的轻建议。
+
+![包含插画、行为、协作风格和轻建议的完整 Coding Wrapped Insight](docs/images/insight-detail.png)
+
+### 可以自定义的 Coding behavior 数据
+
+事实数据区最多包含八个模块。用户可以选择需要显示的内容，响应式网格会
+根据模块数量自动重排。
+
+![打开自定义面板后的八个合成 Coding behavior 数据模块](docs/images/behavior-metrics.png)
+
+### 四种不重复的视觉故事
+
 ![四种不同构图的 Coding Wrapped 插画](docs/images/insights.jpg)
+
+### 响应式本地 Dashboard
+
+在窄屏中，Coding 总览、Insight 和事实数据依然可以正常查看。
+
+<img src="docs/images/mobile.png" alt="使用合成数据的 Coding Wrapped 手机端 Dashboard" width="390">
 
 ## 安装
 

@@ -114,6 +114,10 @@ def validate_layout() -> None:
         "skills/coding-wrapped/assets/frontend-template/fonts/Noto-OFL.txt",
         "skills/coding-wrapped/assets/frontend-template/fonts/PlusJakartaSans-OFL.txt",
         "docs/images/dashboard.png",
+        "docs/images/insight-detail.png",
+        "docs/images/behavior-metrics.png",
+        "docs/images/insights.jpg",
+        "docs/images/mobile.png",
     )
     for relative in required:
         if not (ROOT / relative).is_file():
