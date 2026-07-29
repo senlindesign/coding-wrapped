@@ -2,5 +2,7 @@
 __pycache__/
 *.py[cod]
 .venv/
+node_modules
+skills/coding-wrapped/assets/frontend-source/dist/
 dist/
 *.skill

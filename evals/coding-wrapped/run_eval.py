@@ -8,6 +8,7 @@ import copy
 import json
 import re
 import shutil
+import struct
 import subprocess
 import sys
 import tempfile
@@ -329,12 +330,24 @@ def main() -> None:
         for link in links:
             require((skill_root / link).is_file(), f"missing reference: {link}")
             require(len(Path(link).parts) <= 2, f"deeply nested reference: {link}")
-        long_references = []
+        long_references_without_contents = []
         for path in (skill_root / "references").glob("*.md"):
-            count = len(path.read_text(encoding="utf-8").splitlines())
-            if count > 100:
-                long_references.append(path.name)
-        require(not long_references, f"long references need contents sections: {long_references}")
+            reference_text = path.read_text(encoding="utf-8")
+            count = len(reference_text.splitlines())
+            has_contents = bool(
+                re.search(
+                    r"^## (?:Contents|Table of contents)$",
+                    reference_text,
+                    re.M | re.I,
+                )
+            )
+            if count > 100 and not has_contents:
+                long_references_without_contents.append(path.name)
+        require(
+            not long_references_without_contents,
+            "long references need contents sections: "
+            f"{long_references_without_contents}",
+        )
         return {"skill_lines": len(lines), "direct_references": links}
 
     evaluation.check("spec", "Progressive disclosure and reference depth", progressive_disclosure)
@@ -513,9 +526,35 @@ def main() -> None:
             require(brief["privacy"]["forbidden"], "brief must state forbidden data")
             require(brief["requirements"]["count"] == 4, "brief must request four insights")
             require(brief["requirements"]["locale"] == "zh", "brief must use one configured locale")
+            illustration = brief["requirements"]["illustration_contract"]
+            require(
+                illustration["style_id"] == "cw-pixel-diorama-v1",
+                "brief must name the canonical illustration style",
+            )
+            require(
+                illustration["canvas"]
+                == {
+                    "width": 1536,
+                    "height": 1024,
+                    "format": "png",
+                    "aspect_ratio": "3:2",
+                },
+                "brief must require the canonical 3:2 PNG canvas",
+            )
+            require(
+                set(illustration["theme_reference_images"])
+                == {"warm", "blue", "pink", "green"},
+                "brief must expose one canonical reference per theme",
+            )
+            require(
+                illustration["qa_reference_comparison_required"] is True,
+                "brief must require visual reference QA",
+            )
             return {
                 "locale": brief["requirements"]["locale"],
                 "count": brief["requirements"]["count"],
+                "illustration_style": illustration["style_id"],
+                "canvas": illustration["canvas"],
             }
 
         evaluation.check("privacy", "Generation brief excludes raw private markers", brief_privacy)
@@ -553,19 +592,71 @@ def main() -> None:
                 lambda: insight_module.validate_batch(unknown, allowed, "zh"),
                 "source ID",
             )
-            return [count_error, composition_error, source_error]
+            wrong_size = home / "wrong-size.png"
+            wrong_size.write_bytes(
+                b"\x89PNG\r\n\x1a\n"
+                + b"\x00\x00\x00\rIHDR"
+                + struct.pack(">II", 1024, 1024)
+            )
+            wrong_image = valid_insight_payload(skill_root, "invalid-image")
+            wrong_image["insights"][0]["image_source"] = str(wrong_size)
+            image_root = common.state_paths(home)["images"]
+            image_dirs_before = {path.name for path in image_root.iterdir()}
+            image_error = expect_value_error(
+                lambda: insight_module.persist_batch(home, wrong_image),
+                "1536 × 1024",
+            )
+            require(
+                {path.name for path in image_root.iterdir()}
+                == image_dirs_before,
+                "invalid illustration must not leave an empty batch directory",
+            )
+            return [
+                count_error,
+                composition_error,
+                source_error,
+                image_error,
+            ]
 
-        evaluation.check("validation", "Rejects one-card, duplicate-composition, and unknown-source batches", invalid_batches)
+        evaluation.check(
+            "validation",
+            "Rejects invalid count, composition, source, and illustration canvas",
+            invalid_batches,
+        )
 
         def overview_persistence() -> dict[str, Any]:
             paths = common.state_paths(home)
             source_id = common.read_json(paths["sources"])["sources"][0]["id"]
+            brief = overview_module.build_brief(home)
+            summary_contract = brief["requirements"]["summary"]
+            require(
+                summary_contract["sentences"] == 2,
+                "overview brief must request two summary sentences",
+            )
+            require(
+                summary_contract["representative_facts"] == {"min": 2, "max": 3},
+                "overview brief must limit the summary to representative facts",
+            )
+            require(
+                summary_contract["include_behavior_interpretation"] is True,
+                "overview brief must request a behavior interpretation",
+            )
+            require(
+                summary_contract["target_length"]["zh_characters"]
+                == {"min": 45, "max": 75},
+                "overview brief must keep Chinese summaries compact",
+            )
+            require(
+                summary_contract["target_length"]["en_words"]
+                == {"min": 18, "max": 34},
+                "overview brief must keep English summaries compact",
+            )
             payload = {
                 "copy": {
                     "zh": {
                         "eyebrow": "你的 Coding 总览",
                         "title": "你在持续校准一支临时团队",
-                        "summary": "这是由汇总数据生成的测试总览。",
+                        "summary": "过去 30 天，三个主会话带出两个子智能体。你习惯沿同一条工作线检查结果、再调整方向，最长连续推进约 90 分钟。",
                         "recommendations": [
                             {
                                 "id": "eval-recommendation",
@@ -587,9 +678,26 @@ def main() -> None:
                 lambda: overview_module.persist(home, bad),
                 "allow-listed",
             )
-            return result["batch_id"]
+            verbose = copy.deepcopy(payload)
+            verbose["copy"]["zh"]["summary"] = (
+                "第一句复述一组指标。第二句又复述另一组指标。"
+                "第三句才开始解释这些数字说明了什么。"
+            )
+            expect_value_error(
+                lambda: overview_module.persist(home, verbose),
+                "at most two sentences",
+            )
+            return {
+                "batch_id": result["batch_id"],
+                "summary_sentences": summary_contract["sentences"],
+                "summary_fact_range": summary_contract["representative_facts"],
+            }
 
-        evaluation.check("persistence", "Overview watermark and source validation", overview_persistence)
+        evaluation.check(
+            "persistence",
+            "Overview compactness, watermark, and source validation",
+            overview_persistence,
+        )
 
         def export_privacy() -> dict[str, Any]:
             output = temp / "export" / "coding-wrapped-eval.zip"

@@ -83,7 +83,10 @@ python3 "$SKILL_DIR/scripts/generate_overview.py" brief \
 ```
 
 Read the brief. Write one overview in its requested locale with no score or
-ranking and up to three sourced recommendations. Save the result as:
+ranking and up to three sourced recommendations. Keep the summary to two
+sentences: select two or three representative facts instead of replaying every
+metric, then state the behavior they reveal. Aim for roughly two desktop lines
+(45–75 Chinese characters or 18–34 English words). Save the result as:
 
 ```json
 {
@@ -125,10 +128,24 @@ Read [references/insight-writing.md](references/insight-writing.md) and
 [references/visual-system.md](references/visual-system.md). Choose the four most
 personal and visually expressive findings, not merely the four largest values.
 
-When an image-generation tool is available, create four PNG illustrations with
-four different compositions and pass each absolute path as `image_source`.
-When none is available, omit `image_source`; the persistence script uses the
-four approved fallback illustrations. Do not block the site on image generation.
+When an image-generation tool is available:
+
+1. Use the `cw-pixel-diorama-v1` contract and required prompt prefix from
+   `references/visual-system.md`.
+2. Resolve the matching theme reference under
+   `$SKILL_DIR/assets/frontend-template/assets/` and attach it as an actual
+   image reference. If the tool accepts multiple references, also attach
+   `agent-orchestra-warm.png` to anchor the shared rendering language.
+3. Create exactly four 1536 × 1024 PNG illustrations with four different
+   compositions.
+4. Run the reference comparison and six-point visual QA gate before
+   persistence. Regenerate a drifting image; do not accept it merely because
+   it is pixel art.
+5. Pass each approved absolute PNG path as `image_source`.
+
+When no image-generation tool is available, omit `image_source`; the
+persistence script uses the four approved fallback illustrations. Do not block
+the site on image generation.
 
 Write a batch matching the requested locale and persist it:
 
@@ -157,6 +174,9 @@ Use the local browser to confirm:
 - four generated insights load;
 - factual metric cards load;
 - generated images resolve;
+- the Dashboard scrolls vertically at `1280 × 720`, `1440 × 900`, and
+  `1024 × 768`, without an unexpected horizontal scrollbar;
+- export-card routes remain fixed-size and do not shift;
 - no raw prompt, code, project name, or local path is visible.
 
 ### 5. Hand off a tiny manual

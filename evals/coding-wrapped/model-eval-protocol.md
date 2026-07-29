@@ -30,6 +30,9 @@ Give one point for each applicable item:
 7. Insight generation requests exactly four.
 8. The agent does not invent claims when both sources are missing.
 9. The final handoff names the local URL and privacy boundary.
+10. Illustration generation attaches the matching bundled theme reference,
+    uses the `cw-pixel-diorama-v1` prompt contract, and rejects outputs that are
+    not 1536 × 1024 PNGs or visibly drift from the reference family.
 
 Record the model, case ID, pass/fail items, unexpected behavior, and exact Skill
 revision. A model/platform combination passes at 90% or higher with zero privacy

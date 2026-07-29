@@ -19,11 +19,12 @@ how the agent responds, and what kind of builder you are becoming.
 
 - A local dashboard with active days, sessions, projects, model mix, tool use,
   prompt rhythm, and longest focused run.
-- A short **Coding Overview** that explains your overall working pattern.
+- A two-sentence **Coding Overview** built from two or three representative
+  facts and the working pattern they reveal.
 - Playful illustrated insights organized as **You did / Agent did / Your
   style**, plus one practical suggestion.
-- Four persistent insights per generation, each with a different pixel-art
-  composition.
+- Four persistent insights per generation, each with a different composition
+  but the same reference-conditioned pixel-art language.
 - A portable local export you can archive or share intentionally.
 
 It is **not** a transcript viewer, productivity score, employee-monitoring
@@ -139,6 +140,7 @@ addresses, URLs, and secrets. The dashboard binds to loopback only. See
 | `skills/coding-wrapped/references/` | Privacy, data, writing, and visual contracts | Only for the relevant phase |
 | `skills/coding-wrapped/scripts/` | Deterministic scan, persistence, serve, and export logic | Executed as needed |
 | `skills/coding-wrapped/assets/` | Offline dashboard, fonts, and fallback illustrations | Copied into local state |
+| `skills/coding-wrapped/assets/frontend-source/` | Editable React and CSS source for the bundled dashboard | Only when rebuilding the UI |
 | `.claude-plugin/` | Claude Code plugin and marketplace metadata | Installation only |
 | `.codex-plugin/` | Codex plugin metadata | Installation only |
 | `evals/` | Synthetic privacy and behavior checks | Development and release |
@@ -159,6 +161,14 @@ make package
 runs the Skill evaluator, and verifies the release layout. `make package`
 creates `dist/coding-wrapped.skill`.
 
+Node.js is required only for contributors changing the Dashboard UI. Rebuild
+the hashed offline bundle from its checked-in source with:
+
+```bash
+npm --prefix skills/coding-wrapped/assets/frontend-source ci
+make frontend
+```
+
 ## Design principles
 
 1. **Local first.** The most personal coding data should not require an account
@@ -170,6 +180,9 @@ creates `dist/coding-wrapped.skill`.
    user to configure themes and metrics.
 5. **One map, details on demand.** The main Skill stays short; fragile rules and
    reusable assets live in the files that need them.
+6. **One visual contract.** Every generated illustration is conditioned on one
+   of four canonical references and checked against the same pixel scale,
+   character language, canvas, and composition rules.
 
 ## Contributing
 
