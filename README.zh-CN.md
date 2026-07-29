@@ -1,5 +1,10 @@
 # Coding Wrapped
 
+[![适用于 Claude Code](https://img.shields.io/badge/Made_for-Claude_Code-7C3AED?style=flat-square&labelColor=555555)](#claude-code-和-codex一条命令)
+[![适用于 Codex](https://img.shields.io/badge/Made_for-Codex-0F766E?style=flat-square&labelColor=555555)](#claude-code-和-codex一条命令)
+[![格式：Agent Skill](https://img.shields.io/badge/Format-Agent_Skill-EA580C?style=flat-square&labelColor=555555)](skills/coding-wrapped/SKILL.md)
+[![许可证：MIT](https://img.shields.io/badge/License-MIT-65A30D?style=flat-square&labelColor=555555)](LICENSE)
+
 **你的 Coding Agent，其实记得很多。**
 
 Coding Wrapped 会读取本地的 Claude Code 和 Codex 记录，把你与 AI

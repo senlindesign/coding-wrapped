@@ -1,6 +1,6 @@
 {
   "schema_version": "1.0.0",
-  "generated_at": "2026-07-29T08:11:44.614440+00:00",
+  "generated_at": "2026-07-29T08:20:30.703941+00:00",
   "skill_root": "skills/coding-wrapped",
   "passed": 14,
   "failed": 0,
@@ -129,7 +129,7 @@
       "category": "persistence",
       "name": "Overview watermark and source validation",
       "status": "pass",
-      "details": "overview-20260729081143370906"
+      "details": "overview-20260729082029544064"
     },
     {
       "category": "privacy",

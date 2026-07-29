@@ -1,5 +1,10 @@
 # Coding Wrapped
 
+[![Made for Claude Code](https://img.shields.io/badge/Made_for-Claude_Code-7C3AED?style=flat-square&labelColor=555555)](#claude-code-and-codex--one-command)
+[![Made for Codex](https://img.shields.io/badge/Made_for-Codex-0F766E?style=flat-square&labelColor=555555)](#claude-code-and-codex--one-command)
+[![Format: Agent Skill](https://img.shields.io/badge/Format-Agent_Skill-EA580C?style=flat-square&labelColor=555555)](skills/coding-wrapped/SKILL.md)
+[![License: MIT](https://img.shields.io/badge/License-MIT-65A30D?style=flat-square&labelColor=555555)](LICENSE)
+
 **Your coding agents remember more than you think.**
 
 Coding Wrapped turns local Claude Code and Codex history into a private,
