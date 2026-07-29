@@ -1,0 +1,71 @@
+{
+  "schema_version": "1.0.0",
+  "checked_at": "2026-07-28T00:00:00.000Z",
+  "sources": [
+    {
+      "id": "claude-code-best-practices",
+      "title": "Best practices for Claude Code",
+      "publisher": "Anthropic",
+      "url": "https://code.claude.com/docs/en/best-practices",
+      "type": "first-party-documentation",
+      "supporting_claims": [
+        "Give the agent a way to verify its work with tests, builds, screenshots, or other checks.",
+        "Use focused subagents for investigation or verification to keep the main context clean.",
+        "Separate exploration, planning, implementation, and verification when the task benefits from it."
+      ],
+      "topics": [
+        "verification",
+        "subagents",
+        "context-management",
+        "planning"
+      ]
+    },
+    {
+      "id": "claude-code-subagents",
+      "title": "Create custom subagents",
+      "publisher": "Anthropic",
+      "url": "https://code.claude.com/docs/en/sub-agents",
+      "type": "first-party-documentation",
+      "supporting_claims": [
+        "Give each subagent a specialized purpose and focused responsibility."
+      ],
+      "topics": [
+        "subagents",
+        "delegation"
+      ]
+    },
+    {
+      "id": "openai-how-we-use-codex",
+      "title": "How OpenAI uses Codex",
+      "publisher": "OpenAI",
+      "url": "https://openai.com/business/guides-and-resources/how-openai-uses-codex/",
+      "type": "first-party-practice-guide",
+      "supporting_claims": [
+        "Write a task like a well-scoped GitHub issue with relevant files, components, and examples.",
+        "Use AGENTS.md to give Codex durable repository guidance.",
+        "Use parallel attempts when comparing approaches is valuable."
+      ],
+      "topics": [
+        "prompting",
+        "repository-context",
+        "parallel-work"
+      ]
+    },
+    {
+      "id": "openai-introducing-codex",
+      "title": "Introducing Codex",
+      "publisher": "OpenAI",
+      "url": "https://openai.com/index/introducing-codex/",
+      "type": "first-party-product-guide",
+      "supporting_claims": [
+        "Codex performs better with configured test environments and clear repository instructions.",
+        "Users should review and validate generated work before integrating it."
+      ],
+      "topics": [
+        "verification",
+        "tests",
+        "repository-context"
+      ]
+    }
+  ]
+}

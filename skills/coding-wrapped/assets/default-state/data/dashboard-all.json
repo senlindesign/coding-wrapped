@@ -1,0 +1,195 @@
+{
+  "analysis": {
+    "generated_at": "2026-01-31T12:00:00+00:00",
+    "days": "all",
+    "timezone": "UTC",
+    "privacy": "Synthetic demo aggregates only. No user history was used to create this seed.",
+    "data_origin": "synthetic-demo"
+  },
+  "coverage": {
+    "sessions": 47,
+    "sessions_by_source": {
+      "claude-code": 19,
+      "codex": 28
+    },
+    "subagent_sessions": 78,
+    "subagent_sessions_by_source": {
+      "claude-code": 23,
+      "codex": 55
+    },
+    "agent_runs": 125,
+    "projects": 15,
+    "active_days": 31,
+    "user_messages": 586
+  },
+  "rhythm": {
+    "most_common_start_hour": 21,
+    "sessions_started_in_that_hour": 14,
+    "most_common_start_weekday": "Tuesday",
+    "sessions_started_that_weekday": 13,
+    "median_active_segment_minutes": 67.2,
+    "longest_active_segment_minutes": 147.0,
+    "longest_active_segment_started_at": "2026-01-18T21:10:00+00:00",
+    "activity_by_date": [
+      {
+        "date": "2025-10-03",
+        "messages": 12
+      },
+      {
+        "date": "2025-10-18",
+        "messages": 24
+      },
+      {
+        "date": "2025-11-02",
+        "messages": 15
+      },
+      {
+        "date": "2025-11-21",
+        "messages": 31
+      },
+      {
+        "date": "2025-12-04",
+        "messages": 18
+      },
+      {
+        "date": "2025-12-19",
+        "messages": 27
+      },
+      {
+        "date": "2026-01-02",
+        "messages": 8
+      },
+      {
+        "date": "2026-01-04",
+        "messages": 13
+      },
+      {
+        "date": "2026-01-07",
+        "messages": 17
+      },
+      {
+        "date": "2026-01-09",
+        "messages": 9
+      },
+      {
+        "date": "2026-01-11",
+        "messages": 21
+      },
+      {
+        "date": "2026-01-13",
+        "messages": 14
+      },
+      {
+        "date": "2026-01-16",
+        "messages": 19
+      },
+      {
+        "date": "2026-01-18",
+        "messages": 28
+      },
+      {
+        "date": "2026-01-25",
+        "messages": 12
+      },
+      {
+        "date": "2026-01-26",
+        "messages": 18
+      },
+      {
+        "date": "2026-01-27",
+        "messages": 9
+      },
+      {
+        "date": "2026-01-29",
+        "messages": 22
+      },
+      {
+        "date": "2026-01-30",
+        "messages": 15
+      },
+      {
+        "date": "2026-01-31",
+        "messages": 11
+      }
+    ]
+  },
+  "prompts": {
+    "median_characters": 42,
+    "mean_characters": 186,
+    "under_20_characters": 141,
+    "under_50_characters": 322,
+    "phrase_counts": [
+      {
+        "phrase": "continue / 继续",
+        "occurrences": 39,
+        "messages": 39
+      },
+      {
+        "phrase": "帮我 / help me",
+        "occurrences": 53,
+        "messages": 48
+      },
+      {
+        "phrase": "看一下",
+        "occurrences": 45,
+        "messages": 42
+      },
+      {
+        "phrase": "先",
+        "occurrences": 36,
+        "messages": 34
+      },
+      {
+        "phrase": "不要 / 别",
+        "occurrences": 31,
+        "messages": 28
+      },
+      {
+        "phrase": "直接",
+        "occurrences": 25,
+        "messages": 25
+      },
+      {
+        "phrase": "测试 / test",
+        "occurrences": 20,
+        "messages": 20
+      },
+      {
+        "phrase": "检查 / verify",
+        "occurrences": 14,
+        "messages": 14
+      },
+      {
+        "phrase": "重新 / again",
+        "occurrences": 8,
+        "messages": 8
+      }
+    ]
+  },
+  "behavior": {
+    "plan_mode_sessions": 8,
+    "tool_categories": {
+      "shell": 616,
+      "edit": 459,
+      "read": 358,
+      "browser": 213,
+      "search": 151,
+      "subagent": 78
+    },
+    "models": {
+      "claude-sonnet": 269,
+      "gpt-codex": 230,
+      "claude-opus": 87
+    }
+  },
+  "tokens": {
+    "status": "synthetic-demo",
+    "total_tokens": 35966840,
+    "input_tokens": 22775760,
+    "cached_input_tokens": 15293880,
+    "cache_write_input_tokens": 1041600,
+    "output_tokens": 3041920,
+    "reasoning_output_tokens": 600880,
+    "scope": "Fictional values bundled only for the first-run preview."
+  }
+}

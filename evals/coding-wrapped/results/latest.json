@@ -1,0 +1,153 @@
+{
+  "schema_version": "1.0.0",
+  "generated_at": "2026-07-29T07:38:12.504441+00:00",
+  "skill_root": "skills/coding-wrapped",
+  "passed": 14,
+  "failed": 0,
+  "activation_model_eval": {
+    "status": "not-run",
+    "reason": "Requires fresh Claude and Codex sessions with the Skill installed; static contract cases are defined in evals.json."
+  },
+  "results": [
+    {
+      "category": "spec",
+      "name": "Agent Skills frontmatter and discovery metadata",
+      "status": "pass",
+      "details": {
+        "name": "coding-wrapped",
+        "description_characters": 447,
+        "frontmatter_keys": [
+          "description",
+          "name"
+        ]
+      }
+    },
+    {
+      "category": "spec",
+      "name": "Progressive disclosure and reference depth",
+      "status": "pass",
+      "details": {
+        "skill_lines": 198,
+        "direct_references": [
+          "references/privacy-policy.md",
+          "references/insight-writing.md",
+          "references/visual-system.md"
+        ]
+      }
+    },
+    {
+      "category": "compatibility",
+      "name": "Codex and Claude Code install contract",
+      "status": "pass",
+      "details": "One canonical Skill is exposed through Claude and Codex manifests"
+    },
+    {
+      "category": "activation",
+      "name": "Direct, indirect, incomplete, and negative trigger cases",
+      "status": "pass",
+      "details": {
+        "scenarios": 10,
+        "note": "Contract cases are defined; fresh-agent model activation is reported separately."
+      }
+    },
+    {
+      "category": "privacy",
+      "name": "Static network and local-only boundary",
+      "status": "pass",
+      "details": "No bundled outbound HTTP client; local server defaults to 127.0.0.1"
+    },
+    {
+      "category": "function",
+      "name": "Synthetic Claude + Codex aggregate scan",
+      "status": "pass",
+      "details": {
+        "sessions": 2,
+        "subagents": 2,
+        "sources": [
+          "claude-code",
+          "codex"
+        ]
+      }
+    },
+    {
+      "category": "recovery",
+      "name": "Missing and single-source graceful degradation",
+      "status": "pass",
+      "details": "Both-missing and Claude-only coverage states are explicit"
+    },
+    {
+      "category": "function",
+      "name": "CLI builds 7d, 30d, and unbounded all snapshots",
+      "status": "pass",
+      "details": {
+        "7d": {
+          "output": "data/metrics/dashboard-7d.json",
+          "sessions": 2,
+          "messages": 3
+        },
+        "30d": {
+          "output": "data/metrics/dashboard-30d.json",
+          "sessions": 2,
+          "messages": 3
+        },
+        "all": {
+          "output": "data/metrics/dashboard-all.json",
+          "sessions": 2,
+          "messages": 3
+        }
+      }
+    },
+    {
+      "category": "privacy",
+      "name": "Generation brief excludes raw private markers",
+      "status": "pass",
+      "details": {
+        "locale": "zh",
+        "count": 4
+      }
+    },
+    {
+      "category": "persistence",
+      "name": "Four-at-a-time replacement and append persistence",
+      "status": "pass",
+      "details": {
+        "batches": 2,
+        "insights": 8
+      }
+    },
+    {
+      "category": "validation",
+      "name": "Rejects one-card, duplicate-composition, and unknown-source batches",
+      "status": "pass",
+      "details": [
+        "Insight batches must contain exactly four items",
+        "All four insights must use different compositions",
+        "Every source ID must exist in sources.json"
+      ]
+    },
+    {
+      "category": "persistence",
+      "name": "Overview watermark and source validation",
+      "status": "pass",
+      "details": "overview-20260729073811368868"
+    },
+    {
+      "category": "privacy",
+      "name": "Portable export excludes transcripts and private markers",
+      "status": "pass",
+      "details": {
+        "archive": "coding-wrapped-eval.zip",
+        "files": 48
+      }
+    },
+    {
+      "category": "compatibility",
+      "name": "Fresh-directory copy compiles and scans",
+      "status": "pass",
+      "details": {
+        "compiled_scripts": 8,
+        "portable_sessions": 2
+      }
+    }
+  ]
+}

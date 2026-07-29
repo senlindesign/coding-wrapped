@@ -1,0 +1,4 @@
+interface:
+  display_name: "Coding Wrapped"
+  short_description: "Turn coding-agent history into a private Wrapped site"
+  default_prompt: "Use $coding-wrapped to scan my local coding-agent history and generate a private Coding Wrapped site."

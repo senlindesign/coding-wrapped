@@ -1,0 +1,171 @@
+{
+  "analysis": {
+    "generated_at": "2026-01-31T12:00:00+00:00",
+    "days": 30,
+    "timezone": "UTC",
+    "privacy": "Synthetic demo aggregates only. No user history was used to create this seed.",
+    "data_origin": "synthetic-demo"
+  },
+  "coverage": {
+    "sessions": 18,
+    "sessions_by_source": {
+      "claude-code": 7,
+      "codex": 11
+    },
+    "subagent_sessions": 32,
+    "subagent_sessions_by_source": {
+      "claude-code": 10,
+      "codex": 22
+    },
+    "agent_runs": 50,
+    "projects": 7,
+    "active_days": 14,
+    "user_messages": 214
+  },
+  "rhythm": {
+    "most_common_start_hour": 21,
+    "sessions_started_in_that_hour": 5,
+    "most_common_start_weekday": "Tuesday",
+    "sessions_started_that_weekday": 5,
+    "median_active_segment_minutes": 24.0,
+    "longest_active_segment_minutes": 126.0,
+    "longest_active_segment_started_at": "2026-01-18T21:10:00+00:00",
+    "activity_by_date": [
+      {
+        "date": "2026-01-02",
+        "messages": 8
+      },
+      {
+        "date": "2026-01-04",
+        "messages": 13
+      },
+      {
+        "date": "2026-01-07",
+        "messages": 17
+      },
+      {
+        "date": "2026-01-09",
+        "messages": 9
+      },
+      {
+        "date": "2026-01-11",
+        "messages": 21
+      },
+      {
+        "date": "2026-01-13",
+        "messages": 14
+      },
+      {
+        "date": "2026-01-16",
+        "messages": 19
+      },
+      {
+        "date": "2026-01-18",
+        "messages": 28
+      },
+      {
+        "date": "2026-01-25",
+        "messages": 12
+      },
+      {
+        "date": "2026-01-26",
+        "messages": 18
+      },
+      {
+        "date": "2026-01-27",
+        "messages": 9
+      },
+      {
+        "date": "2026-01-29",
+        "messages": 22
+      },
+      {
+        "date": "2026-01-30",
+        "messages": 15
+      },
+      {
+        "date": "2026-01-31",
+        "messages": 11
+      }
+    ]
+  },
+  "prompts": {
+    "median_characters": 42,
+    "mean_characters": 186,
+    "under_20_characters": 51,
+    "under_50_characters": 118,
+    "phrase_counts": [
+      {
+        "phrase": "continue / 继续",
+        "occurrences": 14,
+        "messages": 14
+      },
+      {
+        "phrase": "帮我 / help me",
+        "occurrences": 19,
+        "messages": 17
+      },
+      {
+        "phrase": "看一下",
+        "occurrences": 16,
+        "messages": 15
+      },
+      {
+        "phrase": "先",
+        "occurrences": 13,
+        "messages": 12
+      },
+      {
+        "phrase": "不要 / 别",
+        "occurrences": 11,
+        "messages": 10
+      },
+      {
+        "phrase": "直接",
+        "occurrences": 9,
+        "messages": 9
+      },
+      {
+        "phrase": "测试 / test",
+        "occurrences": 7,
+        "messages": 7
+      },
+      {
+        "phrase": "检查 / verify",
+        "occurrences": 5,
+        "messages": 5
+      },
+      {
+        "phrase": "重新 / again",
+        "occurrences": 3,
+        "messages": 3
+      }
+    ]
+  },
+  "behavior": {
+    "plan_mode_sessions": 3,
+    "tool_categories": {
+      "shell": 220,
+      "edit": 164,
+      "read": 128,
+      "browser": 76,
+      "search": 54,
+      "subagent": 32
+    },
+    "models": {
+      "claude-sonnet": 96,
+      "gpt-codex": 82,
+      "claude-opus": 31
+    }
+  },
+  "tokens": {
+    "status": "synthetic-demo",
+    "total_tokens": 12845300,
+    "input_tokens": 8134200,
+    "cached_input_tokens": 5462100,
+    "cache_write_input_tokens": 372000,
+    "output_tokens": 1086400,
+    "reasoning_output_tokens": 214600,
+    "scope": "Fictional values bundled only for the first-run preview."
+  }
+}

@@ -1,0 +1,21 @@
+{
+  "name": "coding-wrapped",
+  "version": "0.1.0",
+  "description": "Turn local Claude Code and Codex history into a private, pixel-art Coding Wrapped dashboard.",
+  "skills": "./skills/",
+  "author": {
+    "name": "Sen",
+    "url": "https://github.com/senlindesign"
+  },
+  "homepage": "https://github.com/senlindesign/coding-wrapped",
+  "repository": "https://github.com/senlindesign/coding-wrapped",
+  "license": "MIT",
+  "keywords": [
+    "coding-wrapped",
+    "claude-code",
+    "codex",
+    "coding-agents",
+    "local-dashboard",
+    "pixel-art"
+  ]
+}

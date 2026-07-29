@@ -1,0 +1,103 @@
+{
+  "schema_version": "1.0.0",
+  "status": "ready",
+  "generated_at": "2026-01-31T12:00:00+00:00",
+  "period": "rolling-30d",
+  "input_watermark": {
+    "snapshot_generated_at": "2026-01-31T12:00:00+00:00",
+    "sessions": 18,
+    "user_messages": 214
+  },
+  "refresh_policy": {
+    "stale_after_days": 7,
+    "minimum_new_sessions": 3,
+    "minimum_new_messages": 20
+  },
+  "generation": {
+    "batch_id": "overview-synthetic-demo",
+    "mode": "synthetic-demo",
+    "model_used": false
+  },
+  "last_update_attempt": null,
+  "update_history": [
+    {
+      "batch_id": "overview-synthetic-demo",
+      "generated_at": "2026-01-31T12:00:00+00:00",
+      "mode": "synthetic-demo",
+      "model_used": false,
+      "input_watermark": {
+        "snapshot_generated_at": "2026-01-31T12:00:00+00:00",
+        "sessions": 18,
+        "user_messages": 214
+      }
+    }
+  ],
+  "copy": {
+    "zh": {
+      "eyebrow": "你的 Coding 总览",
+      "title": "你在指挥一支会不断校准的临时团队",
+      "summary": "这是一段合成示例：18 个主会话带出 32 个子智能体，55% 的输入不到 50 字，最长活跃段为 126 分钟。它只用来展示 Coding Wrapped 会怎样讲述协作习惯。",
+      "recommendations": [
+        {
+          "id": "delegation-contract",
+          "title": "给每次分派补一个交付契约",
+          "body": "只写三件事：角色、输出格式、验收动作。主线程会更容易合并结果。",
+          "source_ids": [
+            "claude-code-best-practices",
+            "claude-code-subagents"
+          ]
+        },
+        {
+          "id": "verification-milestones",
+          "title": "长段工作中间插入可见验证",
+          "body": "每完成一个里程碑就运行测试、构建或截图，别把所有验证留到最后。",
+          "source_ids": [
+            "claude-code-best-practices",
+            "openai-introducing-codex"
+          ]
+        },
+        {
+          "id": "short-prompt-finish-line",
+          "title": "短提示词只多补一个完成标准",
+          "body": "不用把提示词写成长规格，只要补上相关文件、完成条件或验证方式中的一个。",
+          "source_ids": [
+            "openai-how-we-use-codex"
+          ]
+        }
+      ]
+    },
+    "en": {
+      "eyebrow": "YOUR CODING OVERVIEW",
+      "title": "You conduct a temporary team through continuous calibration",
+      "summary": "This is a synthetic example: 18 main sessions led to 32 subagents, 55% of prompts stayed under 50 characters, and the longest run was 126 minutes. It exists only to preview the Coding Wrapped story.",
+      "recommendations": [
+        {
+          "id": "delegation-contract",
+          "title": "Add a small contract to every delegation",
+          "body": "Name the role, output format, and acceptance check so the main thread can merge results cleanly.",
+          "source_ids": [
+            "claude-code-best-practices",
+            "claude-code-subagents"
+          ]
+        },
+        {
+          "id": "verification-milestones",
+          "title": "Put visible checks inside long work sessions",
+          "body": "Run a test, build, or screenshot check at each milestone instead of saving every verification step for the end.",
+          "source_ids": [
+            "claude-code-best-practices",
+            "openai-introducing-codex"
+          ]
+        },
+        {
+          "id": "short-prompt-finish-line",
+          "title": "Add one finish line to a short prompt",
+          "body": "Keep the prompt compact, then add one relevant file, success condition, or verification method.",
+          "source_ids": [
+            "openai-how-we-use-codex"
+          ]
+        }
+      ]
+    }
+  }
+}

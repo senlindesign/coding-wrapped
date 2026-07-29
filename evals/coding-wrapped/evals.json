@@ -1,0 +1,56 @@
+{
+  "schema_version": "1.0.0",
+  "skill": "coding-wrapped",
+  "activation_scenarios": [
+    {
+      "id": "direct-zh",
+      "query": "用 coding wrapped 读取我最近 30 天的记录，生成本地网站。",
+      "expected": ["activate", "infer-zh", "scan-authorized", "generate-site"]
+    },
+    {
+      "id": "direct-en",
+      "query": "Use Coding Wrapped to show my last 30 days of Claude Code and Codex work.",
+      "expected": ["activate", "infer-en", "scan-authorized", "generate-site"]
+    },
+    {
+      "id": "indirect-behavior",
+      "query": "我想看看自己平时是怎么和 coding agent 一起工作的，有没有一些有趣的数据？",
+      "expected": ["activate", "infer-zh", "ask-scan-permission-if-needed"]
+    },
+    {
+      "id": "refresh-facts",
+      "query": "更新一下我 Coding Wrapped 里的本月数据，但不要重做洞察。",
+      "expected": ["activate", "refresh-aggregates-only", "preserve-insights"]
+    },
+    {
+      "id": "generate-four",
+      "query": "给我的 Wrapped 再生成一组新的洞察。",
+      "expected": ["activate", "warn-model-allowance-and-time", "generate-exactly-four"]
+    },
+    {
+      "id": "export",
+      "query": "把我现在的 Coding Wrapped 导出成一个本地包。",
+      "expected": ["activate", "export-existing-state", "exclude-raw-transcripts"]
+    },
+    {
+      "id": "incomplete",
+      "query": "帮我做一个 wrapped。",
+      "expected": ["activate-if-context-is-coding", "ask-at-most-two-questions", "do-not-invent-data"]
+    },
+    {
+      "id": "explain-only",
+      "query": "Coding Wrapped 这个 skill 会读取什么？",
+      "expected": ["activate", "explain-only", "do-not-scan-without-authorization"]
+    },
+    {
+      "id": "negative-code-wrap",
+      "query": "Wrap this function in a retry helper.",
+      "expected": ["do-not-activate"]
+    },
+    {
+      "id": "negative-dashboard",
+      "query": "Build a sales dashboard from this CSV.",
+      "expected": ["do-not-activate"]
+    }
+  ]
+}

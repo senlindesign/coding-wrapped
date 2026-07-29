@@ -1,0 +1,300 @@
+{
+  "schema_version": "1.0.0",
+  "updated_at": "2026-01-31T12:00:00+00:00",
+  "batches": [
+    {
+      "id": "synthetic-demo-2026-01",
+      "created_at": "2026-01-31T12:00:00+00:00",
+      "source_snapshot": "dashboard-30d@2026-01-31T12:00:00+00:00",
+      "count": 4,
+      "generator": "prototype-seed"
+    }
+  ],
+  "insights": [
+    {
+      "id": "agent-conductor",
+      "batch_id": "synthetic-demo-2026-01",
+      "created_at": "2026-01-31T12:00:00+00:00",
+      "theme": "warm",
+      "composition": "tiered-orchestra",
+      "image": "/generated-images/initial-2026-07-28/agent-orchestra-warm.png",
+      "source_ids": [
+        "claude-code-best-practices",
+        "claude-code-subagents"
+      ],
+      "evidence": {
+        "metric_ids": [
+          "coverage.sessions",
+          "coverage.subagent_sessions"
+        ],
+        "values": {
+          "sessions": 18,
+          "subagent_sessions": 32
+        }
+      },
+      "copy": {
+        "zh": {
+          "profile_title": "智能体总指挥",
+          "title": "18 次开场，32 路接力",
+          "subtitle": "合成样例中，18 个主会话带出了 32 个子智能体。",
+          "rows": [
+            {
+              "key": "you_did",
+              "label": "你怎么做",
+              "body": "把问题交给主智能体，再让任务继续往下拆。"
+            },
+            {
+              "key": "agent_did",
+              "label": "AI 怎么做",
+              "body": "研究、实现和检查，被分给不同角色接力完成。"
+            },
+            {
+              "key": "your_style",
+              "label": "你的风格",
+              "body": "你更像在指挥一支临时乐团，而不是独自敲代码。"
+            }
+          ],
+          "tip": "给每个子智能体写清角色、交付格式和验收动作。",
+          "image_alt": "一位指挥者面对由多个 AI 机器人组成的像素乐团"
+        },
+        "en": {
+          "profile_title": "AGENT CONDUCTOR",
+          "title": "18 starts, 32 agents in relay",
+          "subtitle": "In this synthetic demo, 18 main sessions led to 32 subagent runs.",
+          "rows": [
+            {
+              "key": "you_did",
+              "label": "You did",
+              "body": "Gave the problem to a lead agent, then let the work branch."
+            },
+            {
+              "key": "agent_did",
+              "label": "Agent did",
+              "body": "Split research, implementation, and checks across roles."
+            },
+            {
+              "key": "your_style",
+              "label": "Your style",
+              "body": "You conduct a temporary ensemble instead of coding alone."
+            }
+          ],
+          "tip": "Give each agent a role, output format, and acceptance check.",
+          "image_alt": "A pixel conductor facing an orchestra of AI agents"
+        }
+      }
+    },
+    {
+      "id": "night-runner",
+      "batch_id": "synthetic-demo-2026-01",
+      "created_at": "2026-01-31T12:00:00+00:00",
+      "theme": "blue",
+      "composition": "horizontal-night-route",
+      "image": "/generated-images/initial-2026-07-28/night-runner-blue.png",
+      "source_ids": [
+        "claude-code-best-practices",
+        "openai-introducing-codex"
+      ],
+      "evidence": {
+        "metric_ids": [
+          "rhythm.longest_active_segment_minutes",
+          "rhythm.longest_active_segment_started_at"
+        ],
+        "values": {
+          "minutes": 126,
+          "started_at": "2026-01-18T21:10:00+00:00"
+        }
+      },
+      "copy": {
+        "zh": {
+          "profile_title": "夜间长跑者",
+          "title": "126 分钟，一路做到底",
+          "subtitle": "合成样例中，最长活跃段从 21:10 开始，持续了 126 分钟。",
+          "rows": [
+            {
+              "key": "you_did",
+              "label": "你怎么做",
+              "body": "21:10 开始，把一条工作线连续推进到底。"
+            },
+            {
+              "key": "agent_did",
+              "label": "AI 怎么做",
+              "body": "持续读取、修改和执行，陪你把上下文做深。"
+            },
+            {
+              "key": "your_style",
+              "label": "你的风格",
+              "body": "一旦进入状态，你更愿意把一件事连续做透。"
+            }
+          ],
+          "tip": "长任务每推进一段就跑测试或截图，让验证跟着进度走。",
+          "image_alt": "夜晚，一位使用者和机器人沿发光路线持续工作"
+        },
+        "en": {
+          "profile_title": "NIGHT RUNNER",
+          "title": "126 minutes, one continuous run",
+          "subtitle": "In this synthetic demo, the longest run began at 9:10 PM.",
+          "rows": [
+            {
+              "key": "you_did",
+              "label": "You did",
+              "body": "Started at 9:10 PM and kept one workstream moving."
+            },
+            {
+              "key": "agent_did",
+              "label": "Agent did",
+              "body": "Kept reading, editing, and running in the same context."
+            },
+            {
+              "key": "your_style",
+              "label": "Your style",
+              "body": "Once you find the thread, you follow it all the way through."
+            }
+          ],
+          "tip": "Run a test or capture a screenshot at each milestone.",
+          "image_alt": "A person and an AI robot following a glowing route at night"
+        }
+      }
+    },
+    {
+      "id": "short-commander",
+      "batch_id": "synthetic-demo-2026-01",
+      "created_at": "2026-01-31T12:00:00+00:00",
+      "theme": "pink",
+      "composition": "vertical-cutaway-machine",
+      "image": "/generated-images/initial-2026-07-28/prompt-machine-pink.png",
+      "source_ids": [
+        "openai-how-we-use-codex"
+      ],
+      "evidence": {
+        "metric_ids": [
+          "coverage.user_messages",
+          "prompts.under_50_characters"
+        ],
+        "values": {
+          "user_messages": 214,
+          "under_50_characters": 118,
+          "percentage": 55
+        }
+      },
+      "copy": {
+        "zh": {
+          "profile_title": "短句指挥官",
+          "title": "55% 消息不到 50 字",
+          "subtitle": "合成样例的 214 条消息里，有 118 条不到 50 字。",
+          "rows": [
+            {
+              "key": "you_did",
+              "label": "你怎么做",
+              "body": "先给一句方向，再看 AI 怎样展开。"
+            },
+            {
+              "key": "agent_did",
+              "label": "AI 怎么做",
+              "body": "短输入也会启动读取、拆解、修改和验证。"
+            },
+            {
+              "key": "your_style",
+              "label": "你的风格",
+              "body": "你控制方向和节奏，把展开空间留给 AI。"
+            }
+          ],
+          "tip": "短句不用变长，只补一个文件、完成标准或验证动作。",
+          "image_alt": "一个短指令进入像素机器后被扩展成多道工作流程"
+        },
+        "en": {
+          "profile_title": "SHORT-PROMPT COMMANDER",
+          "title": "55% under 50 characters",
+          "subtitle": "In this synthetic demo, 118 of 214 messages were under 50 characters.",
+          "rows": [
+            {
+              "key": "you_did",
+              "label": "You did",
+              "body": "Gave one clear direction, then watched the agent expand it."
+            },
+            {
+              "key": "agent_did",
+              "label": "Agent did",
+              "body": "Turned short input into reading, editing, and verification."
+            },
+            {
+              "key": "your_style",
+              "label": "Your style",
+              "body": "You set direction and tempo, leaving room for expansion."
+            }
+          ],
+          "tip": "Keep it short; add one file, finish line, or verification step.",
+          "image_alt": "A short prompt expanding into several workflows inside a pixel machine"
+        }
+      }
+    },
+    {
+      "id": "continue-button",
+      "batch_id": "synthetic-demo-2026-01",
+      "created_at": "2026-01-31T12:00:00+00:00",
+      "theme": "green",
+      "composition": "diagonal-platform-journey",
+      "image": "/generated-images/initial-2026-07-28/continue-steps-green.png",
+      "source_ids": [
+        "claude-code-best-practices"
+      ],
+      "evidence": {
+        "metric_ids": [
+          "prompts.phrase_counts.continue"
+        ],
+        "values": {
+          "messages": 14
+        }
+      },
+      "copy": {
+        "zh": {
+          "profile_title": "继续按钮本人",
+          "title": "14 次「继续」，保持惯性",
+          "subtitle": "合成样例中，continue / 继续在 14 条消息里出现。",
+          "rows": [
+            {
+              "key": "you_did",
+              "label": "你怎么做",
+              "body": "方向没变时，用一句“继续”维持工作的惯性。"
+            },
+            {
+              "key": "agent_did",
+              "label": "AI 怎么做",
+              "body": "沿着已有上下文继续读取、修改和检查。"
+            },
+            {
+              "key": "your_style",
+              "label": "你的风格",
+              "body": "你喜欢在同一条线上校准，而不是反复重写需求。"
+            }
+          ],
+          "tip": "继续前让 AI 用一行报：已完成、未验证、下一步。",
+          "image_alt": "一位使用者鼓励机器人沿着像素台阶继续前进"
+        },
+        "en": {
+          "profile_title": "THE CONTINUE BUTTON",
+          "title": "14 “continues”, momentum intact",
+          "subtitle": "In this synthetic demo, continue / 继续 appeared in 14 messages.",
+          "rows": [
+            {
+              "key": "you_did",
+              "label": "You did",
+              "body": "Used one word to preserve momentum when the direction held."
+            },
+            {
+              "key": "agent_did",
+              "label": "Agent did",
+              "body": "Continued reading, editing, and checking the same context."
+            },
+            {
+              "key": "your_style",
+              "label": "Your style",
+              "body": "You calibrate one workstream instead of rewriting the brief."
+            }
+          ],
+          "tip": "Before continuing, ask for one line: done, unverified, next.",
+          "image_alt": "A person encouraging a robot up a sequence of pixel steps"
+        }
+      }
+    }
+  ]
+}

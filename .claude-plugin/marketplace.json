@@ -1,0 +1,23 @@
+{
+  "$schema": "https://anthropic.com/claude-code/marketplace.schema.json",
+  "name": "coding-wrapped",
+  "description": "A private, local Coding Wrapped dashboard for Claude Code and Codex.",
+  "owner": {
+    "name": "Sen",
+    "url": "https://github.com/senlindesign"
+  },
+  "plugins": [
+    {
+      "name": "coding-wrapped",
+      "description": "Scan local coding-agent history, turn safe aggregates into playful insights, and build a persistent pixel-art dashboard.",
+      "source": "./",
+      "category": "productivity",
+      "tags": [
+        "coding-agents",
+        "analytics",
+        "local-first",
+        "pixel-art"
+      ]
+    }
+  ]
+}

@@ -1,0 +1,39 @@
+{
+  "name": "coding-wrapped",
+  "version": "0.1.0",
+  "description": "Turn local Claude Code and Codex history into a private, pixel-art Coding Wrapped dashboard.",
+  "author": {
+    "name": "Sen",
+    "url": "https://github.com/senlindesign"
+  },
+  "homepage": "https://github.com/senlindesign/coding-wrapped",
+  "repository": "https://github.com/senlindesign/coding-wrapped",
+  "license": "MIT",
+  "keywords": [
+    "coding-wrapped",
+    "claude-code",
+    "codex",
+    "coding-agents",
+    "local-dashboard",
+    "pixel-art"
+  ],
+  "skills": "./skills/",
+  "interface": {
+    "displayName": "Coding Wrapped",
+    "shortDescription": "Your private local AI-coding yearbook",
+    "longDescription": "Scan local Claude Code and Codex history, turn safe aggregates into playful insights, and build a persistent localhost dashboard.",
+    "developerName": "Sen",
+    "category": "Productivity",
+    "capabilities": [
+      "Scan local coding-agent history",
+      "Build a private localhost dashboard",
+      "Generate and persist illustrated insights"
+    ],
+    "defaultPrompt": [
+      "Build my Coding Wrapped from local agent history.",
+      "Refresh my Coding Wrapped facts without changing my insights.",
+      "Generate four new Coding Wrapped insights."
+    ],
+    "brandColor": "#A8D8D5"
+  }
+}

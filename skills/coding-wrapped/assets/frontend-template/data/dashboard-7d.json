@@ -1,0 +1,139 @@
+{
+  "analysis": {
+    "generated_at": "2026-01-31T12:00:00+00:00",
+    "days": 7,
+    "timezone": "UTC",
+    "privacy": "Synthetic demo aggregates only. No user history was used to create this seed.",
+    "data_origin": "synthetic-demo"
+  },
+  "coverage": {
+    "sessions": 6,
+    "sessions_by_source": {
+      "claude-code": 2,
+      "codex": 4
+    },
+    "subagent_sessions": 9,
+    "subagent_sessions_by_source": {
+      "claude-code": 3,
+      "codex": 6
+    },
+    "agent_runs": 15,
+    "projects": 3,
+    "active_days": 6,
+    "user_messages": 87
+  },
+  "rhythm": {
+    "most_common_start_hour": 21,
+    "sessions_started_in_that_hour": 2,
+    "most_common_start_weekday": "Tuesday",
+    "sessions_started_that_weekday": 2,
+    "median_active_segment_minutes": 16.8,
+    "longest_active_segment_minutes": 84.0,
+    "longest_active_segment_started_at": "2026-01-18T21:10:00+00:00",
+    "activity_by_date": [
+      {
+        "date": "2026-01-25",
+        "messages": 12
+      },
+      {
+        "date": "2026-01-26",
+        "messages": 18
+      },
+      {
+        "date": "2026-01-27",
+        "messages": 9
+      },
+      {
+        "date": "2026-01-29",
+        "messages": 22
+      },
+      {
+        "date": "2026-01-30",
+        "messages": 15
+      },
+      {
+        "date": "2026-01-31",
+        "messages": 11
+      }
+    ]
+  },
+  "prompts": {
+    "median_characters": 42,
+    "mean_characters": 186,
+    "under_20_characters": 21,
+    "under_50_characters": 48,
+    "phrase_counts": [
+      {
+        "phrase": "continue / 继续",
+        "occurrences": 6,
+        "messages": 6
+      },
+      {
+        "phrase": "帮我 / help me",
+        "occurrences": 8,
+        "messages": 7
+      },
+      {
+        "phrase": "看一下",
+        "occurrences": 7,
+        "messages": 6
+      },
+      {
+        "phrase": "先",
+        "occurrences": 5,
+        "messages": 5
+      },
+      {
+        "phrase": "不要 / 别",
+        "occurrences": 5,
+        "messages": 4
+      },
+      {
+        "phrase": "直接",
+        "occurrences": 4,
+        "messages": 4
+      },
+      {
+        "phrase": "测试 / test",
+        "occurrences": 3,
+        "messages": 3
+      },
+      {
+        "phrase": "检查 / verify",
+        "occurrences": 2,
+        "messages": 2
+      },
+      {
+        "phrase": "重新 / again",
+        "occurrences": 1,
+        "messages": 1
+      }
+    ]
+  },
+  "behavior": {
+    "plan_mode_sessions": 1,
+    "tool_categories": {
+      "shell": 92,
+      "edit": 69,
+      "read": 54,
+      "browser": 32,
+      "search": 23,
+      "subagent": 9
+    },
+    "models": {
+      "claude-sonnet": 40,
+      "gpt-codex": 34,
+      "claude-opus": 13
+    }
+  },
+  "tokens": {
+    "status": "synthetic-demo",
+    "total_tokens": 5395026,
+    "input_tokens": 3416364,
+    "cached_input_tokens": 2294082,
+    "cache_write_input_tokens": 156240,
+    "output_tokens": 456288,
+    "reasoning_output_tokens": 90132,
+    "scope": "Fictional values bundled only for the first-run preview."
+  }
+}

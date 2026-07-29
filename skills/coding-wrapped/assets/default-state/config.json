@@ -1,0 +1,38 @@
+{
+  "schema_version": "1.0.0",
+  "profile": {
+    "display_name": "ALEX",
+    "default_locale": "en"
+  },
+  "interface": {
+    "visible_metrics": [
+      "active",
+      "projects",
+      "longest",
+      "tokens",
+      "sessions",
+      "subagents",
+      "messages",
+      "prompt"
+    ]
+  },
+  "privacy": {
+    "store_raw_transcripts": false,
+    "send_raw_transcripts_to_model": false,
+    "model_payload": "aggregates-and-approved-short-phrases"
+  },
+  "generation": {
+    "insight_batch_size": 4,
+    "overview": {
+      "enabled": true,
+      "max_generations_per_week": 1,
+      "stale_after_days": 7,
+      "minimum_new_sessions": 3,
+      "minimum_new_messages": 20
+    }
+  },
+  "seed": {
+    "data_origin": "synthetic-demo",
+    "contains_user_history": false
+  }
+}

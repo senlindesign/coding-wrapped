@@ -1,0 +1,26 @@
+name: Validate
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - name: Validate repository and Skill
+        run: python3 scripts/validate_release.py
+      - name: Package Skill
+        run: python3 scripts/package_skill.py
+      - uses: actions/upload-artifact@v4
+        with:
+          name: coding-wrapped-skill
+          path: dist/coding-wrapped.skill
