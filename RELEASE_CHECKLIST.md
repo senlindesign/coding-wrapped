@@ -2,34 +2,34 @@
 
 ## Before the first push
 
-- [ ] Confirm the GitHub owner is `senlindesign`. If not, replace repository
+- [x] Confirm the GitHub owner is `senlindesign`. If not, replace repository
       URLs in both READMEs, both plugin manifests, the Claude marketplace, and
       `SECURITY.md`.
-- [ ] Re-authenticate GitHub CLI with `gh auth login -h github.com`.
-- [ ] Run `make validate`.
-- [ ] Run `make package` and confirm `unzip -t dist/coding-wrapped.skill`.
+- [x] Re-authenticate GitHub CLI with `gh auth login -h github.com`.
+- [x] Run `make validate`.
+- [x] Run `make package` and confirm `unzip -t dist/coding-wrapped.skill`.
 - [ ] Run the activation matrix in
       `evals/coding-wrapped/model-eval-protocol.md` in fresh Claude Code and
       Codex conversations.
-- [ ] Test the public `npx skills add` command after the repository is visible.
+- [x] Test the public `npx skills add` command after the repository is visible.
 - [ ] Test the Claude Code marketplace install after the repository is visible.
 
 ## GitHub repository settings
 
-- [ ] Description: `Your private local AI-coding yearbook.`
-- [ ] Topics: `agent-skills`, `claude-code`, `codex`, `coding-agents`,
+- [x] Description: `A local-first Coding Wrapped Skill for Claude Code and Codex.`
+- [x] Topics: `agent-skills`, `claude-code`, `codex`, `coding-agents`,
       `local-first`, `pixel-art`, `dashboard`.
-- [ ] Enable Issues.
-- [ ] Enable private vulnerability reporting.
-- [ ] Keep GitHub Actions enabled for `.github/workflows/validate.yml`.
+- [x] Enable Issues.
+- [x] Enable private vulnerability reporting.
+- [x] Keep GitHub Actions enabled for `.github/workflows/validate.yml`.
 
 ## Version 0.1.0
 
-- [ ] Commit the release with the two platform manifests on version `0.1.0`.
-- [ ] Tag `v0.1.0`.
-- [ ] Create a GitHub Release from `CHANGELOG.md`.
-- [ ] Attach `dist/coding-wrapped.skill`.
-- [ ] Verify all README screenshots and local links on the published page.
+- [x] Commit the release with the two platform manifests on version `0.1.0`.
+- [x] Tag `v0.1.0`.
+- [x] Create a GitHub Release from `CHANGELOG.md`.
+- [x] Attach `dist/coding-wrapped.skill`.
+- [x] Verify all README screenshots and local links on the published page.
 
 ## After publishing
 
