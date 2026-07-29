@@ -5,6 +5,7 @@ from __future__ import annotations
 
 import argparse
 import json
+import re
 from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any
@@ -24,10 +25,21 @@ def build_brief(home: Path) -> dict[str, Any]:
     locale = config.get("profile", {}).get("default_locale", "en")
     return {
         "schema_version": "1.0.0",
-        "task": "Write one behavior overview and up to three recommendations.",
+        "task": "Write one concise behavior overview and up to three recommendations.",
         "privacy": "Use only the supplied aggregates and source IDs.",
         "requirements": {
             "locale": locale,
+            "summary": {
+                "sentences": 2,
+                "representative_facts": {"min": 2, "max": 3},
+                "include_behavior_interpretation": True,
+                "do_not_repeat_every_metric": True,
+                "target_length": {
+                    "zh_characters": {"min": 55, "max": 90},
+                    "en_words": {"min": 28, "max": 45},
+                },
+                "layout_goal": "Usually about two lines on the desktop dashboard.",
+            },
             "recommendations_max": 3,
             "no_score": True,
             "no_ranking": True,
@@ -40,6 +52,34 @@ def build_brief(home: Path) -> dict[str, Any]:
     }
 
 
+def validate_summary(summary: str, locale: str) -> None:
+    compact = summary.strip()
+    if locale == "zh":
+        sentence_count = len(
+            [part for part in re.split(r"[。！？]+", compact) if part.strip()]
+        )
+        length = len(re.sub(r"\s+", "", compact))
+        maximum = 100
+        unit = "non-space characters"
+    else:
+        sentence_count = len(
+            [
+                part
+                for part in re.split(r"(?<=[.!?])(?:\s+|$)", compact)
+                if part.strip()
+            ]
+        )
+        length = len(re.findall(r"\b[\w'-]+\b", compact, flags=re.UNICODE))
+        maximum = 55
+        unit = "words"
+    if sentence_count > 2:
+        raise ValueError("Overview summary may contain at most two sentences")
+    if length > maximum:
+        raise ValueError(
+            f"Overview summary is too long; keep it within {maximum} {unit}"
+        )
+
+
 def validate_copy(copy: Any, allowed_sources: set[str], locale: str) -> None:
     if not isinstance(copy, dict):
         raise ValueError("Overview copy must be an object")
@@ -49,6 +89,7 @@ def validate_copy(copy: Any, allowed_sources: set[str], locale: str) -> None:
     for field in ("eyebrow", "title", "summary"):
         if not isinstance(localized.get(field), str) or not localized[field].strip():
             raise ValueError(f"Missing {locale}.{field}")
+    validate_summary(localized["summary"], locale)
     recommendations = localized.get("recommendations")
     if not isinstance(recommendations, list) or len(recommendations) > 3:
         raise ValueError("The overview may contain up to three recommendations")

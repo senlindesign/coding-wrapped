@@ -83,7 +83,10 @@ python3 "$SKILL_DIR/scripts/generate_overview.py" brief \
 ```
 
 Read the brief. Write one overview in its requested locale with no score or
-ranking and up to three sourced recommendations. Save the result as:
+ranking and up to three sourced recommendations. Keep the summary to two
+sentences: select two or three representative facts instead of replaying every
+metric, then state the behavior they reveal. Aim for roughly two desktop lines
+(55–90 Chinese characters or 28–45 English words). Save the result as:
 
 ```json
 {

@@ -627,12 +627,26 @@ def main() -> None:
         def overview_persistence() -> dict[str, Any]:
             paths = common.state_paths(home)
             source_id = common.read_json(paths["sources"])["sources"][0]["id"]
+            brief = overview_module.build_brief(home)
+            summary_contract = brief["requirements"]["summary"]
+            require(
+                summary_contract["sentences"] == 2,
+                "overview brief must request two summary sentences",
+            )
+            require(
+                summary_contract["representative_facts"] == {"min": 2, "max": 3},
+                "overview brief must limit the summary to representative facts",
+            )
+            require(
+                summary_contract["include_behavior_interpretation"] is True,
+                "overview brief must request a behavior interpretation",
+            )
             payload = {
                 "copy": {
                     "zh": {
                         "eyebrow": "你的 Coding 总览",
                         "title": "你在持续校准一支临时团队",
-                        "summary": "这是由汇总数据生成的测试总览。",
+                        "summary": "过去 30 天，三个主会话带出两个子智能体。你习惯沿同一条工作线检查结果、再调整方向，最长连续推进约 90 分钟。",
                         "recommendations": [
                             {
                                 "id": "eval-recommendation",
@@ -654,9 +668,26 @@ def main() -> None:
                 lambda: overview_module.persist(home, bad),
                 "allow-listed",
             )
-            return result["batch_id"]
+            verbose = copy.deepcopy(payload)
+            verbose["copy"]["zh"]["summary"] = (
+                "第一句复述一组指标。第二句又复述另一组指标。"
+                "第三句才开始解释这些数字说明了什么。"
+            )
+            expect_value_error(
+                lambda: overview_module.persist(home, verbose),
+                "at most two sentences",
+            )
+            return {
+                "batch_id": result["batch_id"],
+                "summary_sentences": summary_contract["sentences"],
+                "summary_fact_range": summary_contract["representative_facts"],
+            }
 
-        evaluation.check("persistence", "Overview watermark and source validation", overview_persistence)
+        evaluation.check(
+            "persistence",
+            "Overview compactness, watermark, and source validation",
+            overview_persistence,
+        )
 
         def export_privacy() -> dict[str, Any]:
             output = temp / "export" / "coding-wrapped-eval.zip"
