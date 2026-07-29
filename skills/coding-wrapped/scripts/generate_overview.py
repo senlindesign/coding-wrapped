@@ -35,8 +35,8 @@ def build_brief(home: Path) -> dict[str, Any]:
                 "include_behavior_interpretation": True,
                 "do_not_repeat_every_metric": True,
                 "target_length": {
-                    "zh_characters": {"min": 55, "max": 90},
-                    "en_words": {"min": 28, "max": 45},
+                    "zh_characters": {"min": 45, "max": 75},
+                    "en_words": {"min": 18, "max": 34},
                 },
                 "layout_goal": "Usually about two lines on the desktop dashboard.",
             },
@@ -59,7 +59,7 @@ def validate_summary(summary: str, locale: str) -> None:
             [part for part in re.split(r"[。！？]+", compact) if part.strip()]
         )
         length = len(re.sub(r"\s+", "", compact))
-        maximum = 100
+        maximum = 90
         unit = "non-space characters"
     else:
         sentence_count = len(
@@ -70,7 +70,7 @@ def validate_summary(summary: str, locale: str) -> None:
             ]
         )
         length = len(re.findall(r"\b[\w'-]+\b", compact, flags=re.UNICODE))
-        maximum = 55
+        maximum = 45
         unit = "words"
     if sentence_count > 2:
         raise ValueError("Overview summary may contain at most two sentences")

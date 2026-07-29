@@ -36,7 +36,7 @@
     "zh": {
       "eyebrow": "你的 Coding 总览",
       "title": "你在指挥一支会不断校准的临时团队",
-      "summary": "这是一段合成示例：18 个主会话带出 32 个子智能体。它呈现的是持续分派、检查和调整的协作习惯，最长活跃段为 126 分钟。",
+      "summary": "18 个主会话带出 32 个子智能体。你持续分派、检查和调整方向，最长连续推进 126 分钟。",
       "recommendations": [
         {
           "id": "delegation-contract",
@@ -69,7 +69,7 @@
     "en": {
       "eyebrow": "YOUR CODING OVERVIEW",
       "title": "You conduct a temporary team through continuous calibration",
-      "summary": "This synthetic example has 18 main sessions and 32 subagents. It shows a habit of delegating, checking, and adjusting, with the longest run lasting 126 minutes.",
+      "summary": "18 sessions produced 32 subagents. You kept delegating, checking, and adjusting course; the longest run lasted 126 minutes.",
       "recommendations": [
         {
           "id": "delegation-contract",

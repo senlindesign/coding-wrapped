@@ -29,6 +29,17 @@ Rebuild the public first-run seed with:
 python3 scripts/generate_demo_state.py
 ```
 
+When changing the Dashboard UI, edit only
+`skills/coding-wrapped/assets/frontend-source/`, then rebuild the bundled
+offline template:
+
+```bash
+npm --prefix skills/coding-wrapped/assets/frontend-source ci
+make frontend
+```
+
+Do not patch a hashed file in `frontend-template/assets/` by hand.
+
 ## Package
 
 ```bash

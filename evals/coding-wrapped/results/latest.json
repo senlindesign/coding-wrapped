@@ -1,6 +1,6 @@
 {
   "schema_version": "1.0.0",
-  "generated_at": "2026-07-29T12:01:42.153245+00:00",
+  "generated_at": "2026-07-29T12:20:09.344887+00:00",
   "skill_root": "skills/coding-wrapped",
   "passed": 14,
   "failed": 0,
@@ -27,7 +27,7 @@
       "name": "Progressive disclosure and reference depth",
       "status": "pass",
       "details": {
-        "skill_lines": 215,
+        "skill_lines": 218,
         "direct_references": [
           "references/privacy-policy.md",
           "references/insight-writing.md",
@@ -138,7 +138,7 @@
       "name": "Overview compactness, watermark, and source validation",
       "status": "pass",
       "details": {
-        "batch_id": "overview-20260729120141001644",
+        "batch_id": "overview-20260729122007404973",
         "summary_sentences": 2,
         "summary_fact_range": {
           "min": 2,

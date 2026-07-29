@@ -9,6 +9,8 @@
   compositions.
 - Keep the Coding Overview summary to two sentences: two or three representative
   facts plus the behavior they reveal. Do not replay every metric.
+- Keep ordinary Dashboard pages vertically scrollable at common laptop
+  viewports. Scope any `overflow: hidden` rule to `.export-page`.
 - Condition every generated illustration on the matching bundled theme
   reference and keep the whole batch on the `cw-pixel-diorama-v1` visual
   contract: 1536 × 1024, one coherent pixel scale, pale negative space,

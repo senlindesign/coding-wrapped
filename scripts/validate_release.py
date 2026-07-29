@@ -90,6 +90,69 @@ def validate_skill() -> None:
             fail(f"missing canonical illustration reference: {filename}")
 
 
+def validate_frontend() -> None:
+    source_root = SKILL_ROOT / "assets" / "frontend-source"
+    template_root = SKILL_ROOT / "assets" / "frontend-template"
+    required_source = (
+        "index.html",
+        "package.json",
+        "package-lock.json",
+        "vite.config.mjs",
+        "src/App.jsx",
+        "src/main.jsx",
+        "src/styles.css",
+        "src/enhancements.css",
+        "src/responsive.css",
+    )
+    for relative in required_source:
+        if not (source_root / relative).is_file():
+            fail(f"missing editable frontend source: {relative}")
+
+    source_css = (source_root / "src" / "styles.css").read_text(encoding="utf-8")
+    source_app = (source_root / "src" / "App.jsx").read_text(encoding="utf-8")
+    if "overflow-y: auto" not in source_css:
+        fail("Dashboard source must keep body overflow-y:auto")
+    if (
+        "html.export-page" not in source_css
+        or "body.export-page" not in source_css
+        or "document.documentElement.classList" not in source_app
+        or "document.body.classList" not in source_app
+    ):
+        fail("fixed overflow must be scoped to export pages")
+    if re.search(
+        r"@media\s*\(min-width:\s*1000px\).*?body\s*\{\s*overflow:\s*hidden",
+        source_css,
+        re.S,
+    ):
+        fail("Dashboard source contains a global desktop body overflow lock")
+
+    css_assets = sorted((template_root / "assets").glob("index-*.css"))
+    js_assets = sorted((template_root / "assets").glob("index-*.js"))
+    if len(css_assets) != 1 or len(js_assets) != 1:
+        fail("frontend template must contain exactly one hashed CSS and JS asset")
+    built_css = css_assets[0].read_text(encoding="utf-8")
+    built_js = js_assets[0].read_text(encoding="utf-8")
+    if not re.search(
+        r"html\.export-page,body\.export-page\{[^}]*overflow:hidden",
+        built_css,
+    ):
+        fail("bundled CSS is missing the scoped export overflow rule")
+    if not re.search(
+        r"body\.export-page\{position:fixed;[^}]*top:0;[^}]*right:0;"
+        r"[^}]*bottom:0;[^}]*left:0",
+        built_css,
+    ):
+        fail("bundled export page is not fixed to the capture viewport")
+    if "overflow-y:auto" not in built_css or "export-page" not in built_js:
+        fail("bundled frontend is stale relative to editable source")
+    if re.search(
+        r"@media\(min-width:1000px\)and "
+        r"\(max-height:900px\)\{body\{overflow:hidden",
+        built_css,
+    ):
+        fail("bundled Dashboard still contains the desktop scroll bug")
+
+
 def compile_python() -> None:
     paths = sorted(
         [
@@ -177,6 +240,7 @@ def main() -> None:
     validate_layout()
     validate_manifests()
     validate_skill()
+    validate_frontend()
     validate_public_seed()
     compile_python()
     run_eval()

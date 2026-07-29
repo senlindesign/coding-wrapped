@@ -31,6 +31,16 @@
 - [x] Attach `dist/coding-wrapped.skill`.
 - [x] Verify all README screenshots and local links on the published page.
 
+## Version 0.1.2
+
+- [x] Keep Dashboard scrolling enabled at `1280 × 720`, `1440 × 900`, and
+      `1024 × 768`.
+- [x] Scope fixed-size overflow behavior to export pages.
+- [x] Lock illustration generation to `cw-pixel-diorama-v1` and canonical
+      reference images.
+- [x] Keep Coding Overview summaries to two sentences.
+- [x] Rebuild the frontend from checked-in source and run `make validate`.
+
 ## After publishing
 
 - [ ] Install from GitHub into Claude Code and run a Chinese first-run prompt.

@@ -8,6 +8,7 @@
   - Fixed rendering grammar
   - Required prompt prefix
   - Visual QA gate
+  - Maintenance rules
 - Card content
 
 ## Product surface
@@ -104,6 +105,20 @@ reject or regenerate any image that fails one of these checks:
 
 Do not persist a visibly drifting image merely because it is technically pixel
 art. Regenerate it or use the approved fallback illustration.
+
+### Maintenance rules
+
+- Treat `cw-pixel-diorama-v1` and the four bundled references as a versioned
+  contract, not a loose mood board.
+- Keep the style ID, canvas, prompt prefix, avoid list, and reference paths
+  synchronized with `scripts/generate_insights.py` and its evaluator.
+- Never promote a newly generated image into the canonical reference set
+  automatically. Replace a reference only after human visual approval, then
+  compare all four themes again.
+- Keep the four fallback images as the canonical references so the no-image-tool
+  path and the generated path cannot drift into two products.
+- Rebuild or regenerate Dashboard screenshots only from approved references and
+  synthetic metrics.
 
 ## Card content
 

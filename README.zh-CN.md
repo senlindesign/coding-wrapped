@@ -19,10 +19,12 @@ Coding Wrapped 会读取本地的 Claude Code 和 Codex 记录，把你与 AI
 
 - 一组事实数据：活跃天数、会话数、项目数、模型使用、工具使用、提示词
   节奏和最长连续工作时间。
-- 一段简短的 **Coding 总览**，解释你的整体协作习惯。
+- 一段两句话的 **Coding 总览**：只选择两到三个最有代表性的事实，再说明
+  它们反映出的整体协作习惯。
 - 多张有趣的洞察：**你怎么做 / Agent 如何回应 / 你的风格**，再加一条
   有依据的轻建议。
-- 每次生成四条洞察，每张都是不同构图的像素插画，并会保存在本地。
+- 每次生成四条洞察，每张采用不同构图，但遵循同一套由参考图约束的像素
+  视觉语言，并会保存在本地。
 - 一个可以归档或主动分享的本地导出包。
 
 它**不是**原始对话浏览器、生产力评分、员工监控工具或云端分析服务。
@@ -127,6 +129,7 @@ Skill 会根据这句话自动确定界面语言。正常首次运行最多只�
 | `skills/coding-wrapped/references/` | 隐私、数据、文案和视觉规范 | 对应阶段才读取 |
 | `skills/coding-wrapped/scripts/` | 扫描、持久化、本地服务和导出 | 按需执行 |
 | `skills/coding-wrapped/assets/` | 离线网站、字体和后备插画 | 初始化本地状态时 |
+| `skills/coding-wrapped/assets/frontend-source/` | Dashboard 的 React 与 CSS 可编辑源文件 | 只有重建界面时 |
 | `.claude-plugin/` | Claude Code 插件与市场清单 | 仅安装时 |
 | `.codex-plugin/` | Codex 插件清单 | 仅安装时 |
 | `evals/` | 合成隐私与行为测试 | 开发和发布时 |
@@ -147,6 +150,14 @@ make package
 评测并检查发布结构。`make package` 会生成
 `dist/coding-wrapped.skill`。
 
+只有修改 Dashboard 界面的贡献者需要 Node.js。可通过以下命令从已提交的
+源文件重建带 hash 的离线前端：
+
+```bash
+npm --prefix skills/coding-wrapped/assets/frontend-source ci
+make frontend
+```
+
 ## 五条设计原则
 
 1. **本地优先。** 最个人的 Coding 数据不应该先注册一个云端服务。
@@ -155,6 +166,8 @@ make package
 4. **先给东西看，不先做问卷。** 先生成一个有用的版本，再让用户调整。
 5. **一张地图，按需展开。** 主 Skill 保持简短，脆弱规则和可复用素材放到
    对应文件。
+6. **一套视觉契约。** 每张生成插画都必须绑定四张 canonical reference
+   之一，并遵循相同的像素密度、角色语言、画布和构图规则。
 
 ## 参与开发
 

@@ -86,7 +86,7 @@ Read the brief. Write one overview in its requested locale with no score or
 ranking and up to three sourced recommendations. Keep the summary to two
 sentences: select two or three representative facts instead of replaying every
 metric, then state the behavior they reveal. Aim for roughly two desktop lines
-(55–90 Chinese characters or 28–45 English words). Save the result as:
+(45–75 Chinese characters or 18–34 English words). Save the result as:
 
 ```json
 {
@@ -174,6 +174,9 @@ Use the local browser to confirm:
 - four generated insights load;
 - factual metric cards load;
 - generated images resolve;
+- the Dashboard scrolls vertically at `1280 × 720`, `1440 × 900`, and
+  `1024 × 768`, without an unexpected horizontal scrollbar;
+- export-card routes remain fixed-size and do not shift;
 - no raw prompt, code, project name, or local path is visible.
 
 ### 5. Hand off a tiny manual

@@ -641,6 +641,16 @@ def main() -> None:
                 summary_contract["include_behavior_interpretation"] is True,
                 "overview brief must request a behavior interpretation",
             )
+            require(
+                summary_contract["target_length"]["zh_characters"]
+                == {"min": 45, "max": 75},
+                "overview brief must keep Chinese summaries compact",
+            )
+            require(
+                summary_contract["target_length"]["en_words"]
+                == {"min": 18, "max": 34},
+                "overview brief must keep English summaries compact",
+            )
             payload = {
                 "copy": {
                     "zh": {
