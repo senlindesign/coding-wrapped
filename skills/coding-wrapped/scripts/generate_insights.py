@@ -7,6 +7,7 @@ import argparse
 import json
 import re
 import shutil
+import struct
 from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any
@@ -25,6 +26,33 @@ from common import (
 
 THEMES = ("warm", "blue", "pink", "green")
 REQUIRED_ROW_KEYS = ("you_did", "agent_did", "your_style")
+ILLUSTRATION_STYLE_ID = "cw-pixel-diorama-v1"
+ILLUSTRATION_WIDTH = 1536
+ILLUSTRATION_HEIGHT = 1024
+THEME_REFERENCE_IMAGES = dict(zip(THEMES, SEED_ILLUSTRATIONS))
+ILLUSTRATION_PROMPT_PREFIX = (
+    "Create a 1536 × 1024 Coding Wrapped pixel-art diorama in the exact visual "
+    "language of the attached canonical reference. Match its medium pixel "
+    "density, crisp stair-stepped edges, simplified isometric geometry, "
+    "rounded cream-white robot design, restrained palette, pale negative "
+    "space, and selective amber glow. Show one clean, immediately readable "
+    "scene with no text or UI."
+)
+ILLUSTRATION_AVOID = (
+    "cinematic full-bleed landscapes",
+    "dark RPG environments",
+    "complex architecture",
+    "anime illustration",
+    "painterly softness",
+    "photorealism",
+    "3D rendering",
+    "vector-flat art",
+    "micro-pixel texture",
+    "heavy noise",
+    "giant pixels",
+    "mixed rendering styles",
+    "text, UI, logos, or accidental lettering",
+)
 
 
 def generation_brief(home: Path) -> dict[str, Any]:
@@ -57,6 +85,25 @@ def generation_brief(home: Path) -> dict[str, Any]:
             "different_compositions": True,
             "maximum_center_hub_compositions": 1,
             "source_ids_must_exist": True,
+            "illustration_contract": {
+                "style_id": ILLUSTRATION_STYLE_ID,
+                "canvas": {
+                    "width": ILLUSTRATION_WIDTH,
+                    "height": ILLUSTRATION_HEIGHT,
+                    "format": "png",
+                    "aspect_ratio": "3:2",
+                },
+                "theme_reference_images": {
+                    theme: (
+                        "assets/frontend-template/assets/"
+                        f"{THEME_REFERENCE_IMAGES[theme]}"
+                    )
+                    for theme in THEMES
+                },
+                "prompt_prefix": ILLUSTRATION_PROMPT_PREFIX,
+                "avoid": list(ILLUSTRATION_AVOID),
+                "qa_reference_comparison_required": True,
+            },
         },
         "metrics": sanitize_metrics(metrics),
         "sources": sources["sources"],
@@ -140,6 +187,22 @@ def resolve_source_image(item: dict[str, Any], index: int) -> Path:
     return SOURCE_ILLUSTRATIONS_ROOT / SEED_ILLUSTRATIONS[index]
 
 
+def validate_illustration_image(path: Path) -> None:
+    if path.suffix.lower() != ".png":
+        raise ValueError("Insight illustrations must be PNG files")
+    with path.open("rb") as image_file:
+        header = image_file.read(24)
+    if len(header) < 24 or header[:8] != b"\x89PNG\r\n\x1a\n":
+        raise ValueError("Insight illustration is not a valid PNG")
+    width, height = struct.unpack(">II", header[16:24])
+    if (width, height) != (ILLUSTRATION_WIDTH, ILLUSTRATION_HEIGHT):
+        raise ValueError(
+            "Insight illustrations must be exactly "
+            f"{ILLUSTRATION_WIDTH} × {ILLUSTRATION_HEIGHT}; "
+            f"received {width} × {height}"
+        )
+
+
 def persist_batch(home: Path, payload: dict[str, Any]) -> dict[str, Any]:
     paths = ensure_state(home)
     source_state = read_json(paths["sources"])
@@ -154,15 +217,21 @@ def persist_batch(home: Path, payload: dict[str, Any]) -> dict[str, Any]:
     state = read_json(paths["insights"])
     created_at = datetime.now(timezone.utc).isoformat()
     batch_id = f"batch-{datetime.now(timezone.utc).strftime('%Y%m%d%H%M%S%f')}"
+    source_images = [
+        resolve_source_image(item, index)
+        for index, item in enumerate(insights)
+    ]
+    for source_image in source_images:
+        validate_illustration_image(source_image)
+
     image_root = paths["images"] / batch_id
     image_root.mkdir(parents=True, exist_ok=False)
 
     persisted = []
-    for index, item in enumerate(insights):
-        source_image = resolve_source_image(item, index)
+    for index, (item, source_image) in enumerate(
+        zip(insights, source_images)
+    ):
         suffix = source_image.suffix.lower()
-        if suffix not in {".png", ".jpg", ".jpeg", ".webp"}:
-            raise ValueError("Insight images must be PNG, JPG, or WebP")
         filename = f"{index + 1:02d}-{item['id']}{suffix}"
         shutil.copy2(source_image, image_root / filename)
         persisted.append(

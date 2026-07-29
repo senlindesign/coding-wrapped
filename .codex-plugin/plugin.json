@@ -1,6 +1,6 @@
 {
   "name": "coding-wrapped",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "Turn local Claude Code and Codex history into a private, pixel-art Coding Wrapped dashboard.",
   "author": {
     "name": "Sen",

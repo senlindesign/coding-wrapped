@@ -1,6 +1,6 @@
 {
   "schema_version": "1.0.0",
-  "generated_at": "2026-07-29T08:27:07.781380+00:00",
+  "generated_at": "2026-07-29T11:56:32.619338+00:00",
   "skill_root": "skills/coding-wrapped",
   "passed": 14,
   "failed": 0,
@@ -27,7 +27,7 @@
       "name": "Progressive disclosure and reference depth",
       "status": "pass",
       "details": {
-        "skill_lines": 198,
+        "skill_lines": 212,
         "direct_references": [
           "references/privacy-policy.md",
           "references/insight-writing.md",
@@ -103,7 +103,14 @@
       "status": "pass",
       "details": {
         "locale": "zh",
-        "count": 4
+        "count": 4,
+        "illustration_style": "cw-pixel-diorama-v1",
+        "canvas": {
+          "width": 1536,
+          "height": 1024,
+          "format": "png",
+          "aspect_ratio": "3:2"
+        }
       }
     },
     {
@@ -117,19 +124,20 @@
     },
     {
       "category": "validation",
-      "name": "Rejects one-card, duplicate-composition, and unknown-source batches",
+      "name": "Rejects invalid count, composition, source, and illustration canvas",
       "status": "pass",
       "details": [
         "Insight batches must contain exactly four items",
         "All four insights must use different compositions",
-        "Every source ID must exist in sources.json"
+        "Every source ID must exist in sources.json",
+        "Insight illustrations must be exactly 1536 × 1024; received 1024 × 1024"
       ]
     },
     {
       "category": "persistence",
       "name": "Overview watermark and source validation",
       "status": "pass",
-      "details": "overview-20260729082706613780"
+      "details": "overview-20260729115631464334"
     },
     {
       "category": "privacy",

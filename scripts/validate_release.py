@@ -76,6 +76,19 @@ def validate_skill() -> None:
         if not (SKILL_ROOT / relative).is_file():
             fail(f"missing linked reference: {relative}")
 
+    illustration_assets = (
+        "agent-orchestra-warm.png",
+        "night-runner-blue.png",
+        "prompt-machine-pink.png",
+        "continue-steps-green.png",
+    )
+    illustration_root = (
+        SKILL_ROOT / "assets" / "frontend-template" / "assets"
+    )
+    for filename in illustration_assets:
+        if not (illustration_root / filename).is_file():
+            fail(f"missing canonical illustration reference: {filename}")
+
 
 def compile_python() -> None:
     paths = sorted(
