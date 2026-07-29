@@ -54,12 +54,6 @@ remain visible; the responsive grid reflows around that selection.
 
 ![Four distinct Coding Wrapped illustrations](docs/images/insights.jpg)
 
-### Responsive local dashboard
-
-The same Overview, insights, and data remain usable on a narrow screen.
-
-<img src="docs/images/mobile.png" alt="Coding Wrapped mobile dashboard using synthetic data" width="390">
-
 ## Install
 
 ### Claude Code and Codex — one command
