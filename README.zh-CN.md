@@ -168,6 +168,27 @@ make frontend
 阅读 [CONTRIBUTING.md](CONTRIBUTING.md)，提交 Pull Request 前运行
 `make validate`。
 
+### Landing Page
+
+公开产品演示位于 [`landing/`](landing/)。它是一个不依赖后端的静态 Vite
+页面，所有数据都是合成数据。四张洞察插画来自经过批准的 fallback 参考图的
+网页优化版本，不包含任何真实用户的会话汇总。
+
+```bash
+npm --prefix landing install
+npm --prefix landing run dev
+make landing-test
+```
+
+正式网站使用 Cloudflare Workers Static Assets 部署。在 `landing/` 目录中，
+`npm run deploy:check` 会完成发布前验证但不真正上线，`npm run deploy` 会发布
+已经构建好的页面。配置 Cloudflare Workers Builds 时，Root directory 使用
+`landing/`，Build command 使用 `npm run build`，Deploy command 使用
+`npm run deploy`。
+
+外部链接统一配置在 `landing/src/content.js`。在提供经过确认的 Buy Me a
+Coffee 地址之前，支持按钮会保持为说明状态，不会链接到错误的收款页面。
+
 ## License
 
 [MIT](LICENSE)。内置字体的授权说明见

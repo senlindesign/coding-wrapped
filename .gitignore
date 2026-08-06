@@ -6,3 +6,6 @@ node_modules
 skills/coding-wrapped/assets/frontend-source/dist/
 dist/
 *.skill
+landing/qa-*.png
+landing/qa-*.jpg
+landing/tmp/

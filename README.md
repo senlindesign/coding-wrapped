@@ -183,6 +183,29 @@ make frontend
 Read [CONTRIBUTING.md](CONTRIBUTING.md), then run `make validate` before opening
 a pull request.
 
+### Landing page
+
+The public product demo lives in [`landing/`](landing/). It is a static,
+backend-free Vite app built entirely from synthetic data. Its four insight
+illustrations are optimized copies of the approved fallback references; no real
+session aggregate is included.
+
+```bash
+npm --prefix landing install
+npm --prefix landing run dev
+make landing-test
+```
+
+The production site is deployed as Cloudflare Workers Static Assets. From the
+`landing/` directory, `npm run deploy:check` validates the release without
+publishing and `npm run deploy` publishes the previously built site. Cloudflare
+Workers Builds should use `landing/` as its root directory, `npm run build` as
+the build command, and `npm run deploy` as the deploy command.
+
+External destinations are configured in `landing/src/content.js`. The support
+button intentionally remains inactive until a verified Buy Me a Coffee URL is
+provided.
+
 ## License
 
 [MIT](LICENSE). Bundled font licenses are listed in
