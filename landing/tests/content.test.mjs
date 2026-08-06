@@ -20,8 +20,8 @@ test("installation and repository destinations stay canonical", () => {
   assert.match(INSTALL_COMMAND, /--agent claude-code/);
   assert.match(INSTALL_COMMAND, /--agent codex/);
   assert.equal(LINKS.github, "https://github.com/senlindesign/coding-wrapped");
-  assert.equal(LINKS.profile, "https://github.com/senlindesign");
-  assert.equal(LINKS.support, null);
+  assert.equal(LINKS.profile, "https://www.linkedin.com/in/senlinbebop");
+  assert.equal(LINKS.support, "https://buymeacoffee.com/senlin");
 });
 
 test("landing hero exposes only the two supported agents", async () => {
@@ -36,9 +36,11 @@ test("landing hero exposes only the two supported agents", async () => {
 test("landing dock contains four pixel-style destinations", async () => {
   const source = await readFile(new URL("../src/App.jsx", import.meta.url), "utf8");
   assert.match(source, /function Dock/);
-  for (const label of ["Coding Wrapped", "GitHub", "Sen", "Buy Me a Coffee"]) {
+  for (const label of ["Coding Wrapped", "GitHub", "About Sen", "Support the project"]) {
     assert.match(source, new RegExp(label));
   }
+  assert.match(source, /href: LINKS\.profile, external: true/);
+  assert.match(source, /href: LINKS\.support, external: true/);
   for (const asset of ["github.webp", "sen-profile.webp", "support-coffee.webp"]) {
     await readFile(new URL(`../public/assets/dock/${asset}`, import.meta.url));
   }

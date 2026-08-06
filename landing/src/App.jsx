@@ -9,8 +9,8 @@ const AGENTS = [
 const DOCK_ITEMS = [
   { label: "Coding Wrapped", icon: "/assets/coding-wrapped-app.webp", href: "#top" },
   { label: "GitHub", icon: "/assets/dock/github.webp", href: LINKS.github, external: true },
-  { label: "Sen", icon: "/assets/dock/sen-profile.webp", href: LINKS.profile, external: true },
-  { label: "Buy Me a Coffee", icon: "/assets/dock/support-coffee.webp", href: LINKS.support },
+  { label: "About Sen", icon: "/assets/dock/sen-profile.webp", href: LINKS.profile, external: true },
+  { label: "Support the project", icon: "/assets/dock/support-coffee.webp", href: LINKS.support, external: true },
 ];
 
 const DEMO_VIEWS = [
@@ -81,7 +81,7 @@ function Hero({ onInstall }) {
   );
 }
 
-function Dock({ onUnavailable }) {
+function Dock() {
   return (
     <nav aria-label="Quick links" className="page-dock">
       {DOCK_ITEMS.map((item) => {
@@ -91,14 +91,6 @@ function Dock({ onUnavailable }) {
             <span>{item.label}</span>
           </>
         );
-
-        if (!item.href) {
-          return (
-            <button aria-label={`${item.label} — link coming soon`} key={item.label} onClick={onUnavailable} type="button">
-              {content}
-            </button>
-          );
-        }
 
         return (
           <a
@@ -369,7 +361,7 @@ export function App() {
         <div><strong>Coding Wrapped</strong></div>
         <a href={LINKS.github} rel="noreferrer" target="_blank">MIT · OPEN SOURCE</a>
       </footer>
-      <Dock onUnavailable={() => setToast("Buy Me a Coffee link coming soon.")} />
+      <Dock />
       {toast && <div aria-live="polite" className="toast" role="status">{toast}</div>}
     </main>
   );

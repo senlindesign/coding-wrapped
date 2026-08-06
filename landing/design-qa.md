@@ -41,9 +41,9 @@ generated three-step illustration.
 - No actionable P0, P1, or P2 issues remain.
 - The side desktop shortcuts from the reference are intentionally omitted so
   the page has one clear product focus. The requested Dock stays visible.
-- Buy Me a Coffee remains a labeled in-page control until a verified payment
-  URL is supplied; it reports that the link is coming soon rather than sending
-  visitors to an invented destination.
+- The About Sen tile links to Sen's verified LinkedIn profile, and the Support
+  the project tile links to the supplied Buy Me a Coffee destination. Both open
+  externally and retain the Dock's hover/focus labels.
 
 ## Required fidelity surfaces
 
@@ -81,10 +81,10 @@ generated three-step illustration.
 - Mobile at 390 × 844: no horizontal overflow; Hero height is 850 px, support
   divider is 342 px, and the 247 px Dock fits with comfortable side margins.
 - Hero button hover reveals its right arrow. Install Skill scrolls to the install
-  window. The unavailable support control produces its expected toast.
+  window. About Sen and Support the project open their verified external links.
 - Selecting Insight deck pauses the automatic demo tour; Resume advances it to
   Behavior data.
-- Fifteen automated build, asset, content, privacy, and Sites packaging tests
+- Seventeen automated build, asset, content, privacy, and Sites packaging tests
   pass. `git diff --check` reports no whitespace errors.
 
 ## Comparison history

@@ -1,7 +1,7 @@
 export const LINKS = {
   github: "https://github.com/senlindesign/coding-wrapped",
-  profile: "https://github.com/senlindesign",
-  support: null,
+  profile: "https://www.linkedin.com/in/senlinbebop",
+  support: "https://buymeacoffee.com/senlin",
 };
 
 export const INSTALL_COMMAND = `npx skills add senlindesign/coding-wrapped \\
