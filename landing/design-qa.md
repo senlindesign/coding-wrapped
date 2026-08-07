@@ -145,3 +145,157 @@ generated three-step illustration.
 ## Final result
 
 final result: passed
+
+## Native demo restoration — 2026-08-07
+
+This revision supersedes the earlier compact-tour presentation for the Landing
+live demo.
+
+### Reference alignment
+
+- Insight reference: the native Dashboard deck with a large centered card,
+  visible previous/next cards, HTML insight copy, three behavior columns, and a
+  Light tip.
+- Behavior reference: the native four-column pastel metric grid with eight
+  selectable facts and the activity-dot matrix inside Active days.
+- Information-section reference: the opaque `Give your coding history a plot`
+  panel, including its solid outline and hard shadow.
+
+### Implemented behavior
+
+1. The Demo retains three direct tabs and automatic view rotation, but removes
+   progress, pause, and next-tour controls. Manual interaction holds autoplay
+   for twelve seconds.
+2. Insight Deck now shows a true three-card album composition. Four numbered
+   selectors, Prev/Next, arrow-key navigation, swipe, synchronized art/copy,
+   `You did / Agent did / Your style`, and Light tip remain available.
+3. Coding Overview contains one concise summary, three behavior patterns, safe
+   source counts, and a local-aggregate privacy note.
+4. Behavior Data retains the compact Customize popover, supports eight facts,
+   automatically demonstrates 4/6/8 selections, and renders a responsive
+   four-color grid. Active days includes a 30-day activity matrix.
+5. The Dock is fully opaque. It collapses to one side tile only while the Demo
+   intersects a desktop viewport; mobile keeps all four items centered.
+6. How it works and Install share the same opaque warm panel, solid border, and
+   hard shadow. Their vertical gap is 30 px.
+
+### Validation evidence
+
+- Desktop 1280 × 900: three Insight cards remain visible, all eight metric
+  cards form two rows of four, and document width equals viewport width.
+- Mobile 390 × 844: Insight art remains centered with side cards peeking in,
+  copy stacks into one column, all four Dock items remain visible, and there is
+  no horizontal overflow.
+- Interaction checks: direct tabs, numbered insight buttons, Prev/Next, and all
+  eight metric toggles update the HTML state. The Dock is opaque in compact and
+  full states.
+- Automated verification: 21 production build, content, privacy, interaction,
+  responsive-contract, and Sites packaging tests pass.
+
+### Final result
+
+final result: passed
+
+## Historical preview interaction revision — 2026-08-06 (superseded)
+
+This section records the earlier compact-tour iteration. The 2026-08-07 Native
+demo restoration above is the current contract and validation result.
+
+### Source and implementation comparison
+
+- UX source of truth: `audit/preview-ux/audit.md` plus the seven captured states
+  in `audit/preview-ux/01-preview-default.png` through
+  `audit/preview-ux/07-behavior-cards.png`.
+- Implementation under test: `http://127.0.0.1:4175/#demo` at 1280 × 720 and
+  390 × 844 CSS pixels.
+- The old and new Overview states were compared at 1280 × 720. The new state
+  removes the duplicate numbered tour, adds one explicit live-demo guide, and
+  keeps the primary tabs visible above the content.
+- Focused comparisons covered the Insight deck title/navigation region and the
+  Behavior data metric grid because those were the two highest-risk interaction
+  changes from the audit.
+
+### Resolved findings
+
+1. **Earlier P0 — three competing navigation systems.** The numbered 01–03
+   coach is removed. The tabs now choose a view; a single `Tour X of 3` row
+   explains progress and offers Pause/Resume plus Next view.
+2. **Earlier P0 — insight controls appeared below the fold.** The 01–04
+   selectors now sit beside `INSIGHT XX / 04`, remain visible with the title,
+   and update the illustration and story together.
+3. **Earlier P1 — the Preview looked like a screenshot.** The browser bar now
+   says `LIVE DEMO`, the tour describes the current interaction, and the main
+   action reads `USE MY OWN DATA`.
+4. **Earlier P1 — weak input coverage.** Insight cards support clicking,
+   `ArrowLeft` / `ArrowRight`, and touch swipes. Manual input pauses autoplay so
+   the tour does not take control back from the visitor.
+5. **Earlier P1 — Behavior data was static.** It opens with three core metrics
+   and expands to all six in place. Cards have hover/focus feedback and a short
+   relationship label.
+6. **Earlier P1 — the fixed Dock obscured Preview content.** While the demo is
+   in view the Dock collapses to one low-opacity tile at the lower-right edge;
+   hover or keyboard focus expands it again.
+
+### Validation evidence
+
+- Desktop 1280 × 720: no horizontal overflow; the live guide, tabs, and primary
+  action remain visible; the quiet Dock does not cover the insight copy.
+- Mobile 390 × 844: document width equals viewport width; insight content
+  stacks into one column and remains swipeable; the quiet Dock is reduced to a
+  single tile.
+- Keyboard test: focusing the Insight panel and pressing `ArrowRight` changed
+  the active story from 01 to 02 and moved the active pager state accordingly.
+- Data test: Behavior data rendered three metrics initially and six after
+  choosing `CUSTOMIZE · SHOW ALL 6`.
+- Browser console: zero warnings or errors during Overview, Insight deck, and
+  Behavior data interaction.
+- Automated verification: 18 build, content, privacy, interaction-contract,
+  and Sites packaging tests pass. Vite production build succeeds.
+
+### Final result
+
+final result: passed
+
+## Hero motion and vertical rhythm revision — 2026-08-06
+
+### Source and implementation comparison
+
+- User reference: `/var/folders/rb/jdf2xk8s7zqg66tssdhwnzp00000gn/T/codex-clipboard-e6417436-5860-4a02-a257-641b1d71f228.png`
+  (1840 × 1160 px).
+- Browser implementation: `qa-hero-motion-default-1840x1160.png` at the same
+  1840 px width and matching first-screen state.
+- Combined comparison input: `qa-hero-motion-comparison.png`. The left side is
+  the supplied reference; the right side is the browser-rendered revision.
+- Focused interaction state: `qa-hero-motion-mascot-hover-1840x1160.png`.
+
+### Findings and fixes
+
+1. **Earlier P2 — Hero content sat too low.** The main Hero group now moves up
+   44 px on regular desktop sizes. Short laptop heights receive 26 px more
+   bottom safe area, while mobile uses a smaller 12–22 px adjustment.
+2. **Requested mascot feedback.** Hover scales the supplied bitmap mascot to
+   1.14×, rotates it 7 degrees around its seated base, and adds a hard shadow.
+   The bitmap stays crisp through `image-rendering: pixelated`.
+3. **Static title retained.** The explored pixel-font title treatments were
+   removed. `Coding Wrapped` remains a single HTML heading in Plus Jakarta Sans
+   with no hover or automatic type animation.
+4. **Reduced motion.** Motion-reduced environments keep only a restrained 1.08×
+   mascot scale and collapse all animation durations.
+
+### Validation evidence
+
+- 1280 × 720: Hero content top is 43.13 px; the support row ends at 526 px;
+  the Dock begins at 597 px; the live-demo window remains visible at the fold.
+- 1440 × 900: Hero content top is 80.09 px and the support row ends at
+  647.91 px, with no horizontal overflow.
+- 390 × 844: document and viewport widths both equal 390 px; CTA, support row,
+  Dock, and the top edge of the live demo remain visible.
+- Hover inspection confirms the mascot transform and shadow. Source inspection
+  confirms the title has no secondary font layer or title animation selector.
+- Nineteen production-build, content, privacy, responsive-contract,
+  interaction, and Sites packaging tests pass. Browser console contains no
+  errors or warnings.
+
+### Final result
+
+final result: passed

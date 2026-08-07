@@ -14,6 +14,7 @@ export const INSIGHTS = [
   {
     title: "The tiny-prompt commander",
     stat: "49% of your messages stayed under 50 characters.",
+    summary: "Short prompts became a steering system: you set direction, inspect the result, then correct the next move.",
     youDid: "You pointed in a direction, then waited to see how the agent expanded it.",
     agentDid: "Short inputs often started a full implementation loop.",
     yourStyle: "You control rhythm and direction while leaving the expansion space to AI.",
@@ -25,6 +26,7 @@ export const INSIGHTS = [
   {
     title: "The night-shift navigator",
     stat: "Your longest session ran for 160 focused minutes.",
+    summary: "A single thread held enough context for decisions to compound instead of resetting with every task switch.",
     youDid: "Once momentum arrived, you stayed with one thread instead of switching projects.",
     agentDid: "The agent kept context and accumulated decisions across a long run.",
     yourStyle: "You work in deep expeditions rather than evenly spaced check-ins.",
@@ -36,6 +38,7 @@ export const INSIGHTS = [
   {
     title: "The prompt machine operator",
     stat: "One short sentence routinely became a multi-step build.",
+    summary: "You hand over a compact instruction and let the agent assemble the missing production steps around it.",
     youDid: "You used compact requests to keep decisions moving quickly.",
     agentDid: "The agent inferred missing steps and assembled a production line around them.",
     yourStyle: "You prefer steering the system to documenting the entire route first.",
@@ -47,6 +50,7 @@ export const INSIGHTS = [
   {
     title: "The continue-button native",
     stat: "You said “continue” 10 times across active builds.",
+    summary: "Once the direction is calibrated, continuity becomes your fastest way to protect momentum.",
     youDid: "When the direction felt right, you protected momentum with a single word.",
     agentDid: "The agent treated continuity as permission to preserve the working plan.",
     yourStyle: "You calibrate early, then let a trusted loop keep running.",
@@ -58,10 +62,12 @@ export const INSIGHTS = [
 ];
 
 export const METRICS = [
-  { label: "Active days", value: "18", note: "of the last 30" },
+  { label: "Active days", value: "18", note: "of the last 30", kind: "activity" },
   { label: "Sessions", value: "23", note: "across 13 projects" },
   { label: "Longest run", value: "160m", note: "one continuous thread" },
   { label: "Messages", value: "111", note: "safe aggregate only" },
   { label: "Top model", value: "GPT-5", note: "52% of turns" },
   { label: "Tool calls", value: "286", note: "terminal led the mix" },
+  { label: "Projects", value: "13", note: "active in this period" },
+  { label: "Short prompts", value: "49%", note: "under 50 characters" },
 ];

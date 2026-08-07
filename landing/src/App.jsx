@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { INSTALL_COMMAND, INSIGHTS, LINKS, METRICS } from "./content.js";
 
 const AGENTS = [
@@ -14,10 +14,45 @@ const DOCK_ITEMS = [
 ];
 
 const DEMO_VIEWS = [
-  { id: "overview", label: "Overview", description: "See the pattern behind your month before opening individual stories." },
-  { id: "insight", label: "Insight deck", description: "Move through four illustrated moments built from safe aggregates." },
-  { id: "data", label: "Behavior data", description: "Check the factual blocks that support every observation." },
+  { id: "overview", label: "Coding overview" },
+  { id: "insight", label: "Insight deck" },
+  { id: "data", label: "Behavior data" },
 ];
+
+const OVERVIEW_PATTERNS = [
+  { title: "Short prompts", copy: "Point, inspect, then adjust instead of writing the whole route upfront." },
+  { title: "Long runs", copy: "Stay inside one thread long enough for decisions to compound." },
+  { title: "Calibration", copy: "Use small corrections to keep a trusted agent loop moving." },
+];
+
+const METRIC_PRESETS = [
+  [0, 1, 2, 3],
+  [0, 1, 2, 3, 4, 5],
+  [0, 1, 2, 3, 4, 5, 6, 7],
+];
+
+const ACTIVITY_DAYS = [
+  0, 1, 1, 2, 0, 1, 0,
+  1, 2, 1, 3, 2, 0, 1,
+  2, 3, 1, 2, 3, 1, 0,
+  0, 2, 3, 2, 1, 2, 0,
+  1, 2,
+];
+
+function useReducedMotion() {
+  const [reducedMotion, setReducedMotion] = useState(false);
+
+  useEffect(() => {
+    const media = window.matchMedia?.("(prefers-reduced-motion: reduce)");
+    if (!media) return undefined;
+    const update = () => setReducedMotion(media.matches);
+    update();
+    media.addEventListener?.("change", update);
+    return () => media.removeEventListener?.("change", update);
+  }, []);
+
+  return reducedMotion;
+}
 
 function WindowFrame({ children, className = "", id, title, controls = true }) {
   return (
@@ -81,9 +116,9 @@ function Hero({ onInstall }) {
   );
 }
 
-function Dock() {
+function Dock({ quiet = false }) {
   return (
-    <nav aria-label="Quick links" className="page-dock">
+    <nav aria-label="Quick links" className={`page-dock ${quiet ? "is-quiet" : ""}`}>
       {DOCK_ITEMS.map((item) => {
         const content = (
           <>
@@ -119,79 +154,227 @@ function OverviewPanel() {
           agent carried the implementation detail. Your clearest pattern is a
           fast loop: point, inspect, adjust, continue.
         </p>
-        <div className="mini-metrics">
-          {METRICS.slice(0, 3).map((metric) => (
-            <div key={metric.label}><strong>{metric.value}</strong><span>{metric.label}</span></div>
+        <div className="overview-patterns" aria-label="Three coding patterns">
+          {OVERVIEW_PATTERNS.map((pattern, index) => (
+            <article key={pattern.title} style={{ "--pattern-delay": `${index * 180}ms` }}>
+              <span>{String(index + 1).padStart(2, "0")}</span>
+              <div><strong>{pattern.title}</strong><p>{pattern.copy}</p></div>
+            </article>
           ))}
+        </div>
+        <div className="overview-sources">
+          <span>Sources</span>
+          <div><strong>Codex</strong><small>18 sessions</small></div>
+          <div><strong>Claude Code</strong><small>5 sessions</small></div>
         </div>
       </div>
       <div className="overview-visual">
         <img alt="A pixel-art person directing a fleet of coding agents" src={INSIGHTS[0].image} />
+        <span>Local aggregates only · no transcript leaves your machine</span>
       </div>
     </div>
   );
 }
 
-function InsightPanel({ activeIndex, onChange }) {
+function InsightPanel({ activeIndex, onChange, onManualInteraction, reducedMotion }) {
   const insight = INSIGHTS[activeIndex];
+  const previousIndex = (activeIndex - 1 + INSIGHTS.length) % INSIGHTS.length;
+  const nextIndex = (activeIndex + 1) % INSIGHTS.length;
+  const touchStartX = useRef(null);
+  const selectRelativeInsight = (offset) => {
+    onManualInteraction?.();
+    onChange((activeIndex + offset + INSIGHTS.length) % INSIGHTS.length);
+  };
+
+  useEffect(() => {
+    if (reducedMotion) return undefined;
+    const timer = window.setTimeout(() => {
+      onChange((activeIndex + 1) % INSIGHTS.length);
+    }, 5200);
+    return () => window.clearTimeout(timer);
+  }, [activeIndex, onChange, reducedMotion]);
+
+  const handleKeyDown = (event) => {
+    if (event.key === "ArrowLeft") {
+      event.preventDefault();
+      selectRelativeInsight(-1);
+    }
+    if (event.key === "ArrowRight") {
+      event.preventDefault();
+      selectRelativeInsight(1);
+    }
+  };
+
+  const handleTouchEnd = (event) => {
+    if (touchStartX.current === null) return;
+    const distance = event.changedTouches[0].clientX - touchStartX.current;
+    touchStartX.current = null;
+    if (Math.abs(distance) < 48) return;
+    selectRelativeInsight(distance > 0 ? -1 : 1);
+  };
+
   return (
-    <div className={`insight-panel insight-panel--${insight.theme}`}>
-      <div className="insight-image-wrap">
-        <img alt={insight.alt} src={insight.image} />
-        <div className="insight-pagination" aria-label="Choose an insight">
-          {INSIGHTS.map((item, index) => (
-            <button
-              aria-label={`Show insight ${index + 1}: ${item.title}`}
-              aria-pressed={index === activeIndex}
-              className={index === activeIndex ? "is-active" : ""}
-              key={item.title}
-              onClick={() => onChange(index)}
-              type="button"
-            >
-              {String(index + 1).padStart(2, "0")}
-            </button>
-          ))}
+    <div
+      aria-label="Insight stories. Use left and right arrow keys or swipe to change the story."
+      className={`insight-panel insight-panel--${insight.theme}`}
+      onKeyDown={handleKeyDown}
+      onTouchEnd={handleTouchEnd}
+      onTouchStart={(event) => { touchStartX.current = event.touches[0].clientX; }}
+      tabIndex={0}
+    >
+      <header className="insight-deck-toolbar">
+        <div>
+          <p className="panel-kicker">CURRENT INSIGHT {String(activeIndex + 1).padStart(2, "0")} / 04</p>
+          <span>BUILT FROM LOCAL DEMO DATA · AUTO PLAY</span>
         </div>
+        <div className="insight-deck-actions">
+          <div className="insight-pagination" aria-label="Choose an insight">
+            {INSIGHTS.map((item, index) => (
+              <button
+                aria-label={`Show insight ${index + 1}: ${item.title}`}
+                aria-pressed={index === activeIndex}
+                className={index === activeIndex ? "is-active" : ""}
+                key={item.title}
+                onClick={() => {
+                  onManualInteraction?.();
+                  onChange(index);
+                }}
+                type="button"
+              >
+                {String(index + 1).padStart(2, "0")}
+              </button>
+            ))}
+          </div>
+          <button onClick={() => selectRelativeInsight(-1)} type="button">PREV</button>
+          <button onClick={() => selectRelativeInsight(1)} type="button">NEXT</button>
+        </div>
+      </header>
+      <div className="insight-image-stage" aria-label="An illustrated insight card stack">
+        <figure className="insight-card-preview insight-card-preview--left" aria-hidden="true">
+          <img alt="" src={INSIGHTS[previousIndex].image} />
+        </figure>
+        <figure className="insight-card-preview insight-card-preview--main">
+          <img alt={insight.alt} key={insight.image} src={insight.image} />
+        </figure>
+        <figure className="insight-card-preview insight-card-preview--right" aria-hidden="true">
+          <img alt="" src={INSIGHTS[nextIndex].image} />
+        </figure>
+        <span className="insight-swipe-hint">SWIPE OR USE ARROW KEYS</span>
       </div>
-      <article className="insight-copy">
-        <p className="panel-kicker">INSIGHT {String(activeIndex + 1).padStart(2, "0")} / 04</p>
-        <h3>{insight.title}</h3>
-        <p className="insight-stat">{insight.stat}</p>
-        <dl>
-          <div><dt>You did</dt><dd>{insight.youDid}</dd></div>
-          <div><dt>Agent did</dt><dd>{insight.agentDid}</dd></div>
-          <div><dt>Your style</dt><dd>{insight.yourStyle}</dd></div>
-        </dl>
-        <div className="light-tip"><strong>Light tip</strong><span>{insight.tip}</span></div>
+      <article className="insight-copy" aria-live="polite">
+        <div className="insight-story" key={insight.title}>
+          <div className="insight-story__headline">
+            <div><p className="panel-kicker">{insight.title}</p><h3>{insight.stat}</h3></div>
+            <p>{insight.summary}</p>
+          </div>
+          <dl>
+            <div><dt>You did</dt><dd>{insight.youDid}</dd></div>
+            <div><dt>Agent did</dt><dd>{insight.agentDid}</dd></div>
+            <div><dt>Your style</dt><dd>{insight.yourStyle}</dd></div>
+          </dl>
+          <div className="light-tip"><strong>Light tip</strong><span>{insight.tip}</span></div>
+        </div>
       </article>
     </div>
   );
 }
 
-function DataPanel() {
+function ActivityGrid() {
   return (
-    <div className="data-panel">
-      <div className="data-panel__intro">
-        <p className="panel-kicker">THE FACTUAL LAYER</p>
-        <h3>A dashboard made from aggregates, not transcripts.</h3>
-        <p>Choose the blocks that matter to you. The private source material stays out of the page.</p>
-      </div>
-      <div className="metric-grid">
-        {METRICS.map((metric) => (
-          <article className="metric-card" key={metric.label}>
-            <span>{metric.label}</span><strong>{metric.value}</strong><small>{metric.note}</small>
-          </article>
-        ))}
-      </div>
+    <div aria-label="30 day activity grid" className="activity-grid">
+      {ACTIVITY_DAYS.map((level, index) => <i className={`is-level-${level}`} key={index} />)}
     </div>
   );
 }
 
-function DemoWindow({ activeIndex, onChange, onViewChange, view }) {
+function DataPanel({ onManualInteraction, reducedMotion }) {
+  const [selectedMetrics, setSelectedMetrics] = useState(METRIC_PRESETS[0]);
+  const [showCustomizer, setShowCustomizer] = useState(false);
+  const [userControlled, setUserControlled] = useState(false);
+
+  useEffect(() => {
+    if (reducedMotion || userControlled) return undefined;
+    let presetIndex = 0;
+    const timer = window.setInterval(() => {
+      presetIndex = (presetIndex + 1) % METRIC_PRESETS.length;
+      setSelectedMetrics(METRIC_PRESETS[presetIndex]);
+    }, 4400);
+    return () => window.clearInterval(timer);
+  }, [reducedMotion, userControlled]);
+
+  const toggleMetric = (metricIndex) => {
+    setUserControlled(true);
+    onManualInteraction?.();
+    setSelectedMetrics((current) => {
+      if (current.includes(metricIndex)) {
+        return current.length === 1 ? current : current.filter((item) => item !== metricIndex);
+      }
+      return [...current, metricIndex].sort((a, b) => a - b);
+    });
+  };
+
+  const visibleMetrics = METRICS.filter((_, index) => selectedMetrics.includes(index));
+
+  return (
+    <div className="data-panel">
+      <div className="data-panel__header">
+        <div className="data-panel__intro">
+          <p className="panel-kicker">YOUR CODING BEHAVIOR</p>
+          <h3>Choose the facts that explain the pattern.</h3>
+          <p>All blocks are safe aggregates. Select up to eight for the view you want to keep.</p>
+        </div>
+        <div className="data-customize">
+          <button
+            aria-expanded={showCustomizer}
+            className="metric-toggle"
+            onClick={() => {
+              setShowCustomizer((current) => !current);
+              onManualInteraction?.();
+            }}
+            type="button"
+          >
+            Customize · {selectedMetrics.length} / {METRICS.length}
+          </button>
+          {showCustomizer && (
+            <div className="metric-customizer" aria-label="Choose visible metrics">
+              {METRICS.map((metric, index) => (
+                <button
+                  aria-pressed={selectedMetrics.includes(index)}
+                  className={selectedMetrics.includes(index) ? "is-selected" : ""}
+                  key={metric.label}
+                  onClick={() => toggleMetric(index)}
+                  type="button"
+                >
+                  <span>{metric.label}</span><b>{selectedMetrics.includes(index) ? "On" : "Off"}</b>
+                </button>
+              ))}
+            </div>
+          )}
+        </div>
+      </div>
+      <div className="metric-grid" aria-live="polite">
+        {visibleMetrics.map((metric) => {
+          const metricIndex = METRICS.indexOf(metric);
+          return (
+          <article className={`metric-card metric-card--tone-${metricIndex % 4} ${metric.kind === "activity" ? "metric-card--activity" : ""}`} key={metric.label} tabIndex={0}>
+            <div className="metric-card__main">
+              <span>{metric.label}</span><strong>{metric.value}</strong><small>{metric.note}</small>
+            </div>
+            {metric.kind === "activity" && <ActivityGrid />}
+          </article>
+          );
+        })}
+      </div>
+      <p className="data-source-note">Factual layer · derived locally from session aggregates</p>
+    </div>
+  );
+}
+
+function DemoWindow({ activeIndex, onChange, onUseData, onViewChange, onVisibilityChange, view }) {
   const [revealed, setRevealed] = useState(false);
-  const [tourPaused, setTourPaused] = useState(false);
+  const [manualHoldUntil, setManualHoldUntil] = useState(0);
+  const reducedMotion = useReducedMotion();
   const activeViewIndex = DEMO_VIEWS.findIndex((item) => item.id === view);
-  const activeView = DEMO_VIEWS[activeViewIndex];
 
   useEffect(() => {
     const element = document.querySelector("#demo-window");
@@ -202,33 +385,44 @@ function DemoWindow({ activeIndex, onChange, onViewChange, view }) {
 
     const observer = new window.IntersectionObserver(
       ([entry]) => {
+        onVisibilityChange?.(entry.isIntersecting && entry.intersectionRatio > 0.12);
         if (entry.isIntersecting) {
           setRevealed(true);
-          observer.disconnect();
         }
       },
-      { threshold: 0.01 },
+      { threshold: [0, 0.12, 0.4] },
     );
     observer.observe(element);
-    return () => observer.disconnect();
-  }, []);
+    return () => {
+      onVisibilityChange?.(false);
+      observer.disconnect();
+    };
+  }, [onVisibilityChange]);
 
   useEffect(() => {
-    if (!revealed || tourPaused) return undefined;
+    if (!revealed || reducedMotion) return undefined;
+    const now = Date.now();
+    const isHolding = manualHoldUntil > now;
     const timer = window.setTimeout(() => {
+      if (isHolding) {
+        setManualHoldUntil(0);
+        return;
+      }
       const nextIndex = (activeViewIndex + 1) % DEMO_VIEWS.length;
       onViewChange(DEMO_VIEWS[nextIndex].id);
-    }, 6200);
+    }, isHolding ? manualHoldUntil - now : 6400);
     return () => window.clearTimeout(timer);
-  }, [activeViewIndex, onViewChange, revealed, tourPaused]);
+  }, [activeViewIndex, manualHoldUntil, onViewChange, reducedMotion, revealed]);
+
+  const pauseAutoplayBriefly = () => setManualHoldUntil(Date.now() + 12000);
 
   const chooseView = (nextView) => {
-    setTourPaused(true);
+    pauseAutoplayBriefly();
     onViewChange(nextView);
   };
 
   return (
-    <WindowFrame className={`product-window ${revealed ? "is-visible" : ""}`} id="demo-window" title="127.0.0.1 / coding-wrapped">
+    <WindowFrame className={`product-window ${revealed ? "is-visible" : ""}`} id="demo-window" title="LIVE DEMO · 127.0.0.1 / coding-wrapped">
       <header className="dashboard-header">
         <div className="dashboard-brand">
           <img alt="" src="/assets/coding-wrapped-app.webp" />
@@ -238,7 +432,7 @@ function DemoWindow({ activeIndex, onChange, onViewChange, view }) {
           <strong>SEN'S CODING ADVENTURE LOG</strong>
           <span>See how you and AI actually get things made together.</span>
         </div>
-        <button type="button">SCAN FACT DATA</button>
+        <button onClick={onUseData} type="button">USE MY OWN DATA</button>
       </header>
       <div className="product-toolbar">
         <nav aria-label="Demo views">
@@ -246,37 +440,12 @@ function DemoWindow({ activeIndex, onChange, onViewChange, view }) {
             <button aria-pressed={view === item.id} className={view === item.id ? "is-active" : ""} key={item.id} onClick={() => chooseView(item.id)} type="button">{item.label}</button>
           ))}
         </nav>
-        <span className="demo-status">SYNTHETIC DEMO · LOCAL-FIRST</span>
-      </div>
-      <div className="demo-coach" aria-live="polite">
-        <div className="demo-coach__copy">
-          <span>INTERACTIVE DEMO</span>
-          <strong>{activeView.label}</strong>
-          <small>{activeView.description}</small>
-        </div>
-        <div className="demo-coach__steps" aria-label="Demo tour progress">
-          {DEMO_VIEWS.map((item, index) => (
-            <button
-              aria-label={`Open ${item.label}`}
-              aria-pressed={view === item.id}
-              className={view === item.id ? "is-active" : ""}
-              key={item.id}
-              onClick={() => chooseView(item.id)}
-              type="button"
-            >
-              {String(index + 1).padStart(2, "0")}
-            </button>
-          ))}
-        </div>
-        <button className="demo-coach__toggle" onClick={() => setTourPaused((paused) => !paused)} type="button">
-          {tourPaused ? "Resume tour" : "Pause tour"}
-        </button>
-        {!tourPaused && <span className="demo-coach__timer" key={view} />}
+        <span className="demo-status"><i aria-hidden="true" /> LIVE PREVIEW · LOCAL-FIRST</span>
       </div>
       <div className="product-content" key={view}>
         {view === "overview" && <OverviewPanel />}
-        {view === "insight" && <InsightPanel activeIndex={activeIndex} onChange={onChange} />}
-        {view === "data" && <DataPanel />}
+        {view === "insight" && <InsightPanel activeIndex={activeIndex} onChange={onChange} onManualInteraction={pauseAutoplayBriefly} reducedMotion={reducedMotion} />}
+        {view === "data" && <DataPanel onManualInteraction={pauseAutoplayBriefly} reducedMotion={reducedMotion} />}
       </div>
     </WindowFrame>
   );
@@ -284,7 +453,7 @@ function DemoWindow({ activeIndex, onChange, onViewChange, view }) {
 
 function ProcessWindow() {
   return (
-    <WindowFrame className="process-window" title="How it works">
+    <section className="process-window" aria-labelledby="how-it-works-title">
       <div className="process-layout">
         <img
           alt="A pixel-art flow from scanning local coding logs, to wrapping safe data, to exploring finished insights"
@@ -293,7 +462,7 @@ function ProcessWindow() {
         />
         <div>
           <p className="panel-kicker">THREE SMALL STEPS</p>
-          <h2>From local traces to a story you recognize.</h2>
+          <h2 id="how-it-works-title">From local traces to a story you recognize.</h2>
           <ol>
             <li><strong>Scan</strong><span>Read standard Claude Code and Codex session folders locally.</span></li>
             <li><strong>Wrap</strong><span>Turn safe aggregates into an overview and four distinct insights.</span></li>
@@ -302,26 +471,30 @@ function ProcessWindow() {
         </div>
       </div>
       <footer className="privacy-strip">Raw conversations, source code, project names, local paths and secrets stay out of the website.</footer>
-    </WindowFrame>
+    </section>
   );
 }
 
 function InstallWindow({ onCopy }) {
   return (
-    <WindowFrame className="install-window" title="Install Coding Wrapped">
+    <section className="install-window" aria-labelledby="install-title">
       <div className="install-layout">
         <div>
           <p className="panel-kicker">ONE COMMAND · CLAUDE CODE + CODEX</p>
-          <h2>Give your coding history a plot.</h2>
+          <h2 id="install-title">Give your coding history a plot.</h2>
           <p>Install the same open Agent Skill on both platforms. No separate product and no cloud account.</p>
         </div>
         <pre><code>{INSTALL_COMMAND}</code></pre>
         <div className="install-actions">
-          <button className="button button--primary" onClick={onCopy} type="button">Copy command</button>
-          <a className="button button--secondary" href={LINKS.github} rel="noreferrer" target="_blank">Read the docs</a>
+          <button className="button button--primary" onClick={onCopy} type="button">
+            <span>Copy command</span><img alt="" aria-hidden="true" className="button__arrow" src="/assets/button-arrow.png" />
+          </button>
+          <a className="button button--secondary" href={LINKS.github} rel="noreferrer" target="_blank">
+            <span>Read the docs</span><img alt="" aria-hidden="true" className="button__arrow" src="/assets/button-arrow.png" />
+          </a>
         </div>
       </div>
-    </WindowFrame>
+    </section>
   );
 }
 
@@ -329,6 +502,7 @@ export function App() {
   const [activeIndex, setActiveIndex] = useState(0);
   const [view, setView] = useState("overview");
   const [toast, setToast] = useState("");
+  const [demoInView, setDemoInView] = useState(false);
 
   useEffect(() => {
     if (!toast) return undefined;
@@ -351,7 +525,14 @@ export function App() {
       <div aria-hidden="true" className="desktop-background" />
       <Hero onInstall={openInstall} />
       <section className="demo-stage" id="demo">
-        <DemoWindow activeIndex={activeIndex} onChange={setActiveIndex} onViewChange={setView} view={view} />
+        <DemoWindow
+          activeIndex={activeIndex}
+          onChange={setActiveIndex}
+          onUseData={openInstall}
+          onViewChange={setView}
+          onVisibilityChange={setDemoInView}
+          view={view}
+        />
       </section>
       <section className="information-stage">
         <ProcessWindow />
@@ -361,7 +542,7 @@ export function App() {
         <div><strong>Coding Wrapped</strong></div>
         <a href={LINKS.github} rel="noreferrer" target="_blank">MIT · OPEN SOURCE</a>
       </footer>
-      <Dock />
+      <Dock quiet={demoInView} />
       {toast && <div aria-live="polite" className="toast" role="status">{toast}</div>}
     </main>
   );
