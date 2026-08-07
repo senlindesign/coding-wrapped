@@ -146,6 +146,101 @@ generated three-step illustration.
 
 final result: passed
 
+## Simplified Three Small Steps illustration — 2026-08-07
+
+### Visual source and implementation
+
+- Style and character references:
+  `public/assets/illustrations/agent-orchestra-warm.webp` and
+  `public/assets/illustrations/prompt-machine-pink.webp`.
+- Superseded flow reference: `public/assets/how-it-works-flow.png`.
+- New project asset: `public/assets/how-it-works-flow-v2.png` (1536 × 1024,
+  3:2).
+- Browser evidence:
+  `audit/preview-ux/how-it-works-simplified-1280x900.png` and
+  `audit/preview-ux/how-it-works-simplified-390x844.png`.
+
+### Findings and fixes
+
+1. **Earlier P1 — the flow illustration was denser than the Insight Deck.**
+   The books, stacked papers, miniature dashboard, charts, decorative stars,
+   and extra props are removed.
+2. **Character continuity.** The new image reuses the dark-haired person in a
+   white shirt and the cream robot with a black face and orange antenna from
+   the Insight Deck visual language.
+3. **Simpler narrative.** Scan, Wrap, and Explore are reduced to three readable
+   moments connected by two small pixel arrows: hand over one log card, turn
+   three colored blocks into one wrapped card, and inspect the result together.
+4. **Pixel density.** Larger pixel clusters, simpler silhouettes, a limited
+   warm palette, and generous negative space keep the image legible at the
+   450 × 300 desktop slot and 329 × 220 mobile slot.
+
+### Validation evidence
+
+- Desktop 1280 × 900: the generated 3:2 image renders at 450 × 300 without
+  cropping, panel overflow, or visible background seams.
+- Mobile 390 × 844: the same asset renders at 329 × 220 with zero horizontal
+  overflow and the three moments remain distinguishable.
+- Browser console: zero warnings or errors during the desktop pass.
+- Automated verification: 23 production build, content, privacy,
+  interaction-contract, responsive-contract, and Sites packaging tests pass.
+- `git diff --check` passes.
+
+### Final result
+
+final result: passed
+
+## Pastel information-panel revision — 2026-08-07
+
+### Source and implementation comparison
+
+- User references:
+  `/var/folders/rb/jdf2xk8s7zqg66tssdhwnzp00000gn/T/codex-clipboard-224c29e5-156e-4210-a759-bd667a72ad39.png`
+  and
+  `/var/folders/rb/jdf2xk8s7zqg66tssdhwnzp00000gn/T/codex-clipboard-c8c0b682-7b32-4020-818c-1cf3bb9a3caa.png`.
+- Desktop browser evidence:
+  `audit/preview-ux/soft-info-panels-1280x900.png` and
+  `audit/preview-ux/soft-install-footer-1280x900.png`.
+- Mobile browser evidence:
+  `audit/preview-ux/soft-info-panels-390x844.png`.
+- The two supplied references and all three browser captures were inspected in
+  one combined comparison pass. The implementation keeps their pale paper
+  surfaces, flat pastel accents, dark linework, and restrained hard shadows
+  without copying the references' decorative desktop backgrounds.
+
+### Findings and fixes
+
+1. **Earlier P1 — both information panels felt too dark.** `Three small steps`
+   and `One command` now share an opaque pale-cream surface (`#fbf7ed`) while
+   retaining the existing outline, shadow, spacing, and illustration.
+2. **Requested pink privacy accent.** The raw-conversation safety strip now
+   uses a quiet blush (`#f4d7dc`) that is visibly distinct without overpowering
+   the explanatory content.
+3. **Requested blue install accent.** The command block and `Copy command`
+   action use pale blue (`#cfe8e6`). `Read the docs` remains neutral cream with
+   dark text, preserving a clear primary/secondary action hierarchy.
+4. **Footer signature.** A small `Observe the way you build.` line now sits
+   directly below `Coding Wrapped` in the compact footer.
+5. **Visual QA correction.** The first browser pass revealed that the neutral
+   `Read the docs` button inherited light text from its former dark treatment.
+   Its text color was corrected to the dark ink token and rechecked visually.
+
+### Validation evidence
+
+- Desktop 1280 × 900: both panels are 1229 px wide, their main surfaces and
+  accent strips render with the intended computed colors, and horizontal
+  overflow is zero.
+- Mobile 390 × 844: both panels resolve to 374 px, the privacy strip and command
+  block remain readable, and horizontal overflow is zero.
+- Browser console: zero warnings or errors during the desktop inspection.
+- Automated verification: 23 production build, content, privacy,
+  interaction-contract, responsive-contract, and Sites packaging tests pass.
+- `git diff --check` passes.
+
+### Final result
+
+final result: passed
+
 ## Native demo restoration — 2026-08-07
 
 This revision supersedes the earlier compact-tour presentation for the Landing
@@ -191,6 +286,60 @@ live demo.
   full states.
 - Automated verification: 21 production build, content, privacy, interaction,
   responsive-contract, and Sites packaging tests pass.
+
+### Final result
+
+final result: passed
+
+## Insight frame and swipe revision — 2026-08-07
+
+### Source and implementation evidence
+
+- Source visual truth:
+  `/var/folders/rb/jdf2xk8s7zqg66tssdhwnzp00000gn/T/codex-clipboard-7e424cd2-ca5b-4942-a759-1049f122e4d1.png`
+  (835 × 471 px, supplied screenshot density).
+- Browser-rendered implementation:
+  `/Users/senlin/Documents/Discuss/coding-wrapped/landing/audit/preview-ux/insight-swipe-fixed-viewport.png`
+  (1280 × 900 CSS px at 1× density).
+- Viewport and state: 1280 × 900, `Insight deck`, warm card 01 active.
+- The source and implementation were opened together in one comparison input.
+  The full viewport supplies composition context; the rendered main-card region
+  is clearly readable, so no separately cropped comparison was required.
+
+### Comparison history
+
+1. **Earlier P1 — the main frame was wider than the 3:2 illustration.** The
+   screenshot showed blank gutters inside a roughly 1.84:1 frame. The frame now
+   uses the illustration's native 3:2 aspect ratio and a 610 px desktop cap.
+2. **Earlier P1 — swipe had no response outside the old touch-only path.** The
+   interaction now uses Pointer Events for touch and mouse drag, plus a guarded
+   horizontal-wheel path for trackpads. `touch-action: pan-y` preserves normal
+   vertical page scrolling.
+3. **Post-fix evidence:** the measured frame is 609.99 × 406.66 px at exactly
+   1.500:1. The image fills the framed region without the earlier side gutters.
+
+### Required fidelity surfaces
+
+- **Fonts and typography:** unchanged; HTML labels and the compact swipe hint
+  retain the native Dashboard hierarchy.
+- **Spacing and layout rhythm:** the centered frame now hugs the illustration,
+  while previous and next cards remain visible behind it.
+- **Colors and visual tokens:** unchanged warm paper, ink border, hard shadow,
+  and theme backgrounds match the supplied state.
+- **Image quality and asset fidelity:** the approved 768 × 512 WebP remains
+  uncropped, pixelated, and rendered at its native 3:2 ratio.
+- **Copy and content:** all Dashboard copy, selectors, Prev/Next controls, and
+  swipe hint remain intact.
+
+### Interaction checks
+
+- Mouse drag changed insight 03 → 04.
+- Horizontal trackpad scroll changed insight 02 → 03.
+- `ArrowLeft` changed insight 01 → 04.
+- A vertical gesture over the image stage moved page scroll from 1037.5 px to
+  1404.5 px, confirming that vertical navigation remains available.
+- Fresh-load browser console: zero warnings and zero errors.
+- Desktop document width equals viewport width; no horizontal overflow.
 
 ### Final result
 

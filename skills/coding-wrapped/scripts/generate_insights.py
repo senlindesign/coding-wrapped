@@ -12,6 +12,7 @@ from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any
 
+from best_practices import load_catalog, practice_map, select_practices
 from common import (
     SEED_ILLUSTRATIONS,
     SOURCE_ILLUSTRATIONS_ROOT,
@@ -58,9 +59,10 @@ ILLUSTRATION_AVOID = (
 def generation_brief(home: Path) -> dict[str, Any]:
     paths = ensure_state(home)
     metrics = read_json(paths["metrics"] / "dashboard-30d.json")
-    sources = read_json(paths["sources"])
     config = read_json(paths["config"])
     locale = config.get("profile", {}).get("default_locale", "en")
+    safe_metrics = sanitize_metrics(metrics)
+    tip_context = select_practices(safe_metrics)
     return {
         "schema_version": "1.0.0",
         "privacy": {
@@ -85,6 +87,9 @@ def generation_brief(home: Path) -> dict[str, Any]:
             "different_compositions": True,
             "maximum_center_hub_compositions": 1,
             "source_ids_must_exist": True,
+            "tip_practice_id_required": True,
+            "tip_source_ids_are_derived": True,
+            "tip_must_match_observed_behavior": True,
             "illustration_contract": {
                 "style_id": ILLUSTRATION_STYLE_ID,
                 "canvas": {
@@ -105,8 +110,8 @@ def generation_brief(home: Path) -> dict[str, Any]:
                 "qa_reference_comparison_required": True,
             },
         },
-        "metrics": sanitize_metrics(metrics),
-        "sources": sources["sources"],
+        "metrics": safe_metrics,
+        "tip_context": tip_context,
     }
 
 
@@ -132,6 +137,7 @@ def validate_batch(
     payload: Any,
     allowed_sources: set[str],
     locale: str,
+    practices: dict[str, dict[str, Any]],
 ) -> list[dict[str, Any]]:
     insights = payload.get("insights") if isinstance(payload, dict) else None
     if not isinstance(insights, list) or len(insights) != 4:
@@ -161,9 +167,18 @@ def validate_batch(
             raise ValueError("All four insights must use different compositions")
         if "hub" in composition.lower() or "network" in composition.lower():
             center_hub_count += 1
-        source_ids = item.get("source_ids", [])
+        practice_id = item.get("tip_practice_id")
+        if not isinstance(practice_id, str) or practice_id not in practices:
+            raise ValueError("Every insight needs an allow-listed tip_practice_id")
+        canonical_source_ids = list(practices[practice_id]["source_ids"])
+        supplied_source_ids = item.get("source_ids")
+        if supplied_source_ids is not None and supplied_source_ids != canonical_source_ids:
+            raise ValueError("Insight source IDs must match its tip practice")
+        item["source_ids"] = canonical_source_ids
+        source_ids = item["source_ids"]
         if (
             not isinstance(source_ids, list)
+            or not source_ids
             or any(source_id not in allowed_sources for source_id in source_ids)
         ):
             raise ValueError("Every source ID must exist in sources.json")
@@ -213,7 +228,8 @@ def persist_batch(home: Path, payload: dict[str, Any]) -> dict[str, Any]:
         for source in source_state.get("sources", [])
         if isinstance(source, dict) and isinstance(source.get("id"), str)
     }
-    insights = validate_batch(payload, allowed_sources, locale)
+    practices = practice_map(load_catalog())
+    insights = validate_batch(payload, allowed_sources, locale, practices)
     state = read_json(paths["insights"])
     created_at = datetime.now(timezone.utc).isoformat()
     batch_id = f"batch-{datetime.now(timezone.utc).strftime('%Y%m%d%H%M%S%f')}"
@@ -242,6 +258,7 @@ def persist_batch(home: Path, payload: dict[str, Any]) -> dict[str, Any]:
                 "theme": item["theme"],
                 "composition": item["composition"],
                 "image": f"/generated-images/{batch_id}/{filename}",
+                "tip_practice_id": item["tip_practice_id"],
                 "source_ids": item.get("source_ids", []),
                 "evidence": item.get("evidence", {}),
                 "copy": item["copy"],

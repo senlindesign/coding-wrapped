@@ -318,6 +318,12 @@
     flex-wrap: wrap;
   }
 
+  .rpg-tip-sources {
+    align-items: flex-start;
+    flex-direction: column;
+    gap: 7px;
+  }
+
   .rpg-stats-controls {
     width: 100%;
     justify-content: space-between;

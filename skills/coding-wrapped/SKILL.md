@@ -88,6 +88,12 @@ sentences: select two or three representative facts instead of replaying every
 metric, then state the behavior they reveal. Aim for roughly two desktop lines
 (45–75 Chinese characters or 18–34 English words). Save the result as:
 
+Read [references/coding-best-practices.md](references/coding-best-practices.md)
+when writing recommendations. Choose only from the brief's
+`tip_context.candidate_practices`. Match the practice to an observed behavior
+signal and use its localized action as the factual basis. Do not invent a
+generic recommendation when no candidate fits.
+
 ```json
 {
   "copy": {
@@ -98,9 +104,9 @@ metric, then state the behavior they reveal. Aim for roughly two desktop lines
       "recommendations": [
         {
           "id": "...",
+          "practice_id": "an-allow-listed-practice-id",
           "title": "...",
-          "body": "...",
-          "source_ids": ["an-allow-listed-id"]
+          "body": "..."
         }
       ]
     }
@@ -125,8 +131,12 @@ python3 "$SKILL_DIR/scripts/generate_insights.py" brief \
 ```
 
 Read [references/insight-writing.md](references/insight-writing.md) and
-[references/visual-system.md](references/visual-system.md). Choose the four most
-personal and visually expressive findings, not merely the four largest values.
+[references/visual-system.md](references/visual-system.md). Read
+[references/coding-best-practices.md](references/coding-best-practices.md) when
+writing each Light Tip. Choose the four most personal and visually expressive
+findings, not merely the four largest values. Use exactly one allow-listed
+`tip_practice_id` per insight; persistence derives its source links from the
+catalog. A tip must match an observed aggregate behavior signal.
 
 When an image-generation tool is available:
 

@@ -90,7 +90,7 @@ function Hero({ onInstall }) {
         />
         <h1>Coding Wrapped</h1>
         <div className="hero-lede">
-          <p className="hero-lede__lead">Observe the way you build.</p>
+          <p className="hero-lede__lead pixel-slogan">Observe the way you build</p>
           <p className="hero-lede__body">
             Turn local AI-coding history into revealing stories and practical
             next steps. One shot. Nothing leaves your machine.
@@ -169,7 +169,10 @@ function OverviewPanel() {
         </div>
       </div>
       <div className="overview-visual">
-        <img alt="A pixel-art person directing a fleet of coding agents" src={INSIGHTS[0].image} />
+        <img
+          alt="A pixel-art person making a small correction while one coding agent moves work through a feedback loop"
+          src="/assets/illustrations/overview-calibration-loop.webp"
+        />
         <span>Local aggregates only · no transcript leaves your machine</span>
       </div>
     </div>
@@ -180,7 +183,12 @@ function InsightPanel({ activeIndex, onChange, onManualInteraction, reducedMotio
   const insight = INSIGHTS[activeIndex];
   const previousIndex = (activeIndex - 1 + INSIGHTS.length) % INSIGHTS.length;
   const nextIndex = (activeIndex + 1) % INSIGHTS.length;
-  const touchStartX = useRef(null);
+  const pointerStartX = useRef(null);
+  const pointerId = useRef(null);
+  const wheelDistance = useRef(0);
+  const wheelResetTimer = useRef(null);
+  const wheelLockedUntil = useRef(0);
+  const [isDragging, setIsDragging] = useState(false);
   const selectRelativeInsight = (offset) => {
     onManualInteraction?.();
     onChange((activeIndex + offset + INSIGHTS.length) % INSIGHTS.length);
@@ -194,6 +202,8 @@ function InsightPanel({ activeIndex, onChange, onManualInteraction, reducedMotio
     return () => window.clearTimeout(timer);
   }, [activeIndex, onChange, reducedMotion]);
 
+  useEffect(() => () => window.clearTimeout(wheelResetTimer.current), []);
+
   const handleKeyDown = (event) => {
     if (event.key === "ArrowLeft") {
       event.preventDefault();
@@ -205,12 +215,42 @@ function InsightPanel({ activeIndex, onChange, onManualInteraction, reducedMotio
     }
   };
 
-  const handleTouchEnd = (event) => {
-    if (touchStartX.current === null) return;
-    const distance = event.changedTouches[0].clientX - touchStartX.current;
-    touchStartX.current = null;
-    if (Math.abs(distance) < 48) return;
+  const resetPointerGesture = () => {
+    pointerStartX.current = null;
+    pointerId.current = null;
+    setIsDragging(false);
+  };
+
+  const handlePointerDown = (event) => {
+    if (event.pointerType === "mouse" && event.button !== 0) return;
+    pointerStartX.current = event.clientX;
+    pointerId.current = event.pointerId;
+    setIsDragging(true);
+    event.currentTarget.setPointerCapture?.(event.pointerId);
+  };
+
+  const handlePointerUp = (event) => {
+    if (pointerStartX.current === null || pointerId.current !== event.pointerId) return;
+    const distance = event.clientX - pointerStartX.current;
+    event.currentTarget.releasePointerCapture?.(event.pointerId);
+    resetPointerGesture();
+    if (Math.abs(distance) < 44) return;
     selectRelativeInsight(distance > 0 ? -1 : 1);
+  };
+
+  const handleWheel = (event) => {
+    if (Math.abs(event.deltaX) < 8 || Math.abs(event.deltaX) <= Math.abs(event.deltaY)) return;
+    event.preventDefault();
+    if (Date.now() < wheelLockedUntil.current) return;
+
+    wheelDistance.current += event.deltaX;
+    window.clearTimeout(wheelResetTimer.current);
+    wheelResetTimer.current = window.setTimeout(() => { wheelDistance.current = 0; }, 180);
+
+    if (Math.abs(wheelDistance.current) < 56) return;
+    selectRelativeInsight(wheelDistance.current > 0 ? 1 : -1);
+    wheelDistance.current = 0;
+    wheelLockedUntil.current = Date.now() + 520;
   };
 
   return (
@@ -218,8 +258,6 @@ function InsightPanel({ activeIndex, onChange, onManualInteraction, reducedMotio
       aria-label="Insight stories. Use left and right arrow keys or swipe to change the story."
       className={`insight-panel insight-panel--${insight.theme}`}
       onKeyDown={handleKeyDown}
-      onTouchEnd={handleTouchEnd}
-      onTouchStart={(event) => { touchStartX.current = event.touches[0].clientX; }}
       tabIndex={0}
     >
       <header className="insight-deck-toolbar">
@@ -249,15 +287,23 @@ function InsightPanel({ activeIndex, onChange, onManualInteraction, reducedMotio
           <button onClick={() => selectRelativeInsight(1)} type="button">NEXT</button>
         </div>
       </header>
-      <div className="insight-image-stage" aria-label="An illustrated insight card stack">
+      <div
+        aria-label="An illustrated insight card stack. Drag or swipe horizontally to change insight."
+        className={`insight-image-stage${isDragging ? " is-dragging" : ""}`}
+        onDragStart={(event) => event.preventDefault()}
+        onPointerCancel={resetPointerGesture}
+        onPointerDown={handlePointerDown}
+        onPointerUp={handlePointerUp}
+        onWheel={handleWheel}
+      >
         <figure className="insight-card-preview insight-card-preview--left" aria-hidden="true">
-          <img alt="" src={INSIGHTS[previousIndex].image} />
+          <img alt="" draggable="false" key={INSIGHTS[previousIndex].image} src={INSIGHTS[previousIndex].image} />
         </figure>
         <figure className="insight-card-preview insight-card-preview--main">
-          <img alt={insight.alt} key={insight.image} src={insight.image} />
+          <img alt={insight.alt} draggable="false" key={insight.image} src={insight.image} />
         </figure>
         <figure className="insight-card-preview insight-card-preview--right" aria-hidden="true">
-          <img alt="" src={INSIGHTS[nextIndex].image} />
+          <img alt="" draggable="false" key={INSIGHTS[nextIndex].image} src={INSIGHTS[nextIndex].image} />
         </figure>
         <span className="insight-swipe-hint">SWIPE OR USE ARROW KEYS</span>
       </div>
@@ -353,10 +399,15 @@ function DataPanel({ onManualInteraction, reducedMotion }) {
         </div>
       </div>
       <div className="metric-grid" aria-live="polite">
-        {visibleMetrics.map((metric) => {
+        {visibleMetrics.map((metric, visibleIndex) => {
           const metricIndex = METRICS.indexOf(metric);
           return (
-          <article className={`metric-card metric-card--tone-${metricIndex % 4} ${metric.kind === "activity" ? "metric-card--activity" : ""}`} key={metric.label} tabIndex={0}>
+          <article
+            className={`metric-card metric-card--tone-${metricIndex % 4} ${metric.kind === "activity" ? "metric-card--activity" : ""}`}
+            key={metric.label}
+            style={{ "--metric-delay": `${visibleIndex * 34}ms` }}
+            tabIndex={0}
+          >
             <div className="metric-card__main">
               <span>{metric.label}</span><strong>{metric.value}</strong><small>{metric.note}</small>
             </div>
@@ -373,6 +424,8 @@ function DataPanel({ onManualInteraction, reducedMotion }) {
 function DemoWindow({ activeIndex, onChange, onUseData, onViewChange, onVisibilityChange, view }) {
   const [revealed, setRevealed] = useState(false);
   const [manualHoldUntil, setManualHoldUntil] = useState(0);
+  const [renderedView, setRenderedView] = useState(view);
+  const [contentPhase, setContentPhase] = useState("is-active");
   const reducedMotion = useReducedMotion();
   const activeViewIndex = DEMO_VIEWS.findIndex((item) => item.id === view);
 
@@ -414,6 +467,28 @@ function DemoWindow({ activeIndex, onChange, onUseData, onViewChange, onVisibili
     return () => window.clearTimeout(timer);
   }, [activeViewIndex, manualHoldUntil, onViewChange, reducedMotion, revealed]);
 
+  useEffect(() => {
+    if (view === renderedView) return undefined;
+    if (reducedMotion) {
+      setRenderedView(view);
+      setContentPhase("is-active");
+      return undefined;
+    }
+
+    setContentPhase("is-leaving");
+    const swapTimer = window.setTimeout(() => {
+      setRenderedView(view);
+      setContentPhase("is-entering");
+    }, 170);
+    return () => window.clearTimeout(swapTimer);
+  }, [reducedMotion, renderedView, view]);
+
+  useEffect(() => {
+    if (contentPhase !== "is-entering") return undefined;
+    const settleTimer = window.setTimeout(() => setContentPhase("is-active"), 360);
+    return () => window.clearTimeout(settleTimer);
+  }, [contentPhase]);
+
   const pauseAutoplayBriefly = () => setManualHoldUntil(Date.now() + 12000);
 
   const chooseView = (nextView) => {
@@ -442,10 +517,10 @@ function DemoWindow({ activeIndex, onChange, onUseData, onViewChange, onVisibili
         </nav>
         <span className="demo-status"><i aria-hidden="true" /> LIVE PREVIEW · LOCAL-FIRST</span>
       </div>
-      <div className="product-content" key={view}>
-        {view === "overview" && <OverviewPanel />}
-        {view === "insight" && <InsightPanel activeIndex={activeIndex} onChange={onChange} onManualInteraction={pauseAutoplayBriefly} reducedMotion={reducedMotion} />}
-        {view === "data" && <DataPanel onManualInteraction={pauseAutoplayBriefly} reducedMotion={reducedMotion} />}
+      <div className={`product-content ${contentPhase}`} data-view={renderedView}>
+        {renderedView === "overview" && <OverviewPanel />}
+        {renderedView === "insight" && <InsightPanel activeIndex={activeIndex} onChange={onChange} onManualInteraction={pauseAutoplayBriefly} reducedMotion={reducedMotion} />}
+        {renderedView === "data" && <DataPanel onManualInteraction={pauseAutoplayBriefly} reducedMotion={reducedMotion} />}
       </div>
     </WindowFrame>
   );
@@ -458,7 +533,7 @@ function ProcessWindow() {
         <img
           alt="A pixel-art flow from scanning local coding logs, to wrapping safe data, to exploring finished insights"
           className="process-illustration"
-          src="/assets/how-it-works-flow.png"
+          src="/assets/how-it-works-flow-v2.png"
         />
         <div>
           <p className="panel-kicker">THREE SMALL STEPS</p>
@@ -471,6 +546,49 @@ function ProcessWindow() {
         </div>
       </div>
       <footer className="privacy-strip">Raw conversations, source code, project names, local paths and secrets stay out of the website.</footer>
+    </section>
+  );
+}
+
+function PracticeTipsWindow() {
+  return (
+    <section className="practice-tips-window" aria-labelledby="practice-tips-title">
+      <div className="practice-tips-layout">
+        <div className="practice-tips-visual">
+          <img
+            alt="Pixel-art sources and local behavior being sorted into one practical coding tip"
+            src="/assets/practice-tip-flow.png"
+          />
+        </div>
+        <div className="practice-tips-copy">
+          <p className="panel-kicker">PRACTICES, NOT PLATITUDES</p>
+          <h2 id="practice-tips-title">A useful tip should have somewhere to point back to.</h2>
+          <p>
+            Coding Wrapped matches patterns in your local aggregates with
+            practices from official agent guidance and experienced builders,
+            then gives you one small next move with its source attached.
+          </p>
+          <ul aria-label="Practice source types" className="practice-source-types">
+            <li>Official guidance</li>
+            <li>Practitioner playbooks</li>
+            <li>Expert conversations</li>
+          </ul>
+          <article className="practice-tip-example">
+            <header>
+              <span>LIGHT TIP</span>
+              <small>MATCHED TO · SHORT PROMPTS</small>
+            </header>
+            <p>Add one sentence describing what done looks like and one thing that must not change.</p>
+            <footer>
+              <span>BASED ON</span>
+              <a href="https://learn.chatgpt.com/docs/prompting" rel="noreferrer" target="_blank">OpenAI · Prompting</a>
+            </footer>
+          </article>
+          <a className="practice-library-link" href={LINKS.practiceLibrary} rel="noreferrer" target="_blank">
+            View the practice library <span aria-hidden="true">→</span>
+          </a>
+        </div>
+      </div>
     </section>
   );
 }
@@ -535,15 +653,16 @@ export function App() {
         />
       </section>
       <section className="information-stage">
+        <PracticeTipsWindow />
         <ProcessWindow />
         <div id="install"><InstallWindow onCopy={copyInstall} /></div>
       </section>
       <footer className="page-footer">
-        <div><strong>Coding Wrapped</strong></div>
+        <div><strong>Coding Wrapped</strong><span className="pixel-slogan">Observe the way you build</span></div>
         <a href={LINKS.github} rel="noreferrer" target="_blank">MIT · OPEN SOURCE</a>
       </footer>
       <Dock quiet={demoInView} />
-      {toast && <div aria-live="polite" className="toast" role="status">{toast}</div>}
+      {toast && <div aria-live="polite" className="toast" key={toast} role="status">{toast}</div>}
     </main>
   );
 }

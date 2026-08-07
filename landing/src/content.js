@@ -1,5 +1,7 @@
 export const LINKS = {
   github: "https://github.com/senlindesign/coding-wrapped",
+  practiceLibrary:
+    "https://github.com/senlindesign/coding-wrapped/blob/main/skills/coding-wrapped/references/coding-best-practices.md",
   profile: "https://www.linkedin.com/in/senlinbebop",
   support: "https://buymeacoffee.com/senlin",
 };
@@ -19,6 +21,8 @@ export const INSIGHTS = [
     agentDid: "Short inputs often started a full implementation loop.",
     yourStyle: "You control rhythm and direction while leaving the expansion space to AI.",
     tip: "Add one finish line before a short command to save a confirmation loop.",
+    practiceId: "define-outcome-boundaries",
+    sourceIds: ["openai-prompting"],
     image: "/assets/illustrations/agent-orchestra-warm.webp",
     alt: "A pixel-art person directing a group of cream robots",
     theme: "warm",
@@ -31,6 +35,8 @@ export const INSIGHTS = [
     agentDid: "The agent kept context and accumulated decisions across a long run.",
     yourStyle: "You work in deep expeditions rather than evenly spaced check-ins.",
     tip: "Leave a one-line checkpoint before the final late-night push.",
+    practiceId: "evidence-before-done",
+    sourceIds: ["anthropic-claude-code-best-practices"],
     image: "/assets/illustrations/night-runner-blue.webp",
     alt: "A pixel-art night runner scene with a car and coding agent",
     theme: "blue",
@@ -43,6 +49,8 @@ export const INSIGHTS = [
     agentDid: "The agent inferred missing steps and assembled a production line around them.",
     yourStyle: "You prefer steering the system to documenting the entire route first.",
     tip: "Name the one thing that must not change when the task is sensitive.",
+    practiceId: "define-outcome-boundaries",
+    sourceIds: ["openai-prompting"],
     image: "/assets/illustrations/prompt-machine-pink.webp",
     alt: "A pixel-art workshop where a person hands prompts to several robots",
     theme: "pink",
@@ -55,6 +63,11 @@ export const INSIGHTS = [
     agentDid: "The agent treated continuity as permission to preserve the working plan.",
     yourStyle: "You calibrate early, then let a trusted loop keep running.",
     tip: "Pair “continue” with one status line: done, blocked, and next.",
+    practiceId: "explicit-agent-state",
+    sourceIds: [
+      "lenny-autonomous-coding-agents",
+      "anthropic-claude-code-subagents",
+    ],
     image: "/assets/illustrations/continue-steps-green.webp",
     alt: "A pixel-art library of coding robots and continuing work",
     theme: "green",

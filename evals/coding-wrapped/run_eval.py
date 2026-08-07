@@ -87,6 +87,7 @@ def load_modules(skill_root: Path) -> dict[str, Any]:
     if scripts not in sys.path:
         sys.path.insert(0, scripts)
     import common
+    import best_practices
     import generate_insights
     import generate_overview
     import scan_sessions
@@ -94,6 +95,7 @@ def load_modules(skill_root: Path) -> dict[str, Any]:
 
     return {
         "common": common,
+        "best_practices": best_practices,
         "generate_insights": generate_insights,
         "generate_overview": generate_overview,
         "scan_sessions": scan_sessions,
@@ -297,6 +299,7 @@ def main() -> None:
     skill_root = args.skill_root.resolve()
     modules = load_modules(skill_root)
     common = modules["common"]
+    practice_module = modules["best_practices"]
     insight_module = modules["generate_insights"]
     overview_module = modules["generate_overview"]
     scan_module = modules["scan_sessions"]
@@ -320,6 +323,89 @@ def main() -> None:
         }
 
     evaluation.check("spec", "Agent Skills frontmatter and discovery metadata", metadata_contract)
+
+    def practice_catalog_contract() -> dict[str, Any]:
+        catalog = practice_module.load_catalog()
+        derived = practice_module.sources_payload(catalog)
+        bundled = json.loads(
+            (
+                skill_root
+                / "assets"
+                / "default-state"
+                / "data"
+                / "sources.json"
+            ).read_text(encoding="utf-8")
+        )
+        require(derived == bundled, "sources.json must be derived from the catalog")
+        require(len(catalog["practices"]) >= 40, "practice catalog is too small")
+        automatic = [
+            practice for practice in catalog["practices"]
+            if practice["match_mode"] == "automatic"
+        ]
+        reserve = [
+            practice for practice in catalog["practices"]
+            if practice["match_mode"] == "reserve"
+        ]
+        require(automatic and reserve, "catalog needs automatic and reserve practices")
+        return {
+            "sources": len(catalog["sources"]),
+            "practices": len(catalog["practices"]),
+            "automatic": len(automatic),
+            "reserve": len(reserve),
+        }
+
+    evaluation.check(
+        "spec",
+        "Best-practice catalog and derived source registry",
+        practice_catalog_contract,
+    )
+
+    def practice_matching_contract() -> dict[str, Any]:
+        weak_phrase_metrics = {
+            "coverage": {"sessions": 10, "user_messages": 10, "projects": 1},
+            "rhythm": {},
+            "prompts": {
+                "median_characters": 100,
+                "under_50_characters": 0,
+                "phrase_counts": [{"phrase": "看一下", "messages": 8}],
+            },
+            "behavior": {"plan_mode_sessions": 1, "tool_categories": {}},
+        }
+        signals = practice_module.detect_behavior_signals(weak_phrase_metrics)
+        tags = {signal["tag"] for signal in signals}
+        require("repeated-corrections" not in tags, "看一下 is not proof of correction")
+        require("low-plan-use" in tags, "low plan use should be detected")
+        require("plan-use" not in tags, "plan signals must be mutually exclusive")
+
+        demo_metrics = json.loads(
+            (
+                skill_root
+                / "assets"
+                / "default-state"
+                / "data"
+                / "dashboard-30d.json"
+            ).read_text(encoding="utf-8")
+        )
+        candidates = practice_module.select_practices(demo_metrics, limit=6)[
+            "candidate_practices"
+        ]
+        families = [practice["family"] for practice in candidates]
+        require(len(families) == len(set(families)), "one candidate per family")
+        require(len(set(families)) >= 3, "candidate batch needs family diversity")
+        require(
+            all(practice["match_mode"] == "automatic" for practice in candidates),
+            "reserve practices must never enter generation briefs",
+        )
+        return {
+            "weak_phrase_tags": sorted(tags),
+            "candidate_families": families,
+        }
+
+    evaluation.check(
+        "validation",
+        "Behavior matching rejects weak inferences and diversifies families",
+        practice_matching_contract,
+    )
 
     def progressive_disclosure() -> dict[str, Any]:
         skill_file = skill_root / "SKILL.md"
@@ -509,6 +595,41 @@ def main() -> None:
 
         evaluation.check("function", "CLI builds 7d, 30d, and unbounded all snapshots", cli_snapshots)
 
+        def source_registry_upgrade() -> dict[str, Any]:
+            paths = common.state_paths(home)
+            historical = {
+                "id": "historical-source",
+                "title": "Historical source",
+                "publisher": "Archive",
+                "url": "https://example.com/historical",
+                "type": "historical",
+                "supporting_claims": ["Kept only for an older card."],
+                "topics": ["history"],
+            }
+            common.write_json_atomic(
+                paths["sources"],
+                {"schema_version": "1.0.0", "sources": [historical]},
+            )
+            common.ensure_state(home)
+            upgraded = common.read_json(paths["sources"])
+            source_ids = {source["id"] for source in upgraded["sources"]}
+            canonical_ids = {
+                source["id"]
+                for source in practice_module.sources_payload()["sources"]
+            }
+            require(canonical_ids <= source_ids, "canonical sources were not merged")
+            require("historical-source" in source_ids, "historical source was lost")
+            return {
+                "canonical_sources": len(canonical_ids),
+                "historical_sources_preserved": 1,
+            }
+
+        evaluation.check(
+            "compatibility",
+            "Existing source registries upgrade without breaking old cards",
+            source_registry_upgrade,
+        )
+
         def brief_privacy() -> dict[str, Any]:
             metric_path = home / "data" / "metrics" / "dashboard-30d.json"
             legacy_metrics = json.loads(metric_path.read_text(encoding="utf-8"))
@@ -526,6 +647,14 @@ def main() -> None:
             require(brief["privacy"]["forbidden"], "brief must state forbidden data")
             require(brief["requirements"]["count"] == 4, "brief must request four insights")
             require(brief["requirements"]["locale"] == "zh", "brief must use one configured locale")
+            require(
+                brief["tip_context"]["candidate_practices"],
+                "brief must include behavior-matched practices",
+            )
+            require(
+                brief["tip_context"]["observed_behavior_signals"],
+                "brief must explain the aggregate behavior match",
+            )
             illustration = brief["requirements"]["illustration_contract"]
             require(
                 illustration["style_id"] == "cw-pixel-diorama-v1",
@@ -574,23 +703,32 @@ def main() -> None:
         def invalid_batches() -> dict[str, Any]:
             sources = common.read_json(common.state_paths(home)["sources"])
             allowed = {item["id"] for item in sources["sources"]}
+            practices = practice_module.practice_map()
             one = valid_insight_payload(skill_root, "invalid-one")
             one["insights"] = one["insights"][:1]
             count_error = expect_value_error(
-                lambda: insight_module.validate_batch(one, allowed, "zh"),
+                lambda: insight_module.validate_batch(one, allowed, "zh", practices),
                 "exactly four",
             )
             duplicate = valid_insight_payload(skill_root, "invalid-duplicate")
             duplicate["insights"][1]["composition"] = duplicate["insights"][0]["composition"]
             composition_error = expect_value_error(
-                lambda: insight_module.validate_batch(duplicate, allowed, "zh"),
+                lambda: insight_module.validate_batch(duplicate, allowed, "zh", practices),
                 "different compositions",
             )
             unknown = valid_insight_payload(skill_root, "invalid-source")
             unknown["insights"][0]["source_ids"] = ["not-allow-listed"]
             source_error = expect_value_error(
-                lambda: insight_module.validate_batch(unknown, allowed, "zh"),
-                "source ID",
+                lambda: insight_module.validate_batch(unknown, allowed, "zh", practices),
+                "must match",
+            )
+            unknown_practice = valid_insight_payload(skill_root, "invalid-practice")
+            unknown_practice["insights"][0]["tip_practice_id"] = "not-allow-listed"
+            practice_error = expect_value_error(
+                lambda: insight_module.validate_batch(
+                    unknown_practice, allowed, "zh", practices
+                ),
+                "practice",
             )
             wrong_size = home / "wrong-size.png"
             wrong_size.write_bytes(
@@ -615,6 +753,7 @@ def main() -> None:
                 count_error,
                 composition_error,
                 source_error,
+                practice_error,
                 image_error,
             ]
 
@@ -626,7 +765,6 @@ def main() -> None:
 
         def overview_persistence() -> dict[str, Any]:
             paths = common.state_paths(home)
-            source_id = common.read_json(paths["sources"])["sources"][0]["id"]
             brief = overview_module.build_brief(home)
             summary_contract = brief["requirements"]["summary"]
             require(
@@ -660,9 +798,9 @@ def main() -> None:
                         "recommendations": [
                             {
                                 "id": "eval-recommendation",
+                                "practice_id": "define-outcome-boundaries",
                                 "title": "先写完成标准",
                                 "body": "给任务补一句可验证的完成标准。",
-                                "source_ids": [source_id],
                             }
                         ],
                     }
@@ -671,12 +809,19 @@ def main() -> None:
             result = overview_module.persist(home, payload)
             overview = common.read_json(paths["overview"])
             require(overview["status"] == "ready", "overview should be ready")
-            require(overview["copy"]["zh"]["recommendations"][0]["source_ids"] == [source_id], "source ID should persist")
+            expected_sources = practice_module.source_ids_for_practice(
+                "define-outcome-boundaries"
+            )
+            require(
+                overview["copy"]["zh"]["recommendations"][0]["source_ids"]
+                == expected_sources,
+                "practice source IDs should be derived and persist",
+            )
             bad = copy.deepcopy(payload)
-            bad["copy"]["zh"]["recommendations"][0]["source_ids"] = ["unknown"]
+            bad["copy"]["zh"]["recommendations"][0]["practice_id"] = "unknown"
             expect_value_error(
                 lambda: overview_module.persist(home, bad),
-                "allow-listed",
+                "practice",
             )
             verbose = copy.deepcopy(payload)
             verbose["copy"]["zh"]["summary"] = (

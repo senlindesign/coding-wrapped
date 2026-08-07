@@ -30,11 +30,18 @@ configured.
 - `dashboard-*.json` stores deterministic aggregates and approved short-phrase
   counts. Rebuild these files without invoking a model.
 - `insights.json` stores stable IDs, batches, evidence values, one requested
-  locale of UI copy, source IDs, and local relative image URLs.
+  locale of UI copy, a Light Tip practice ID, derived source IDs, and local
+  relative image URLs. Older cards without a practice ID remain readable.
 - `overview.json` stores one requested locale, its metrics watermark, refresh
-  decision, and up to three sourced recommendations.
-- `sources.json` is the URL allow-list. Generated copy may reference its IDs but
-  may not invent URLs.
+  decision, and up to three recommendations linked to catalog practice IDs.
+- `sources.json` is the runtime URL allow-list derived from
+  `references/coding-best-practices.md`. Generated copy may reference its IDs
+  but may not invent URLs. Existing installations merge new canonical entries
+  while retaining historical entries needed by older cards.
+- Every catalog practice declares a `family` and `match_mode`. Generation
+  briefs exclude `reserve` entries and select no more than one `automatic`
+  practice per family, so reviewed knowledge is not mistaken for a behavior
+  the scanner can prove.
 - `generated-images/` stores local illustration files by batch.
 
 ## Local API
@@ -54,4 +61,3 @@ POST /api/refresh?range=7d|30d|all
 `POST /api/refresh` changes facts only. `POST /api/insights/generate` accepts
 exactly four records. Generated images use `/generated-images/<batch>/<file>`.
 All endpoints bind to the local server; they are not a hosted API.
-

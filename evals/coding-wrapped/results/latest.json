@@ -1,8 +1,8 @@
 {
   "schema_version": "1.0.0",
-  "generated_at": "2026-07-29T12:20:09.344887+00:00",
+  "generated_at": "2026-08-07T23:48:34.520905+00:00",
   "skill_root": "skills/coding-wrapped",
-  "passed": 14,
+  "passed": 17,
   "failed": 0,
   "activation_model_eval": {
     "status": "not-run",
@@ -24,14 +24,45 @@
     },
     {
       "category": "spec",
+      "name": "Best-practice catalog and derived source registry",
+      "status": "pass",
+      "details": {
+        "sources": 25,
+        "practices": 40,
+        "automatic": 18,
+        "reserve": 22
+      }
+    },
+    {
+      "category": "validation",
+      "name": "Behavior matching rejects weak inferences and diversifies families",
+      "status": "pass",
+      "details": {
+        "weak_phrase_tags": [
+          "low-plan-use"
+        ],
+        "candidate_families": [
+          "verification-loop",
+          "handoff-evidence",
+          "context-management",
+          "review-isolation",
+          "runtime-observability",
+          "plan-persistence"
+        ]
+      }
+    },
+    {
+      "category": "spec",
       "name": "Progressive disclosure and reference depth",
       "status": "pass",
       "details": {
-        "skill_lines": 218,
+        "skill_lines": 228,
         "direct_references": [
           "references/privacy-policy.md",
+          "references/coding-best-practices.md",
           "references/insight-writing.md",
-          "references/visual-system.md"
+          "references/visual-system.md",
+          "references/coding-best-practices.md"
         ]
       }
     },
@@ -98,6 +129,15 @@
       }
     },
     {
+      "category": "compatibility",
+      "name": "Existing source registries upgrade without breaking old cards",
+      "status": "pass",
+      "details": {
+        "canonical_sources": 25,
+        "historical_sources_preserved": 1
+      }
+    },
+    {
       "category": "privacy",
       "name": "Generation brief excludes raw private markers",
       "status": "pass",
@@ -129,7 +169,8 @@
       "details": [
         "Insight batches must contain exactly four items",
         "All four insights must use different compositions",
-        "Every source ID must exist in sources.json",
+        "Insight source IDs must match its tip practice",
+        "Every insight needs an allow-listed tip_practice_id",
         "Insight illustrations must be exactly 1536 × 1024; received 1024 × 1024"
       ]
     },
@@ -138,7 +179,7 @@
       "name": "Overview compactness, watermark, and source validation",
       "status": "pass",
       "details": {
-        "batch_id": "overview-20260729122007404973",
+        "batch_id": "overview-20260807234832472344",
         "summary_sentences": 2,
         "summary_fact_range": {
           "min": 2,
@@ -160,7 +201,7 @@
       "name": "Fresh-directory copy compiles and scans",
       "status": "pass",
       "details": {
-        "compiled_scripts": 8,
+        "compiled_scripts": 10,
         "portable_sessions": 2
       }
     }

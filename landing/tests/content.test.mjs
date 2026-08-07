@@ -22,6 +22,10 @@ test("installation and repository destinations stay canonical", () => {
   assert.equal(LINKS.github, "https://github.com/senlindesign/coding-wrapped");
   assert.equal(LINKS.profile, "https://www.linkedin.com/in/senlinbebop");
   assert.equal(LINKS.support, "https://buymeacoffee.com/senlin");
+  assert.equal(
+    LINKS.practiceLibrary,
+    "https://github.com/senlindesign/coding-wrapped/blob/main/skills/coding-wrapped/references/coding-best-practices.md",
+  );
 });
 
 test("landing hero exposes only the two supported agents", async () => {
@@ -59,7 +63,7 @@ test("landing dock contains four pixel-style destinations", async () => {
 test("hero follows the product story, CTA, then support hierarchy", async () => {
   const source = await readFile(new URL("../src/App.jsx", import.meta.url), "utf8");
   const title = source.indexOf("<h1>Coding Wrapped</h1>");
-  const slogan = source.indexOf("Observe the way you build.");
+  const slogan = source.indexOf("Observe the way you ");
   const actions = source.indexOf('className="hero-actions"');
   const support = source.indexOf('className="hero-support-wrap"');
   assert.ok(title < slogan && slogan < actions && actions < support);
@@ -78,9 +82,9 @@ test("hero CTA labels stay centered before the hover arrow appears", async () =>
 
 test("how it works uses a dedicated three-step illustration", async () => {
   const source = await readFile(new URL("../src/App.jsx", import.meta.url), "utf8");
-  assert.match(source, /how-it-works-flow\.png/);
+  assert.match(source, /how-it-works-flow-v2\.png/);
   assert.doesNotMatch(source, /Coding Wrapped app icon showing a robot reading a notebook/);
-  await readFile(new URL("../public/assets/how-it-works-flow.png", import.meta.url));
+  await readFile(new URL("../public/assets/how-it-works-flow-v2.png", import.meta.url));
 });
 
 test("supported agents use their official color artwork", async () => {
@@ -106,7 +110,7 @@ test("hero keeps its static title while preserving restrained mascot hover motio
   const styles = await readFile(new URL("../src/styles.css", import.meta.url), "utf8");
   assert.match(source, /<h1>Coding Wrapped<\/h1>/);
   assert.doesNotMatch(source, /AnimatedHeroTitle|hero-title__pixel/);
-  assert.doesNotMatch(styles, /Pixelify Sans|hero-title-pixel-scan/);
+  assert.doesNotMatch(styles, /hero-title-pixel-scan/);
   assert.match(styles, /\.hero-app-icon:hover/);
   assert.match(styles, /rotate\(7deg\) scale\(1\.14\)/);
 });
@@ -125,14 +129,25 @@ test("live preview rotates through three direct product views without tour chrom
 test("preview restores complete overview, insight deck, and behavior controls", async () => {
   const source = await readFile(new URL("../src/App.jsx", import.meta.url), "utf8");
   const styles = await readFile(new URL("../src/styles.css", import.meta.url), "utf8");
+  const overviewIllustration = await stat(new URL("../public/assets/illustrations/overview-calibration-loop.webp", import.meta.url));
   assert.match(source, /OVERVIEW_PATTERNS/);
   assert.match(source, /overview-sources/);
+  assert.match(source, /overview-calibration-loop\.webp/);
+  assert.doesNotMatch(source, /A pixel-art person directing a fleet of coding agents/);
+  assert.ok(overviewIllustration.size > 0);
   assert.match(source, /insight-deck-toolbar/);
   assert.match(source, /insight-card-preview--main/);
   assert.match(source, /insight-card-preview--left/);
   assert.match(source, /insight-card-preview--right/);
   assert.match(source, /insight-story__headline/);
   assert.match(source, /Use left and right arrow keys or swipe/);
+  assert.match(source, /onPointerDown=\{handlePointerDown\}/);
+  assert.match(source, /onPointerUp=\{handlePointerUp\}/);
+  assert.match(source, /onWheel=\{handleWheel\}/);
+  assert.match(source, /wheelDistance\.current/);
+  assert.doesNotMatch(source, /handleTouchEnd|touchStartX/);
+  assert.match(styles, /\.insight-card-preview--main\s*\{[^}]*aspect-ratio:\s*3\s*\/\s*2/s);
+  assert.match(styles, /\.insight-image-stage\s*\{[^}]*touch-action:\s*pan-y/s);
   assert.match(source, /Customize · \{selectedMetrics\.length\} \/ \{METRICS\.length\}/);
   assert.match(source, /ACTIVITY_DAYS/);
   assert.equal(METRICS.length, 8);
@@ -148,7 +163,53 @@ test("dock stays opaque and only collapses beside the desktop demo", async () =>
   const styles = await readFile(new URL("../src/styles.css", import.meta.url), "utf8");
   assert.match(styles, /\.page-dock\s*\{[^}]*background:\s*var\(--paper\)/s);
   assert.doesNotMatch(styles, /\.page-dock\.is-quiet\s*\{[^}]*opacity:/s);
-  assert.match(styles, /@media \(max-width: 820px\)[\s\S]*\.page-dock\.is-quiet\s*\{[^}]*left:\s*50%/s);
+  assert.match(styles, /\.page-dock\.is-quiet\s*\{[^}]*translate3d\(calc\(50vw - 100% - 18px\)/s);
+  assert.doesNotMatch(styles, /\.page-dock\.is-quiet\s*\{[^}]*left:\s*auto/s);
+  assert.match(styles, /@media \(max-width: 820px\)[\s\S]*\.page-dock\.is-quiet\s*\{[^}]*translate3d\(-50%/s);
+});
+
+test("motion system smooths dock, view, deck, popover, and data transitions", async () => {
+  const source = await readFile(new URL("../src/App.jsx", import.meta.url), "utf8");
+  const styles = await readFile(new URL("../src/styles.css", import.meta.url), "utf8");
+  for (const token of ["--motion-fast", "--motion-medium", "--motion-slow", "--ease-standard", "--ease-emphasized"]) {
+    assert.match(styles, new RegExp(token));
+  }
+  assert.match(source, /contentPhase/);
+  assert.match(source, /is-leaving/);
+  assert.match(source, /is-entering/);
+  assert.match(styles, /\.product-content\.is-leaving/);
+  assert.match(styles, /\.product-content\.is-entering/);
+  assert.match(styles, /@keyframes insight-side-enter-left/);
+  assert.match(styles, /@keyframes metric-card-enter/);
+  assert.match(styles, /@keyframes popover-enter/);
+  assert.match(styles, /@keyframes toast-lifecycle/);
+});
+
+test("demo and information panels share one responsive alignment contract", async () => {
+  const styles = await readFile(new URL("../src/styles.css", import.meta.url), "utf8");
+  assert.match(styles, /--layout-gutter:\s*clamp\(16px, 2vw, 32px\)/);
+  assert.match(styles, /--layout-max:\s*1420px/);
+  assert.match(styles, /\.demo-stage\s*\{[^}]*padding:\s*0 var\(--layout-gutter\) 96px/s);
+  assert.match(styles, /\.information-stage\s*\{[^}]*padding:\s*36px var\(--layout-gutter\) 150px/s);
+  assert.match(styles, /\.product-window\s*\{[^}]*max-width:\s*var\(--layout-max\)[^}]*width:\s*100%/s);
+  assert.match(styles, /\.practice-tips-window,\s*\.process-window,\s*\.install-window\s*\{[^}]*max-width:\s*var\(--layout-max\)[^}]*width:\s*100%/s);
+});
+
+test("practice tips module explains provenance and links the source-of-truth library", async () => {
+  const source = await readFile(new URL("../src/App.jsx", import.meta.url), "utf8");
+  const styles = await readFile(new URL("../src/styles.css", import.meta.url), "utf8");
+  const image = await stat(new URL("../public/assets/practice-tip-flow.png", import.meta.url));
+  const tips = source.indexOf("<PracticeTipsWindow />");
+  const process = source.indexOf("<ProcessWindow />");
+  assert.ok(tips > 0 && tips < process);
+  assert.match(source, /PRACTICES, NOT PLATITUDES/);
+  assert.match(source, /Official guidance/);
+  assert.match(source, /Practitioner playbooks/);
+  assert.match(source, /Expert conversations/);
+  assert.match(source, /View the practice library/);
+  assert.match(styles, /\.practice-tips-window\s*\{[^}]*background:\s*var\(--panel-cream\)/s);
+  assert.match(styles, /\.practice-tips-layout\s*\{[^}]*grid-template-columns:/s);
+  assert.ok(image.size > 0);
 });
 
 test("install actions mirror the hero arrow feedback", async () => {
@@ -158,14 +219,39 @@ test("install actions mirror the hero arrow feedback", async () => {
   assert.match(source, /<span>Read the docs<\/span><img[^>]*button__arrow/);
   assert.match(styles, /\.button:hover \.button__arrow/);
   assert.match(styles, /\.information-stage\s*\{[^}]*gap:\s*30px/s);
-  assert.match(styles, /\.process-window\s*\{[^}]*background:\s*#efe1bd;[^}]*border:\s*var\(--line\)/s);
+  assert.match(styles, /\.process-window\s*\{[^}]*background:\s*var\(--panel-cream\);[^}]*border:\s*var\(--line\)/s);
+});
+
+test("information panels use the pale retro palette and the footer repeats the slogan", async () => {
+  const source = await readFile(new URL("../src/App.jsx", import.meta.url), "utf8");
+  const styles = await readFile(new URL("../src/styles.css", import.meta.url), "utf8");
+  assert.match(styles, /--panel-cream:\s*#fbf7ed/);
+  assert.match(styles, /--pink-soft:\s*#f4d7dc/);
+  assert.match(styles, /--blue-soft:\s*#cfe8e6/);
+  assert.match(styles, /\.privacy-strip\s*\{[^}]*background:\s*var\(--pink-soft\)/s);
+  assert.match(styles, /\.install-layout pre\s*\{[^}]*background:\s*var\(--blue-soft\)/s);
+  assert.match(styles, /\.install-actions \.button--primary\s*\{[^}]*background:\s*var\(--blue-soft\)/s);
+  assert.match(styles, /\.install-actions \.button--secondary\s*\{[^}]*background:\s*#fffaf0;[^}]*color:\s*var\(--ink\)/s);
+  assert.match(source, /<strong>Coding Wrapped<\/strong><span className="pixel-slogan">Observe the way you build<\/span>/);
+});
+
+test("the complete slogan drops its period and renders in a local pixel font", async () => {
+  const source = await readFile(new URL("../src/App.jsx", import.meta.url), "utf8");
+  const entry = await readFile(new URL("../src/main.jsx", import.meta.url), "utf8");
+  const styles = await readFile(new URL("../src/styles.css", import.meta.url), "utf8");
+  assert.equal((source.match(/pixel-slogan/g) ?? []).length, 2);
+  assert.match(source, /hero-lede__lead pixel-slogan">Observe the way you build<\/p>/);
+  assert.doesNotMatch(source, /Observe the way you build\./);
+  assert.match(entry, /@fontsource-variable\/pixelify-sans/);
+  assert.match(styles, /\.pixel-slogan\s*\{[^}]*font-family:\s*"Pixelify Sans Variable"/s);
+  assert.doesNotMatch(styles, /rainbow-build|rainbow-word/);
 });
 
 test("supported agent marks stay inline with the hero story", async () => {
   const source = await readFile(new URL("../src/App.jsx", import.meta.url), "utf8");
   assert.match(source, /Now works with/);
   assert.match(source, /function InlineAgent/);
-  assert.match(source, /Observe the way you build\./);
+  assert.match(source, /Observe the way you /);
   assert.match(source, /Turn local AI-coding history into revealing stories/);
   assert.doesNotMatch(source, /hero-agent-row/);
 });

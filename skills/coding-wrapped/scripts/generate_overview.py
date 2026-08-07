@@ -10,6 +10,7 @@ from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any
 
+from best_practices import load_catalog, practice_map, select_practices
 from common import (
     ensure_state,
     read_json,
@@ -23,6 +24,10 @@ def build_brief(home: Path) -> dict[str, Any]:
     paths = ensure_state(home)
     config = read_json(paths["config"])
     locale = config.get("profile", {}).get("default_locale", "en")
+    metrics = sanitize_metrics(
+        read_json(paths["metrics"] / "dashboard-30d.json")
+    )
+    tip_context = select_practices(metrics)
     return {
         "schema_version": "1.0.0",
         "task": "Write one concise behavior overview and up to three recommendations.",
@@ -41,14 +46,15 @@ def build_brief(home: Path) -> dict[str, Any]:
                 "layout_goal": "Usually about two lines on the desktop dashboard.",
             },
             "recommendations_max": 3,
+            "recommendation_practice_id_required": True,
+            "recommendation_source_ids_are_derived": True,
+            "omit_when_no_practice_matches": True,
             "no_score": True,
             "no_ranking": True,
             "source_ids_must_exist": True,
         },
-        "metrics": sanitize_metrics(
-            read_json(paths["metrics"] / "dashboard-30d.json")
-        ),
-        "sources": read_json(paths["sources"])["sources"],
+        "metrics": metrics,
+        "tip_context": tip_context,
     }
 
 
@@ -80,7 +86,12 @@ def validate_summary(summary: str, locale: str) -> None:
         )
 
 
-def validate_copy(copy: Any, allowed_sources: set[str], locale: str) -> None:
+def validate_copy(
+    copy: Any,
+    allowed_sources: set[str],
+    locale: str,
+    practices: dict[str, dict[str, Any]],
+) -> None:
     if not isinstance(copy, dict):
         raise ValueError("Overview copy must be an object")
     localized = copy.get(locale)
@@ -100,7 +111,15 @@ def validate_copy(copy: Any, allowed_sources: set[str], locale: str) -> None:
             for field in ("id", "title", "body")
         ):
             raise ValueError("Recommendations need id, title, and body")
-        source_ids = recommendation.get("source_ids", [])
+        practice_id = recommendation.get("practice_id")
+        if not isinstance(practice_id, str) or practice_id not in practices:
+            raise ValueError("Every recommendation needs an allow-listed practice_id")
+        canonical_source_ids = list(practices[practice_id]["source_ids"])
+        supplied_source_ids = recommendation.get("source_ids")
+        if supplied_source_ids is not None and supplied_source_ids != canonical_source_ids:
+            raise ValueError("Recommendation source IDs must match its practice")
+        recommendation["source_ids"] = canonical_source_ids
+        source_ids = recommendation["source_ids"]
         if (
             not isinstance(source_ids, list)
             or not source_ids
@@ -120,8 +139,9 @@ def persist(home: Path, payload: dict[str, Any]) -> dict[str, Any]:
         for source in sources.get("sources", [])
         if isinstance(source, dict) and isinstance(source.get("id"), str)
     }
+    practices = practice_map(load_catalog())
     copy = payload.get("copy")
-    validate_copy(copy, allowed_sources, locale)
+    validate_copy(copy, allowed_sources, locale, practices)
 
     previous = read_json(paths["overview"])
     generated_at = datetime.now(timezone.utc).isoformat()

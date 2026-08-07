@@ -22,7 +22,8 @@ how the agent responds, and what kind of builder you are becoming.
 - A two-sentence **Coding Overview** built from two or three representative
   facts and the working pattern they reveal.
 - Playful illustrated insights organized as **You did / Agent did / Your
-  style**, plus one practical suggestion.
+  style**, plus one practical suggestion matched against a curated library of
+  40 official and practitioner-backed practices, with its sources attached.
 - Four persistent insights per generation, each with a different composition
   but the same reference-conditioned pixel-art language.
 - A portable local export you can archive or share intentionally.
@@ -132,6 +133,7 @@ addresses, URLs, and secrets. The dashboard binds to loopback only. See
 | --- | --- | --- |
 | `skills/coding-wrapped/SKILL.md` | Core workflow and hard rules | Whenever the Skill triggers |
 | `skills/coding-wrapped/references/` | Privacy, data, writing, and visual contracts | Only for the relevant phase |
+| `skills/coding-wrapped/references/coding-best-practices.md` | Curated source-of-truth library for behavior-matched Light Tips | When writing Overview or Insight advice |
 | `skills/coding-wrapped/scripts/` | Deterministic scan, persistence, serve, and export logic | Executed as needed |
 | `skills/coding-wrapped/assets/` | Offline dashboard, fonts, and fallback illustrations | Copied into local state |
 | `skills/coding-wrapped/assets/frontend-source/` | Editable React and CSS source for the bundled dashboard | Only when rebuilding the UI |

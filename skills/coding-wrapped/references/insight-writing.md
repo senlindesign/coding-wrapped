@@ -31,6 +31,7 @@ Each insight contains:
 - one sentence tying the number to the selected period;
 - `you_did`, `agent_did`, and `your_style`;
 - one light suggestion;
+- one allow-listed `tip_practice_id`;
 - evidence metric IDs and values;
 - allow-listed source IDs;
 - one illustration description and accessible alt text.
@@ -41,10 +42,13 @@ copy in the same locale.
 ## Advice requirements
 
 - Ground every suggestion in the insight's evidence.
-- Reference at least one allow-listed source ID.
-- Paraphrase the registered supporting claim.
+- Choose one practice from the generation brief's candidate set.
+- Persist its `tip_practice_id`; source IDs are derived from that practice.
+- Paraphrase the registered action without changing its meaning.
 - Do not attach a famous name unless the source actually supports the claim.
 - Keep the suggestion to one action. Do not turn the card into a tutorial.
+- If no candidate practice matches the evidence, omit the advice rather than
+  adding generic productivity guidance.
 
 ## Four-card diversity
 
@@ -53,4 +57,3 @@ copy in the same locale.
 - At most one composition may use a center hub or network.
 - Vary spatial stories: procession, cutaway machine, diagonal journey, room,
   archive, timeline, shelf, workshop, map, or stage.
-

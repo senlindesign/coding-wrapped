@@ -12,6 +12,8 @@ from pathlib import Path
 from typing import Any, Optional, Union
 from zoneinfo import ZoneInfo, ZoneInfoNotFoundError
 
+from best_practices import sources_payload
+
 
 SKILL_ROOT = Path(__file__).resolve().parents[1]
 ASSETS_ROOT = SKILL_ROOT / "assets"
@@ -204,6 +206,30 @@ def ensure_state(home: Path) -> dict[str, Path]:
         if not destination.exists():
             destination.parent.mkdir(parents=True, exist_ok=True)
             shutil.copy2(source, destination)
+
+    # Keep the curated source registry current for existing installations while
+    # preserving unknown historical entries referenced by older insight cards.
+    canonical_sources = sources_payload()
+    local_sources = read_json(paths["sources"])
+    canonical_ids = {
+        source["id"] for source in canonical_sources.get("sources", [])
+    }
+    historical_sources = [
+        source
+        for source in local_sources.get("sources", [])
+        if isinstance(source, dict)
+        and isinstance(source.get("id"), str)
+        and source["id"] not in canonical_ids
+    ]
+    merged_sources = {
+        **canonical_sources,
+        "sources": [
+            *canonical_sources.get("sources", []),
+            *historical_sources,
+        ],
+    }
+    if merged_sources != local_sources:
+        write_json_atomic(paths["sources"], merged_sources)
 
     for range_id in RANGE_DAYS:
         destination = paths["metrics"] / f"dashboard-{range_id}.json"

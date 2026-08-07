@@ -22,7 +22,8 @@ Coding Wrapped 会读取本地的 Claude Code 和 Codex 记录，把你与 AI
 - 一段两句话的 **Coding 总览**：只选择两到三个最有代表性的事实，再说明
   它们反映出的整体协作习惯。
 - 多张有趣的洞察：**你怎么做 / Agent 如何回应 / 你的风格**，再加一条
-  有依据的轻建议。
+  有依据的轻建议。建议会从 40 条经过筛选的官方与一线实践中匹配，并附上
+  对应来源。
 - 每次生成四条洞察，每张采用不同构图，但遵循同一套由参考图约束的像素
   视觉语言，并会保存在本地。
 - 一个可以归档或主动分享的本地导出包。
@@ -121,6 +122,7 @@ Skill 会根据这句话自动确定界面语言。正常首次运行最多只�
 | --- | --- | --- |
 | `skills/coding-wrapped/SKILL.md` | 核心流程与硬规则 | Skill 被触发时 |
 | `skills/coding-wrapped/references/` | 隐私、数据、文案和视觉规范 | 对应阶段才读取 |
+| `skills/coding-wrapped/references/coding-best-practices.md` | 用于匹配轻建议的 Best Practice 事实源 | 生成总览或 Insight 建议时 |
 | `skills/coding-wrapped/scripts/` | 扫描、持久化、本地服务和导出 | 按需执行 |
 | `skills/coding-wrapped/assets/` | 离线网站、字体和后备插画 | 初始化本地状态时 |
 | `skills/coding-wrapped/assets/frontend-source/` | Dashboard 的 React 与 CSS 可编辑源文件 | 只有重建界面时 |

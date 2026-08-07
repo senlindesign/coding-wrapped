@@ -68,6 +68,7 @@ def validate_skill() -> None:
     required = (
         "references/privacy-policy.md",
         "references/insight-writing.md",
+        "references/coding-best-practices.md",
         "references/visual-system.md",
     )
     for relative in required:
@@ -88,6 +89,18 @@ def validate_skill() -> None:
     for filename in illustration_assets:
         if not (illustration_root / filename).is_file():
             fail(f"missing canonical illustration reference: {filename}")
+
+    scripts_path = str(SKILL_ROOT / "scripts")
+    if scripts_path not in sys.path:
+        sys.path.insert(0, scripts_path)
+    from best_practices import load_catalog, sources_payload
+
+    catalog = load_catalog()
+    bundled_sources = read_json(
+        SKILL_ROOT / "assets" / "default-state" / "data" / "sources.json"
+    )
+    if bundled_sources != sources_payload(catalog):
+        fail("sources.json is stale relative to coding-best-practices.md")
 
 
 def validate_frontend() -> None:

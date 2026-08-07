@@ -18,9 +18,10 @@
       "theme": "warm",
       "composition": "tiered-orchestra",
       "image": "/generated-images/initial-2026-07-28/agent-orchestra-warm.png",
+      "tip_practice_id": "explicit-agent-state",
       "source_ids": [
-        "claude-code-best-practices",
-        "claude-code-subagents"
+        "lenny-autonomous-coding-agents",
+        "anthropic-claude-code-subagents"
       ],
       "evidence": {
         "metric_ids": [
@@ -90,9 +91,9 @@
       "theme": "blue",
       "composition": "horizontal-night-route",
       "image": "/generated-images/initial-2026-07-28/night-runner-blue.png",
+      "tip_practice_id": "executable-verification-loop",
       "source_ids": [
-        "claude-code-best-practices",
-        "openai-introducing-codex"
+        "anthropic-claude-code-best-practices"
       ],
       "evidence": {
         "metric_ids": [
@@ -162,8 +163,9 @@
       "theme": "pink",
       "composition": "vertical-cutaway-machine",
       "image": "/generated-images/initial-2026-07-28/prompt-machine-pink.png",
+      "tip_practice_id": "define-outcome-boundaries",
       "source_ids": [
-        "openai-how-we-use-codex"
+        "openai-prompting"
       ],
       "evidence": {
         "metric_ids": [
@@ -234,8 +236,9 @@
       "theme": "green",
       "composition": "diagonal-platform-journey",
       "image": "/generated-images/initial-2026-07-28/continue-steps-green.png",
+      "tip_practice_id": "evidence-before-done",
       "source_ids": [
-        "claude-code-best-practices"
+        "anthropic-claude-code-best-practices"
       ],
       "evidence": {
         "metric_ids": [

@@ -3122,6 +3122,51 @@ html[lang="en"] .rpg-insight-title h1 {
   line-height: 1.45;
 }
 
+.rpg-tip-sources {
+  grid-column: 1 / -1;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding-top: 10px;
+  border-top: 1px solid color-mix(in srgb, var(--rpg-line) 34%, transparent);
+}
+
+.rpg-tip .rpg-tip-sources > span {
+  flex: 0 0 auto;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  color: #716c62;
+  font-family: "SFMono-Regular", Menlo, Consolas, monospace;
+  font-size: 12px;
+  letter-spacing: 0.04em;
+}
+
+.rpg-tip-sources > div {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 7px;
+}
+
+.rpg-tip-sources a {
+  padding: 4px 7px;
+  border: 1px solid color-mix(in srgb, var(--insight-accent) 42%, #8e887d);
+  border-radius: 4px;
+  background: #fffaf0;
+  color: #4d4a43;
+  font-family: "SFMono-Regular", Menlo, Consolas, monospace;
+  font-size: 11px;
+  font-weight: 750;
+  line-height: 1.2;
+  text-decoration: none;
+}
+
+.rpg-tip-sources a:hover,
+.rpg-tip-sources a:focus-visible {
+  background: var(--insight-soft);
+  color: var(--insight-accent);
+}
+
 .rpg-loading {
   min-height: 580px;
   font-size: 15px;

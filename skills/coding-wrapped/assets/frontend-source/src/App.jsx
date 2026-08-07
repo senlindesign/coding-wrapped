@@ -71,7 +71,7 @@ const validationCards = {
     ],
     tipLabel: "轻建议",
     tip: "给每个子 Agent 写清角色、交付格式和验收动作，主线程只收结论。",
-    tipSource: "claude-code-subagents",
+    tipSource: "anthropic-claude-code-subagents",
     image: "/assets/agent-orchestra-warm.png",
     imageAlt: "一位站立的指挥者面对由许多 AI 机器人组成的像素乐团",
     composition: "tiered-orchestra",
@@ -97,7 +97,7 @@ const validationCards = {
     ],
     tipLabel: "轻建议",
     tip: "长任务每推进一段就跑测试或截图，让进度带着验证一起前进。",
-    tipSource: "claude-code-verification",
+    tipSource: "anthropic-claude-code-best-practices",
     image: "/assets/night-runner-blue.png",
     imageAlt: "夜晚，一位使用者和一个 AI 机器人通过发光进度路径持续工作",
     composition: "horizontal-night-route",
@@ -126,7 +126,7 @@ const validationCards = {
     ],
     tipLabel: "轻建议",
     tip: "短句不用变长，只补一个文件、一个完成标准或一个验证动作。",
-    tipSource: "codex-issue-style-prompts",
+    tipSource: "openai-prompting",
     image: "/assets/prompt-machine-pink.png",
     imageAlt: "一个小指令进入剖面式机器后，被机器人扩展成多道工作流程",
     composition: "vertical-cutaway-machine",
@@ -156,7 +156,7 @@ const validationCards = {
     ],
     tipLabel: "轻建议",
     tip: "每次继续前让 Agent 用一行报：已完成、未验证、下一步。",
-    tipSource: "trust-but-verify",
+    tipSource: "anthropic-claude-code-best-practices",
     image: "/assets/continue-steps-green.png",
     imageAlt: "一位使用者鼓励机器人沿着八段像素台阶继续向前",
     composition: "diagonal-platform-journey",
@@ -319,14 +319,15 @@ const dashboardCopy = {
     prev: "上一条",
     next: "下一条",
     lightTip: "轻建议",
+    tipSources: "建议来源",
     rawPrivacy: "原始对话不会进入这个页面",
     overviewRecommendations: "本期可以试试",
     overviewSources: "参考",
     overviewSourceLabels: {
-      "claude-code-best-practices": "Claude Code 最佳实践",
-      "claude-code-subagents": "Subagents",
-      "openai-how-we-use-codex": "Codex 实践",
-      "openai-introducing-codex": "Codex 介绍",
+      "anthropic-claude-code-best-practices": "Claude Code 指南",
+      "anthropic-claude-code-subagents": "Subagents",
+      "openai-prompting": "OpenAI 提示指南",
+      "openai-agents-md": "AGENTS.md 指南",
     },
     overviewUpdated: (date) => `生成于 ${date}`,
     overviewCadence: "每周自动检查 · 新增 3 个会话或 20 条消息后更新",
@@ -456,14 +457,15 @@ const dashboardCopy = {
     prev: "PREV",
     next: "NEXT",
     lightTip: "LIGHT TIP",
+    tipSources: "BASED ON",
     rawPrivacy: "RAW TRANSCRIPTS NEVER ENTER THIS VIEW",
     overviewRecommendations: "TRY THIS NEXT",
     overviewSources: "SOURCE",
     overviewSourceLabels: {
-      "claude-code-best-practices": "CLAUDE CODE GUIDE",
-      "claude-code-subagents": "SUBAGENTS",
-      "openai-how-we-use-codex": "CODEX PRACTICE",
-      "openai-introducing-codex": "CODEX INTRO",
+      "anthropic-claude-code-best-practices": "CLAUDE CODE GUIDE",
+      "anthropic-claude-code-subagents": "SUBAGENTS",
+      "openai-prompting": "OPENAI PROMPTING",
+      "openai-agents-md": "AGENTS.MD GUIDE",
     },
     overviewUpdated: (date) => `GENERATED ${date}`,
     overviewCadence:
@@ -856,6 +858,7 @@ function localizedInsightsFromStore(insightState, lang) {
         subtitle: localized.subtitle,
         rows: localized.rows.map((row) => [row.label, row.body]),
         tip: localized.tip,
+        tipPracticeId: record.tip_practice_id ?? null,
         image: record.image,
         imageAlt: localized.image_alt,
         sourceIds: record.source_ids ?? [],
@@ -880,11 +883,17 @@ function persistableInsightCopy(card) {
 }
 
 function buildPersistableInsightBatch(metrics, sequenceStart) {
+  const practiceIdsByVariant = [
+    "explicit-agent-state",
+    "executable-verification-loop",
+    "define-outcome-boundaries",
+    "evidence-before-done",
+  ];
   const sourceIdsByVariant = [
-    ["claude-code-best-practices"],
-    ["claude-code-best-practices"],
-    ["openai-introducing-codex"],
-    ["claude-code-best-practices"],
+    ["lenny-autonomous-coding-agents", "anthropic-claude-code-subagents"],
+    ["anthropic-claude-code-best-practices"],
+    ["openai-prompting"],
+    ["anthropic-claude-code-best-practices"],
   ];
   const compositionsByVariant = [
     "horizontal-night-route",
@@ -904,6 +913,7 @@ function buildPersistableInsightBatch(metrics, sequenceStart) {
       theme: zhCard.theme,
       composition: compositionsByVariant[variant],
       image_source: zhCard.image,
+      tip_practice_id: practiceIdsByVariant[variant],
       source_ids: sourceIdsByVariant[variant],
       evidence: {
         sequence,
@@ -1430,25 +1440,18 @@ function DashboardRpg() {
     setOverviewLoadStatus("loading");
 
     try {
-      const [overviewResponse, sourcesResponse] = await Promise.all([
-        fetch("/api/overview/auto-refresh", {
-          method: "POST",
-          cache: "no-store",
-        }),
-        fetch("/api/sources", { cache: "no-store" }),
-      ]);
-      if (!overviewResponse.ok || !sourcesResponse.ok) {
+      const overviewResponse = await fetch("/api/overview/auto-refresh", {
+        method: "POST",
+        cache: "no-store",
+      });
+      if (!overviewResponse.ok) {
         throw new Error("Overview snapshot unavailable");
       }
 
-      const [overviewResult, nextSources] = await Promise.all([
-        overviewResponse.json(),
-        sourcesResponse.json(),
-      ]);
+      const overviewResult = await overviewResponse.json();
       const nextOverview = overviewResult?.overview;
       setOverviewData(nextOverview);
       setOverviewUpdateInfo(overviewResult?.update ?? null);
-      setOverviewSources(nextSources?.sources ?? []);
       setOverviewLoadStatus(
         nextOverview?.status === "updating" ? "updating" : "ready",
       );
@@ -1466,6 +1469,17 @@ function DashboardRpg() {
       } catch {
         setOverviewLoadStatus("error");
       }
+    }
+  };
+
+  const loadSourcesSnapshot = async () => {
+    try {
+      const response = await fetch("/api/sources", { cache: "no-store" });
+      if (!response.ok) throw new Error("Source registry unavailable");
+      const payload = await response.json();
+      setOverviewSources(payload?.sources ?? []);
+    } catch {
+      setOverviewSources([]);
     }
   };
 
@@ -1524,6 +1538,10 @@ function DashboardRpg() {
 
   useEffect(() => {
     loadOverviewSnapshot();
+  }, []);
+
+  useEffect(() => {
+    loadSourcesSnapshot();
   }, []);
 
   useEffect(() => {
@@ -1978,6 +1996,28 @@ function DashboardRpg() {
                 <div className="rpg-tip">
                   <span>{copy.lightTip}</span>
                   <p>{insight.tip}</p>
+                  {insight.sourceIds
+                    .map((sourceId) => overviewSourceMap.get(sourceId))
+                    .filter(Boolean).length > 0 && (
+                    <footer className="rpg-tip-sources">
+                      <span>{copy.tipSources}</span>
+                      <div>
+                        {insight.sourceIds
+                          .map((sourceId) => overviewSourceMap.get(sourceId))
+                          .filter(Boolean)
+                          .map((source) => (
+                            <a
+                              href={source.url}
+                              key={source.id}
+                              rel="noreferrer"
+                              target="_blank"
+                            >
+                              {copy.overviewSourceLabels[source.id] ?? source.publisher}
+                            </a>
+                          ))}
+                      </div>
+                    </footer>
+                  )}
                 </div>
               </div>
             </>

@@ -1,70 +1,474 @@
 {
-  "schema_version": "1.0.0",
-  "checked_at": "2026-07-28T00:00:00.000Z",
+  "schema_version": "1.1.0",
+  "checked_at": "2026-08-08",
+  "derived_from": "references/coding-best-practices.md",
   "sources": [
     {
-      "id": "claude-code-best-practices",
+      "id": "openai-prompting",
+      "title": "Prompting",
+      "publisher": "OpenAI",
+      "url": "https://learn.chatgpt.com/docs/prompting",
+      "type": "first-party-documentation",
+      "source_tier": "official",
+      "published_at": null,
+      "checked_at": "2026-08-08",
+      "supporting_claims": [
+        "Describe the goal, relevant context, expected output, and important boundaries for consequential tasks.",
+        "State the result you need while leaving implementation choices to the agent when the route is not itself a requirement.",
+        "For Codex tasks, include the relevant code location or reproduction path, constraints, and a way to verify success.",
+        "Use focused UI iterations and check the result in the browser."
+      ],
+      "topics": [
+        "prompting",
+        "scoping",
+        "verification",
+        "ui-iteration"
+      ]
+    },
+    {
+      "id": "openai-agents-md",
+      "title": "Custom instructions with AGENTS.md",
+      "publisher": "OpenAI",
+      "url": "https://learn.chatgpt.com/docs/agent-configuration/agents-md",
+      "type": "first-party-documentation",
+      "source_tier": "official",
+      "published_at": null,
+      "checked_at": "2026-08-08",
+      "supporting_claims": [
+        "Store durable repository guidance in AGENTS.md and scope local rules near the code they govern."
+      ],
+      "topics": [
+        "repository-context",
+        "durable-instructions"
+      ]
+    },
+    {
+      "id": "anthropic-claude-code-best-practices",
       "title": "Best practices for Claude Code",
       "publisher": "Anthropic",
       "url": "https://code.claude.com/docs/en/best-practices",
       "type": "first-party-documentation",
+      "source_tier": "official",
+      "published_at": null,
+      "checked_at": "2026-08-08",
       "supporting_claims": [
-        "Give the agent a way to verify its work with tests, builds, screenshots, or other checks.",
-        "Use focused subagents for investigation or verification to keep the main context clean.",
-        "Separate exploration, planning, implementation, and verification when the task benefits from it."
+        "Give the agent an executable way to verify its work and ask for observable evidence.",
+        "Explore before planning and implementing when the task is complex or unfamiliar.",
+        "Point to relevant files, existing patterns, or comparable implementations instead of making the agent rediscover repository context.",
+        "Correct course early and reset a stuck context after repeated failed corrections.",
+        "Use separate context for high-output investigation and independent review."
       ],
       "topics": [
         "verification",
-        "subagents",
+        "planning",
         "context-management",
-        "planning"
+        "subagents"
       ]
     },
     {
-      "id": "claude-code-subagents",
+      "id": "anthropic-claude-code-memory",
+      "title": "How Claude remembers your project",
+      "publisher": "Anthropic",
+      "url": "https://code.claude.com/docs/en/memory",
+      "type": "first-party-documentation",
+      "source_tier": "official",
+      "published_at": null,
+      "checked_at": "2026-08-08",
+      "supporting_claims": [
+        "Keep project instructions concise, specific, consistent, and scoped to where they apply."
+      ],
+      "topics": [
+        "context-management",
+        "durable-instructions"
+      ]
+    },
+    {
+      "id": "anthropic-claude-code-subagents",
       "title": "Create custom subagents",
       "publisher": "Anthropic",
       "url": "https://code.claude.com/docs/en/sub-agents",
       "type": "first-party-documentation",
+      "source_tier": "official",
+      "published_at": null,
+      "checked_at": "2026-08-08",
       "supporting_claims": [
         "Give each subagent a specialized purpose and focused responsibility."
       ],
       "topics": [
         "subagents",
-        "delegation"
+        "delegation",
+        "review"
       ]
     },
     {
-      "id": "openai-how-we-use-codex",
-      "title": "How OpenAI uses Codex",
-      "publisher": "OpenAI",
-      "url": "https://openai.com/business/guides-and-resources/how-openai-uses-codex/",
-      "type": "first-party-practice-guide",
+      "id": "boris-year-of-claude-code",
+      "title": "Reflecting on a year of Claude Code",
+      "publisher": "Anthropic",
+      "url": "https://www.youtube.com/watch?v=Hth_tLaC2j8",
+      "type": "first-party-team-interview",
+      "source_tier": "practitioner",
+      "published_at": "2026-06-08",
+      "checked_at": "2026-08-08",
       "supporting_claims": [
-        "Write a task like a well-scoped GitHub issue with relevant files, components, and examples.",
-        "Use AGENTS.md to give Codex durable repository guidance.",
-        "Use parallel attempts when comparing approaches is valuable."
+        "Avoid preloading irrelevant context; let the agent retrieve what it needs.",
+        "Persist recurring corrections as durable project instructions rather than repeating them in every session."
       ],
       "topics": [
-        "prompting",
-        "repository-context",
+        "context-management",
+        "durable-instructions",
+        "correction-loops"
+      ]
+    },
+    {
+      "id": "lenny-ai-developer-tools",
+      "title": "How to build your own AI developer tools with Claude Code",
+      "publisher": "Lenny's Newsletter",
+      "url": "https://www.lennysnewsletter.com/p/how-to-build-your-own-ai-developer",
+      "type": "practitioner-interview",
+      "source_tier": "expert-conversation",
+      "published_at": "2026-02-09",
+      "checked_at": "2026-08-08",
+      "supporting_claims": [
+        "Use visual specifications for interface-heavy work and give independent reviewers a specific review target."
+      ],
+      "topics": [
+        "ui-iteration",
+        "visual-specification",
+        "review"
+      ]
+    },
+    {
+      "id": "lenny-journalist-ios-developer",
+      "title": "From journalist to iOS developer: How LinkedIn's editor builds with Claude Code",
+      "publisher": "Lenny's Newsletter",
+      "url": "https://www.lennysnewsletter.com/p/from-journalist-to-ios-developer",
+      "type": "practitioner-interview",
+      "source_tier": "expert-conversation",
+      "published_at": "2026-03-16",
+      "checked_at": "2026-08-08",
+      "supporting_claims": [
+        "Separate building from reviewing and isolate AI work in branches or worktrees so experiments remain inspectable and reversible."
+      ],
+      "topics": [
+        "review",
+        "worktrees",
+        "version-control"
+      ]
+    },
+    {
+      "id": "lenny-braintrust-agents-evals",
+      "title": "How Braintrust uses AI agents, evals, and CI to ship better software",
+      "publisher": "Lenny's Newsletter",
+      "url": "https://www.lennysnewsletter.com/p/how-braintrust-uses-ai-agents-evals",
+      "type": "practitioner-interview",
+      "source_tier": "expert-conversation",
+      "published_at": "2026-06-15",
+      "checked_at": "2026-08-08",
+      "supporting_claims": [
+        "Encode recurring quality expectations as repeatable tests, rubrics, or evals instead of relying on vague requests."
+      ],
+      "topics": [
+        "evals",
+        "quality",
+        "verification"
+      ]
+    },
+    {
+      "id": "lenny-autonomous-coding-agents",
+      "title": "How I run autonomous coding agents from my phone with OpenAI Symphony + Linear",
+      "publisher": "Lenny's Newsletter",
+      "url": "https://www.lennysnewsletter.com/p/how-i-run-autonomous-coding-agents",
+      "type": "practitioner-interview",
+      "source_tier": "expert-conversation",
+      "published_at": "2026-07-06",
+      "checked_at": "2026-08-08",
+      "supporting_claims": [
+        "Manage parallel agents with explicit task state, ownership, completion conditions, and a next step after failure.",
+        "Audit accumulated instructions and remove context that no longer helps."
+      ],
+      "topics": [
+        "agent-management",
+        "context-management",
         "parallel-work"
       ]
     },
     {
-      "id": "openai-introducing-codex",
-      "title": "Introducing Codex",
+      "id": "openai-harness-engineering",
+      "title": "Harness engineering: leveraging Codex in an agent-first world",
       "publisher": "OpenAI",
-      "url": "https://openai.com/index/introducing-codex/",
-      "type": "first-party-product-guide",
+      "url": "https://openai.com/index/harness-engineering/",
+      "type": "first-party-engineering-report",
+      "source_tier": "official",
+      "published_at": "2026-02-11",
+      "checked_at": "2026-08-08",
       "supporting_claims": [
-        "Codex performs better with configured test environments and clear repository instructions.",
-        "Users should review and validate generated work before integrating it."
+        "Repeated agent failures often expose a missing tool, abstraction, documentation layer, or enforceable constraint in the environment.",
+        "Agent-readable UI state, logs, metrics, and traces shorten runtime debugging loops.",
+        "A concise AGENTS.md can act as a map to versioned repository knowledge, while stable architecture rules belong in executable checks."
       ],
       "topics": [
-        "verification",
-        "tests",
-        "repository-context"
+        "harness-engineering",
+        "observability",
+        "repository-knowledge",
+        "architecture"
+      ]
+    },
+    {
+      "id": "openai-code-review",
+      "title": "Code review",
+      "publisher": "OpenAI",
+      "url": "https://learn.chatgpt.com/docs/code-review",
+      "type": "first-party-documentation",
+      "source_tier": "official",
+      "published_at": null,
+      "checked_at": "2026-08-08",
+      "supporting_claims": [
+        "Codex can review a specified diff in a read-only pass and return prioritized, actionable findings without changing the worktree."
+      ],
+      "topics": [
+        "review",
+        "diffs",
+        "verification"
+      ]
+    },
+    {
+      "id": "openai-rules",
+      "title": "Rules",
+      "publisher": "OpenAI",
+      "url": "https://learn.chatgpt.com/docs/agent-configuration/rules",
+      "type": "first-party-documentation",
+      "source_tier": "official",
+      "published_at": null,
+      "checked_at": "2026-08-08",
+      "supporting_claims": [
+        "Codex rules can narrowly allow, prompt for, or forbid command prefixes and can include positive and negative match tests."
+      ],
+      "topics": [
+        "permissions",
+        "approval-rules",
+        "security"
+      ]
+    },
+    {
+      "id": "openai-github-action",
+      "title": "Codex GitHub Action",
+      "publisher": "OpenAI",
+      "url": "https://learn.chatgpt.com/docs/github-action",
+      "type": "first-party-documentation",
+      "source_tier": "official",
+      "published_at": null,
+      "checked_at": "2026-08-08",
+      "supporting_claims": [
+        "Stable review and release prompts can be versioned in a repository and run in CI with least GitHub permissions."
+      ],
+      "topics": [
+        "ci",
+        "automation",
+        "review",
+        "least-privilege"
+      ]
+    },
+    {
+      "id": "openai-build-skills",
+      "title": "Build skills",
+      "publisher": "OpenAI",
+      "url": "https://learn.chatgpt.com/docs/build-skills",
+      "type": "first-party-documentation",
+      "source_tier": "official",
+      "published_at": null,
+      "checked_at": "2026-08-08",
+      "supporting_claims": [
+        "Stable repeated workflows can be packaged as reusable Skills whose full instructions load only when the task matches."
+      ],
+      "topics": [
+        "skills",
+        "reusable-workflows",
+        "context-management"
+      ]
+    },
+    {
+      "id": "openai-agent-security",
+      "title": "Agent approvals and security",
+      "publisher": "OpenAI",
+      "url": "https://learn.chatgpt.com/docs/agent-approvals-security",
+      "type": "first-party-documentation",
+      "source_tier": "official",
+      "published_at": null,
+      "checked_at": "2026-08-08",
+      "supporting_claims": [
+        "Dependency setup and credential use should be separated from the agent execution phase so execution can run without secrets and with restricted network access."
+      ],
+      "topics": [
+        "security",
+        "setup",
+        "secrets",
+        "network-access"
+      ]
+    },
+    {
+      "id": "anthropic-claude-code-hooks",
+      "title": "Automate workflows with hooks",
+      "publisher": "Anthropic",
+      "url": "https://code.claude.com/docs/en/hooks-guide",
+      "type": "first-party-documentation",
+      "source_tier": "official",
+      "published_at": null,
+      "checked_at": "2026-08-08",
+      "supporting_claims": [
+        "Deterministic formatting, linting, notifications, and protected-file checks can run at lifecycle hooks instead of depending on repeated prose reminders."
+      ],
+      "topics": [
+        "hooks",
+        "automation",
+        "linting",
+        "protected-files"
+      ]
+    },
+    {
+      "id": "anthropic-claude-code-permissions",
+      "title": "Permissions",
+      "publisher": "Anthropic",
+      "url": "https://code.claude.com/docs/en/permissions",
+      "type": "first-party-documentation",
+      "source_tier": "official",
+      "published_at": null,
+      "checked_at": "2026-08-08",
+      "supporting_claims": [
+        "Permission rules evaluate deny before ask and allow, enabling protected operations to be blocked before execution."
+      ],
+      "topics": [
+        "permissions",
+        "protected-files",
+        "security"
+      ]
+    },
+    {
+      "id": "anthropic-claude-code-security",
+      "title": "Security",
+      "publisher": "Anthropic",
+      "url": "https://code.claude.com/docs/en/security",
+      "type": "first-party-documentation",
+      "source_tier": "official",
+      "published_at": null,
+      "checked_at": "2026-08-08",
+      "supporting_claims": [
+        "Third-party MCP servers are not reviewed by Anthropic and should be treated as external dependencies that require explicit trust."
+      ],
+      "topics": [
+        "mcp",
+        "third-party-tools",
+        "security"
+      ]
+    },
+    {
+      "id": "anthropic-claude-code-mcp",
+      "title": "Connect Claude Code to tools via MCP",
+      "publisher": "Anthropic",
+      "url": "https://code.claude.com/docs/en/mcp",
+      "type": "first-party-documentation",
+      "source_tier": "official",
+      "published_at": null,
+      "checked_at": "2026-08-08",
+      "supporting_claims": [
+        "Project MCP servers require approval, tool permissions can be scoped, and unused OAuth authorization can be revoked."
+      ],
+      "topics": [
+        "mcp",
+        "permissions",
+        "authorization"
+      ]
+    },
+    {
+      "id": "anthropic-claude-code-costs",
+      "title": "Manage costs effectively",
+      "publisher": "Anthropic",
+      "url": "https://code.claude.com/docs/en/costs",
+      "type": "first-party-documentation",
+      "source_tier": "official",
+      "published_at": null,
+      "checked_at": "2026-08-08",
+      "supporting_claims": [
+        "Large tool outputs such as build logs can be filtered to errors and nearby context before entering the conversation.",
+        "Code intelligence can reduce repeated broad searches by navigating definitions, references, and type errors directly."
+      ],
+      "topics": [
+        "context-management",
+        "tool-output",
+        "logs",
+        "code-intelligence"
+      ]
+    },
+    {
+      "id": "linear-coding-sessions",
+      "title": "Coding sessions",
+      "publisher": "Linear",
+      "url": "https://linear.app/docs/coding-sessions",
+      "type": "first-party-product-workflow",
+      "source_tier": "practitioner",
+      "published_at": null,
+      "checked_at": "2026-08-08",
+      "supporting_claims": [
+        "Agent-ready issues benefit from a clear outcome, scope, constraints, and an example that distinguishes correct behavior from the bug."
+      ],
+      "topics": [
+        "issues",
+        "delegation",
+        "task-scoping"
+      ]
+    },
+    {
+      "id": "linear-agent-at-linear",
+      "title": "How we use Linear Agent at Linear",
+      "publisher": "Linear",
+      "url": "https://linear.app/now/how-we-use-linear-agent-at-linear",
+      "type": "first-party-engineering-workflow",
+      "source_tier": "practitioner",
+      "published_at": "2026-04-10",
+      "checked_at": "2026-08-08",
+      "supporting_claims": [
+        "Cross-system investigations become more tractable when divided into targeted evidence-gathering steps that narrow the next search."
+      ],
+      "topics": [
+        "investigation",
+        "cross-tool-work",
+        "task-decomposition"
+      ]
+    },
+    {
+      "id": "armin-agentic-coding",
+      "title": "Agentic Coding: The Future of Software Development with Agents",
+      "publisher": "Armin Ronacher",
+      "url": "https://www.youtube.com/watch?v=nfOVgz_omlU",
+      "type": "practitioner-talk",
+      "source_tier": "practitioner",
+      "published_at": "2025-06-29",
+      "checked_at": "2026-08-08",
+      "supporting_claims": [
+        "Agent-facing environments work better when logs share one tail-able entry point and tools return specific recoverable errors."
+      ],
+      "topics": [
+        "logs",
+        "tool-design",
+        "debugging"
+      ]
+    },
+    {
+      "id": "simon-agentic-patterns",
+      "title": "Agentic Engineering Patterns: Anti-patterns",
+      "publisher": "Simon Willison",
+      "url": "https://simonwillison.net/guides/agentic-engineering-patterns/anti-patterns/",
+      "type": "practitioner-guide",
+      "source_tier": "practitioner",
+      "published_at": "2026-03-04",
+      "checked_at": "2026-08-08",
+      "supporting_claims": [
+        "The author of an agent-generated change remains responsible for reviewing it, validating it, keeping the change reviewable, and attaching evidence."
+      ],
+      "topics": [
+        "review",
+        "accountability",
+        "pull-requests",
+        "verification"
       ]
     }
   ]
