@@ -1615,7 +1615,7 @@ main {
   gap: 16px;
   grid-template-columns: 1fr auto;
   min-height: 0;
-  padding: 18px 7vw 78px;
+  padding: 18px 7vw;
 }
 
 .page-footer div {
@@ -2281,7 +2281,7 @@ main {
 
   .page-footer {
     grid-template-columns: 1fr;
-    padding: 18px 20px 78px;
+    padding: 18px 20px;
   }
 
   .page-footer > a {

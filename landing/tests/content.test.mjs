@@ -278,6 +278,9 @@ test("information panels use the pale retro palette and the footer repeats the s
   assert.match(styles, /\.install-actions \.button--primary\s*\{[^}]*background:\s*var\(--blue-soft\)/s);
   assert.match(styles, /\.install-actions \.button--secondary\s*\{[^}]*background:\s*#fffaf0;[^}]*color:\s*var\(--ink\)/s);
   assert.match(source, /<strong>Coding Wrapped<\/strong><span className="pixel-slogan">Observe the way you build<\/span>/);
+  assert.match(styles, /\.page-footer\s*\{[^}]*padding:\s*18px 7vw;/s);
+  assert.doesNotMatch(styles, /\.page-footer\s*\{[^}]*padding:[^;}]*78px/s);
+  assert.match(styles, /@media \(max-width: 520px\)[\s\S]*\.page-footer\s*\{[^}]*padding:\s*18px 20px;/s);
 });
 
 test("the complete slogan drops its period and renders in a local pixel font", async () => {
