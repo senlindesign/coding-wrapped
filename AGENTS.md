@@ -11,6 +11,9 @@
   facts plus the behavior they reveal. Do not replay every metric.
 - Keep ordinary Dashboard pages vertically scrollable at common laptop
   viewports. Scope any `overflow: hidden` rule to `.export-page`.
+- Keep Insight navigation reliable across mouse drag and touch swipe. Disable
+  native image dragging, preserve vertical page scrolling with `touch-action:
+  pan-y`, and handle cancelled pointer gestures without changing cards.
 - Condition every generated illustration on the matching bundled theme
   reference and keep the whole batch on the `cw-pixel-diorama-v1` visual
   contract: 1536 × 1024, one coherent pixel scale, pale negative space,

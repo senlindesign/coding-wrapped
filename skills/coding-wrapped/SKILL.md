@@ -184,6 +184,8 @@ Use the local browser to confirm:
 - four generated insights load;
 - factual metric cards load;
 - generated images resolve;
+- the Insight deck changes cards with mouse drag and touch swipe while vertical
+  page scrolling still works;
 - the Dashboard scrolls vertically at `1280 × 720`, `1440 × 900`, and
   `1024 × 768`, without an unexpected horizontal scrollbar;
 - export-card routes remain fixed-size and do not shift;
@@ -196,7 +198,7 @@ After generation, give the user the URL and explain only these controls:
 - **Scan data** refreshes factual aggregates and does not regenerate insights.
 - **Generate insights** uses model allowance, usually takes 1–3 minutes, and
   always adds four.
-- **Insight deck** supports click, arrow keys, and horizontal swipe.
+- **Insight deck** supports click, arrow keys, mouse drag, and horizontal swipe.
 - **Customize** chooses which factual metric blocks are shown.
 - **Export** creates a portable local archive:
 

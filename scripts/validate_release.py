@@ -139,6 +139,23 @@ def validate_frontend() -> None:
     ):
         fail("Dashboard source contains a global desktop body overflow lock")
 
+    swipe_source_markers = (
+        "function useHorizontalSwipe",
+        "onPointerCancel={insightSwipe.handlePointerCancel}",
+        "onPointerMove={insightSwipe.handlePointerMove}",
+        "draggable={false}",
+    )
+    if any(marker not in source_app for marker in swipe_source_markers):
+        fail("Dashboard source is missing the complete Insight swipe contract")
+    if not re.search(
+        r"\.rpg-carousel\s*\{[^}]*touch-action:\s*pan-y",
+        source_css,
+        re.S,
+    ):
+        fail("Dashboard carousel must preserve vertical scroll during swipe")
+    if "-webkit-user-drag: none" not in source_css:
+        fail("Dashboard source must disable native image dragging")
+
     css_assets = sorted((template_root / "assets").glob("index-*.css"))
     js_assets = sorted((template_root / "assets").glob("index-*.js"))
     if len(css_assets) != 1 or len(js_assets) != 1:
@@ -164,6 +181,8 @@ def validate_frontend() -> None:
         built_css,
     ):
         fail("bundled Dashboard still contains the desktop scroll bug")
+    if "touch-action:pan-y" not in built_css or "onPointerCancel" not in built_js:
+        fail("bundled frontend is missing the complete Insight swipe contract")
 
 
 def compile_python() -> None:

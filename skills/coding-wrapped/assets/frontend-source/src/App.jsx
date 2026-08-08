@@ -1,5 +1,82 @@
 import { useEffect, useRef, useState } from "react";
 
+function useHorizontalSwipe(onSwipe, threshold = 45) {
+  const gesture = useRef(null);
+  const suppressClick = useRef(false);
+
+  const resetGesture = (event) => {
+    const current = gesture.current;
+    if (
+      current?.element?.hasPointerCapture?.(current.pointerId) &&
+      event?.type !== "pointercancel"
+    ) {
+      current.element.releasePointerCapture?.(current.pointerId);
+    }
+    gesture.current = null;
+  };
+
+  const handlePointerDown = (event) => {
+    if (event.isPrimary === false) return;
+    if (event.pointerType === "mouse" && event.button !== 0) return;
+    suppressClick.current = false;
+    gesture.current = {
+      element: event.currentTarget,
+      pointerId: event.pointerId,
+      startX: event.clientX,
+      startY: event.clientY,
+      lastX: event.clientX,
+      lastY: event.clientY,
+    };
+    event.currentTarget.setPointerCapture?.(event.pointerId);
+  };
+
+  const handlePointerMove = (event) => {
+    const current = gesture.current;
+    if (!current || current.pointerId !== event.pointerId) return;
+    current.lastX = event.clientX;
+    current.lastY = event.clientY;
+    const distanceX = current.lastX - current.startX;
+    const distanceY = current.lastY - current.startY;
+    if (Math.abs(distanceX) > 8 && Math.abs(distanceX) > Math.abs(distanceY)) {
+      suppressClick.current = true;
+    }
+  };
+
+  const handlePointerUp = (event) => {
+    const current = gesture.current;
+    if (!current || current.pointerId !== event.pointerId) return;
+    const distanceX = event.clientX - current.startX;
+    const distanceY = event.clientY - current.startY;
+    resetGesture(event);
+    if (
+      Math.abs(distanceX) >= threshold &&
+      Math.abs(distanceX) > Math.abs(distanceY)
+    ) {
+      suppressClick.current = true;
+      onSwipe(distanceX < 0 ? 1 : -1);
+    }
+  };
+
+  const handlePointerCancel = (event) => {
+    if (gesture.current?.pointerId !== event.pointerId) return;
+    resetGesture(event);
+  };
+
+  const consumeClick = () => {
+    if (!suppressClick.current) return false;
+    suppressClick.current = false;
+    return true;
+  };
+
+  return {
+    consumeClick,
+    handlePointerCancel,
+    handlePointerDown,
+    handlePointerMove,
+    handlePointerUp,
+  };
+}
+
 const wrappedCards = {
   1: {
     meta: "01 / 08",
@@ -1354,8 +1431,6 @@ function DashboardRpg() {
     "messages",
     "prompt",
   ]);
-  const touchStartX = useRef(null);
-  const suppressCarouselClick = useRef(false);
   const copy = dashboardCopy[lang];
 
   const loadSnapshot = async (nextRange) => {
@@ -1632,21 +1707,9 @@ function DashboardRpg() {
     return () => window.removeEventListener("keydown", handleKeyDown);
   }, [activeInsight, insights.length]);
 
-  const handlePointerStart = (event) => {
-    touchStartX.current = event.clientX;
-    suppressCarouselClick.current = false;
-    event.currentTarget.setPointerCapture?.(event.pointerId);
-  };
-
-  const handlePointerEnd = (event) => {
-    if (touchStartX.current === null) return;
-    const distance = event.clientX - touchStartX.current;
-    if (Math.abs(distance) > 45) {
-      suppressCarouselClick.current = true;
-      showInsight(activeInsight + (distance < 0 ? 1 : -1));
-    }
-    touchStartX.current = null;
-  };
+  const insightSwipe = useHorizontalSwipe((direction) => {
+    showInsight(activeInsight + direction);
+  });
 
   const toggleMetric = (id) => {
     setVisibleMetrics((current) => {
@@ -1954,8 +2017,11 @@ function DashboardRpg() {
               <div
                 className="rpg-carousel"
                 aria-live="polite"
-                onPointerDown={handlePointerStart}
-                onPointerUp={handlePointerEnd}
+                onDragStart={(event) => event.preventDefault()}
+                onPointerCancel={insightSwipe.handlePointerCancel}
+                onPointerDown={insightSwipe.handlePointerDown}
+                onPointerMove={insightSwipe.handlePointerMove}
+                onPointerUp={insightSwipe.handlePointerUp}
               >
                 {insights.map((card, index) => (
                   <button
@@ -1965,14 +2031,11 @@ function DashboardRpg() {
                     aria-label={card.profileTitle}
                     aria-current={index === activeInsight ? "true" : undefined}
                     onClick={() => {
-                      if (suppressCarouselClick.current) {
-                        suppressCarouselClick.current = false;
-                        return;
-                      }
+                      if (insightSwipe.consumeClick()) return;
                       showInsight(index);
                     }}
                   >
-                    <img src={card.image} alt={card.imageAlt} />
+                    <img src={card.image} alt={card.imageAlt} draggable={false} />
                   </button>
                 ))}
               </div>
@@ -2257,7 +2320,6 @@ function WrappedViewer() {
   const initialStory = params.get("story") === "2" ? 1 : 0;
   const [activeIndex, setActiveIndex] = useState(initialStory);
   const [shareStatus, setShareStatus] = useState("");
-  const touchStartX = useRef(null);
   const activeStory = stories[activeIndex];
 
   const showStory = (nextIndex) => {
@@ -2265,6 +2327,10 @@ function WrappedViewer() {
     setActiveIndex(normalized);
     setShareStatus("");
   };
+
+  const storySwipe = useHorizontalSwipe((direction) => {
+    showStory(activeIndex + direction);
+  });
 
   useEffect(() => {
     const onKeyDown = (event) => {
@@ -2308,19 +2374,6 @@ function WrappedViewer() {
     }
   };
 
-  const handleTouchStart = (event) => {
-    touchStartX.current = event.changedTouches[0].clientX;
-  };
-
-  const handleTouchEnd = (event) => {
-    if (touchStartX.current === null) return;
-    const distance = event.changedTouches[0].clientX - touchStartX.current;
-    if (Math.abs(distance) > 45) {
-      showStory(activeIndex + (distance < 0 ? 1 : -1));
-    }
-    touchStartX.current = null;
-  };
-
   return (
     <main className="viewer-shell">
       <header className="viewer-header">
@@ -2336,8 +2389,6 @@ function WrappedViewer() {
       <section
         className="viewer-stage"
         aria-label="Coding Wrapped 故事浏览器"
-        onTouchStart={handleTouchStart}
-        onTouchEnd={handleTouchEnd}
       >
         <button
           className="story-nav story-nav-previous"
@@ -2347,11 +2398,19 @@ function WrappedViewer() {
           上一张
         </button>
 
-        <figure className="viewer-card">
+        <figure
+          className="viewer-card"
+          onDragStart={(event) => event.preventDefault()}
+          onPointerCancel={storySwipe.handlePointerCancel}
+          onPointerDown={storySwipe.handlePointerDown}
+          onPointerMove={storySwipe.handlePointerMove}
+          onPointerUp={storySwipe.handlePointerUp}
+        >
           <img
             key={activeStory.image}
             src={activeStory.image}
             alt={`Coding Wrapped 第 ${activeStory.number} 张：${activeStory.title}`}
+            draggable={false}
           />
         </figure>
 

@@ -392,12 +392,21 @@ body {
   border: 1px solid #cfcec8;
   box-shadow: 0 20px 50px rgba(35, 34, 31, 0.12);
   line-height: 0;
+  cursor: grab;
+  touch-action: pan-y;
+  user-select: none;
+}
+
+.viewer-card:active {
+  cursor: grabbing;
 }
 
 .viewer-card img {
   width: 100%;
   height: auto;
   display: block;
+  -webkit-user-drag: none;
+  user-select: none;
   animation: story-reveal 240ms ease-out both;
 }
 
@@ -2998,6 +3007,18 @@ html[lang="en"] .rpg-log-title p {
   min-height: 455px;
   border-bottom: 2px solid var(--rpg-line);
   background: var(--insight-soft);
+  cursor: grab;
+  touch-action: pan-y;
+  user-select: none;
+}
+
+.rpg-carousel:active {
+  cursor: grabbing;
+}
+
+.rpg-carousel img {
+  -webkit-user-drag: none;
+  user-select: none;
 }
 
 .rpg-carousel-card {
