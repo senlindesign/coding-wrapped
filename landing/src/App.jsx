@@ -125,7 +125,7 @@ function Hero({ onInstall }) {
           </p>
         </div>
         <div className="hero-actions">
-          <button className="button button--primary" data-cuelume-toggle="pulse" onClick={onInstall} type="button">
+          <button className="button button--primary" data-cuelume-hover="tick" data-cuelume-toggle="pulse" onClick={onInstall} type="button">
             <span>Install Skill</span><img alt="" aria-hidden="true" className="button__arrow" src="/assets/button-arrow.png" />
           </button>
           <a className="button button--secondary" data-cuelume-hover="tick" data-cuelume-release="scan" href={LINKS.github} rel="noreferrer" target="_blank">
