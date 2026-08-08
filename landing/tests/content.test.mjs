@@ -80,11 +80,11 @@ test("hero CTA labels stay centered before the hover arrow appears", async () =>
   assert.match(styles, /\.button__arrow\s*\{[^}]*position:\s*absolute/s);
 });
 
-test("how it works uses a dedicated three-step illustration", async () => {
+test("how it works uses an optimized dedicated three-step illustration", async () => {
   const source = await readFile(new URL("../src/App.jsx", import.meta.url), "utf8");
-  assert.match(source, /how-it-works-flow-v2\.png/);
+  assert.match(source, /how-it-works-flow-v2\.webp/);
   assert.doesNotMatch(source, /Coding Wrapped app icon showing a robot reading a notebook/);
-  await readFile(new URL("../public/assets/how-it-works-flow-v2.png", import.meta.url));
+  await readFile(new URL("../public/assets/how-it-works-flow-v2.webp", import.meta.url));
 });
 
 test("supported agents use their official color artwork", async () => {
@@ -223,7 +223,7 @@ test("process and install panels keep balanced desktop columns", async () => {
 test("practice tips module explains provenance and links the source-of-truth library", async () => {
   const source = await readFile(new URL("../src/App.jsx", import.meta.url), "utf8");
   const styles = await readFile(new URL("../src/styles.css", import.meta.url), "utf8");
-  const image = await stat(new URL("../public/assets/practice-tip-next-session.png", import.meta.url));
+  const image = await stat(new URL("../public/assets/practice-tip-next-session.webp", import.meta.url));
   const tips = source.indexOf("<PracticeTipsWindow />");
   const process = source.indexOf("<ProcessWindow />");
   const install = source.indexOf("<InstallWindow onCopy={copyInstall} />");
@@ -255,6 +255,24 @@ test("information panels reveal smoothly as they enter the viewport", async () =
   assert.match(source, /install-window scroll-reveal/);
   assert.match(styles, /\.scroll-reveal\s*\{[^}]*opacity:\s*0[^}]*translateY\(34px\)/s);
   assert.match(styles, /\.scroll-reveal\.is-revealed\s*\{[^}]*opacity:\s*1/s);
+  assert.doesNotMatch(styles, /\.scroll-reveal\s*\{[^}]*filter:\s*blur/s);
+});
+
+test("expensive demo updates pause when the preview leaves the viewport", async () => {
+  const source = await readFile(new URL("../src/App.jsx", import.meta.url), "utf8");
+  assert.match(source, /const \[isInView, setIsInView\] = useState\(false\)/);
+  assert.match(source, /if \(!revealed \|\| !isInView \|\| reducedMotion\) return undefined/);
+  assert.match(source, /if \(reducedMotion \|\| !isActive\) return undefined/);
+  assert.match(source, /if \(reducedMotion \|\| userControlled \|\| !isActive\) return undefined/);
+});
+
+test("large below-fold images are lazy, async decoded, and dimensioned", async () => {
+  const source = await readFile(new URL("../src/App.jsx", import.meta.url), "utf8");
+  assert.match(source, /overview-calibration-loop\.webp[\s\S]*width="1536"/);
+  assert.match(source, /loading="lazy"[\s\S]*how-it-works-flow-v2\.webp/);
+  assert.match(source, /loading="lazy"[\s\S]*practice-tip-next-session\.webp/);
+  assert.match(source, /loading="lazy"[^>]*src=\{insight\.image\}/);
+  assert.match(source, /decoding="async"/);
 });
 
 test("install actions mirror the hero arrow feedback", async () => {

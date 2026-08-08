@@ -1,4 +1,5 @@
 @font-face {
+  font-display: swap;
   font-family: "Plus Jakarta Sans";
   font-style: normal;
   font-weight: 200 800;
@@ -1461,11 +1462,7 @@ main {
   color: var(--ink);
   font-weight: 800;
   text-underline-offset: 4px;
-}
-
-.practice-library-link {
   display: inline;
-  gap: 8px;
   white-space: nowrap;
 }
 
@@ -1500,20 +1497,18 @@ main {
 }
 
 .scroll-reveal {
-  filter: blur(6px);
   opacity: 0;
   transform: translateY(34px) scale(0.992);
   transition:
     opacity 680ms var(--ease-standard),
-    transform 820ms var(--ease-emphasized),
-    filter 680ms var(--ease-standard);
-  will-change: opacity, transform, filter;
+    transform 820ms var(--ease-emphasized);
+  will-change: opacity, transform;
 }
 
 .scroll-reveal.is-revealed {
-  filter: blur(0);
   opacity: 1;
   transform: translateY(0) scale(1);
+  will-change: auto;
 }
 
 .process-layout > img {
@@ -2336,7 +2331,6 @@ main {
   }
 
   .scroll-reveal {
-    filter: none;
     opacity: 1;
     transform: none;
   }

@@ -1,7 +1,7 @@
 {
   "$schema": "./node_modules/wrangler/config-schema.json",
   "name": "coding-wrapped",
-  "compatibility_date": "2026-08-06",
+  "compatibility_date": "2026-08-08",
   "assets": {
     "directory": "./dist/client",
     "not_found_handling": "single-page-application"

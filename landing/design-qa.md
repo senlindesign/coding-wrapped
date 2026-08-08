@@ -153,8 +153,8 @@ final result: passed
 - Style and character references:
   `public/assets/illustrations/agent-orchestra-warm.webp` and
   `public/assets/illustrations/prompt-machine-pink.webp`.
-- Superseded flow reference: `public/assets/how-it-works-flow.png`.
-- New project asset: `public/assets/how-it-works-flow-v2.png` (1536 × 1024,
+- Superseded flow reference was removed from the production asset set.
+- New project asset: `public/assets/how-it-works-flow-v2.webp` (1536 × 1024,
   3:2).
 - Browser evidence:
   `audit/preview-ux/how-it-works-simplified-1280x900.png` and

@@ -82,12 +82,12 @@ function useScrollReveal() {
   return { elementRef, revealed };
 }
 
-function WindowFrame({ children, className = "", id, title, controls = true }) {
+function WindowFrame({ children, className = "", id, title }) {
   return (
     <section className={`window-frame ${className}`} id={id}>
       <header className="window-titlebar">
         <div className="window-controls" aria-hidden="true">
-          {controls && <><span /><span /></>}
+          <span /><span />
         </div>
         <span>{title}</span>
         <div className="window-titlebar-spacer" />
@@ -100,7 +100,7 @@ function WindowFrame({ children, className = "", id, title, controls = true }) {
 function InlineAgent({ agent }) {
   return (
     <span aria-label={`${agent.name} supported`} className={`inline-agent inline-agent--${agent.slug}`} tabIndex="0">
-      <img alt="" src={agent.icon} />
+      <img alt="" decoding="async" height="32" src={agent.icon} width="32" />
       <strong>{agent.name}</strong>
       <span className="inline-agent__tooltip" role="tooltip">{agent.name} supported</span>
     </span>
@@ -114,7 +114,10 @@ function Hero({ onInstall }) {
         <img
           alt="Coding Wrapped — a pixel robot reading its coding log"
           className="hero-app-icon"
+          fetchPriority="high"
+          height="512"
           src="/assets/coding-wrapped-mascot.webp"
+          width="512"
         />
         <h1>Coding Wrapped</h1>
         <div className="hero-lede">
@@ -126,10 +129,10 @@ function Hero({ onInstall }) {
         </div>
         <div className="hero-actions">
           <button className="button button--primary" data-cuelume-hover="tick" data-cuelume-toggle="pulse" onClick={onInstall} type="button">
-            <span>Install Skill</span><img alt="" aria-hidden="true" className="button__arrow" src="/assets/button-arrow.png" />
+            <span>Install Skill</span><img alt="" aria-hidden="true" className="button__arrow" height="96" src="/assets/button-arrow.png" width="96" />
           </button>
           <a className="button button--secondary" data-cuelume-hover="tick" data-cuelume-release="scan" href={LINKS.github} rel="noreferrer" target="_blank">
-            <span>Go to GitHub</span><img alt="" aria-hidden="true" className="button__arrow" src="/assets/button-arrow.png" />
+            <span>Go to GitHub</span><img alt="" aria-hidden="true" className="button__arrow" height="96" src="/assets/button-arrow.png" width="96" />
           </a>
         </div>
         <div className="hero-support-wrap">
@@ -150,7 +153,13 @@ function Dock({ quiet = false }) {
       {DOCK_ITEMS.map((item) => {
         const content = (
           <>
-            <img alt="" src={item.icon} />
+            <img
+              alt=""
+              decoding="async"
+              height="512"
+              src={item.icon}
+              width="512"
+            />
             <span>{item.label}</span>
           </>
         );
@@ -201,7 +210,11 @@ function OverviewPanel() {
       <div className="overview-visual">
         <img
           alt="A pixel-art person making a small correction while one coding agent moves work through a feedback loop"
+          decoding="async"
+          height="1024"
+          loading="lazy"
           src="/assets/illustrations/overview-calibration-loop.webp"
+          width="1536"
         />
         <span>Local aggregates only · no transcript leaves your machine</span>
       </div>
@@ -209,7 +222,7 @@ function OverviewPanel() {
   );
 }
 
-function InsightPanel({ activeIndex, onChange, onManualInteraction, reducedMotion }) {
+function InsightPanel({ activeIndex, isActive, onChange, onManualInteraction, reducedMotion }) {
   const insight = INSIGHTS[activeIndex];
   const previousIndex = (activeIndex - 1 + INSIGHTS.length) % INSIGHTS.length;
   const nextIndex = (activeIndex + 1) % INSIGHTS.length;
@@ -229,12 +242,12 @@ function InsightPanel({ activeIndex, onChange, onManualInteraction, reducedMotio
   };
 
   useEffect(() => {
-    if (reducedMotion) return undefined;
+    if (reducedMotion || !isActive) return undefined;
     const timer = window.setTimeout(() => {
       onChange((activeIndex + 1) % INSIGHTS.length);
     }, 5200);
     return () => window.clearTimeout(timer);
-  }, [activeIndex, onChange, reducedMotion]);
+  }, [activeIndex, isActive, onChange, reducedMotion]);
 
   useEffect(() => () => window.clearTimeout(wheelResetTimer.current), []);
 
@@ -328,13 +341,40 @@ function InsightPanel({ activeIndex, onChange, onManualInteraction, reducedMotio
         onWheel={handleWheel}
       >
         <figure className="insight-card-preview insight-card-preview--left" aria-hidden="true">
-          <img alt="" draggable="false" key={INSIGHTS[previousIndex].image} src={INSIGHTS[previousIndex].image} />
+          <img
+            alt=""
+            decoding="async"
+            draggable="false"
+            height="512"
+            key={INSIGHTS[previousIndex].image}
+            loading="lazy"
+            src={INSIGHTS[previousIndex].image}
+            width="768"
+          />
         </figure>
         <figure className="insight-card-preview insight-card-preview--main">
-          <img alt={insight.alt} draggable="false" key={insight.image} src={insight.image} />
+          <img
+            alt={insight.alt}
+            decoding="async"
+            draggable="false"
+            height="512"
+            key={insight.image}
+            loading="lazy"
+            src={insight.image}
+            width="768"
+          />
         </figure>
         <figure className="insight-card-preview insight-card-preview--right" aria-hidden="true">
-          <img alt="" draggable="false" key={INSIGHTS[nextIndex].image} src={INSIGHTS[nextIndex].image} />
+          <img
+            alt=""
+            decoding="async"
+            draggable="false"
+            height="512"
+            key={INSIGHTS[nextIndex].image}
+            loading="lazy"
+            src={INSIGHTS[nextIndex].image}
+            width="768"
+          />
         </figure>
         <span className="insight-swipe-hint">SWIPE OR USE ARROW KEYS</span>
       </div>
@@ -364,20 +404,20 @@ function ActivityGrid() {
   );
 }
 
-function DataPanel({ onManualInteraction, reducedMotion }) {
+function DataPanel({ isActive, onManualInteraction, reducedMotion }) {
   const [selectedMetrics, setSelectedMetrics] = useState(METRIC_PRESETS[0]);
   const [showCustomizer, setShowCustomizer] = useState(false);
   const [userControlled, setUserControlled] = useState(false);
 
   useEffect(() => {
-    if (reducedMotion || userControlled) return undefined;
+    if (reducedMotion || userControlled || !isActive) return undefined;
     let presetIndex = 0;
     const timer = window.setInterval(() => {
       presetIndex = (presetIndex + 1) % METRIC_PRESETS.length;
       setSelectedMetrics(METRIC_PRESETS[presetIndex]);
     }, 4400);
     return () => window.clearInterval(timer);
-  }, [reducedMotion, userControlled]);
+  }, [isActive, reducedMotion, userControlled]);
 
   const toggleMetric = (metricIndex) => {
     play("toggle");
@@ -456,6 +496,7 @@ function DataPanel({ onManualInteraction, reducedMotion }) {
 
 function DemoWindow({ activeIndex, onChange, onUseData, onViewChange, onVisibilityChange, view }) {
   const [revealed, setRevealed] = useState(false);
+  const [isInView, setIsInView] = useState(false);
   const [manualHoldUntil, setManualHoldUntil] = useState(0);
   const [renderedView, setRenderedView] = useState(view);
   const [contentPhase, setContentPhase] = useState("is-active");
@@ -466,12 +507,16 @@ function DemoWindow({ activeIndex, onChange, onUseData, onViewChange, onVisibili
     const element = document.querySelector("#demo-window");
     if (!element || !window.IntersectionObserver) {
       setRevealed(true);
-      return undefined;
+      setIsInView(true);
+      onVisibilityChange?.(true);
+      return () => onVisibilityChange?.(false);
     }
 
     const observer = new window.IntersectionObserver(
       ([entry]) => {
-        onVisibilityChange?.(entry.isIntersecting && entry.intersectionRatio > 0.12);
+        const nextIsInView = entry.isIntersecting && entry.intersectionRatio > 0.12;
+        setIsInView(nextIsInView);
+        onVisibilityChange?.(nextIsInView);
         if (entry.isIntersecting) {
           setRevealed(true);
         }
@@ -486,7 +531,7 @@ function DemoWindow({ activeIndex, onChange, onUseData, onViewChange, onVisibili
   }, [onVisibilityChange]);
 
   useEffect(() => {
-    if (!revealed || reducedMotion) return undefined;
+    if (!revealed || !isInView || reducedMotion) return undefined;
     const now = Date.now();
     const isHolding = manualHoldUntil > now;
     const timer = window.setTimeout(() => {
@@ -498,7 +543,7 @@ function DemoWindow({ activeIndex, onChange, onUseData, onViewChange, onVisibili
       onViewChange(DEMO_VIEWS[nextIndex].id);
     }, isHolding ? manualHoldUntil - now : 6400);
     return () => window.clearTimeout(timer);
-  }, [activeViewIndex, manualHoldUntil, onViewChange, reducedMotion, revealed]);
+  }, [activeViewIndex, isInView, manualHoldUntil, onViewChange, reducedMotion, revealed]);
 
   useEffect(() => {
     if (view === renderedView) return undefined;
@@ -534,7 +579,7 @@ function DemoWindow({ activeIndex, onChange, onUseData, onViewChange, onVisibili
     <WindowFrame className={`product-window ${revealed ? "is-visible" : ""}`} id="demo-window" title="LIVE DEMO · 127.0.0.1 / coding-wrapped">
       <header className="dashboard-header">
         <div className="dashboard-brand">
-          <img alt="" src="/assets/coding-wrapped-app.webp" />
+          <img alt="" decoding="async" height="256" src="/assets/coding-wrapped-app.webp" width="256" />
           <div><strong>CODING WRAPPED</strong><span>PERSONAL / LOCAL</span></div>
         </div>
         <div className="dashboard-title">
@@ -553,8 +598,8 @@ function DemoWindow({ activeIndex, onChange, onUseData, onViewChange, onVisibili
       </div>
       <div className={`product-content ${contentPhase}`} data-view={renderedView}>
         {renderedView === "overview" && <OverviewPanel />}
-        {renderedView === "insight" && <InsightPanel activeIndex={activeIndex} onChange={onChange} onManualInteraction={pauseAutoplayBriefly} reducedMotion={reducedMotion} />}
-        {renderedView === "data" && <DataPanel onManualInteraction={pauseAutoplayBriefly} reducedMotion={reducedMotion} />}
+        {renderedView === "insight" && <InsightPanel activeIndex={activeIndex} isActive={isInView} onChange={onChange} onManualInteraction={pauseAutoplayBriefly} reducedMotion={reducedMotion} />}
+        {renderedView === "data" && <DataPanel isActive={isInView} onManualInteraction={pauseAutoplayBriefly} reducedMotion={reducedMotion} />}
       </div>
     </WindowFrame>
   );
@@ -568,7 +613,11 @@ function ProcessWindow() {
         <img
           alt="A pixel-art flow from scanning local coding logs, to wrapping safe data, to exploring finished insights"
           className="process-illustration"
-          src="/assets/how-it-works-flow-v2.png"
+          decoding="async"
+          height="1024"
+          loading="lazy"
+          src="/assets/how-it-works-flow-v2.webp"
+          width="1536"
         />
         <div>
           <p className="panel-kicker">THREE SMALL STEPS</p>
@@ -620,7 +669,11 @@ function PracticeTipsWindow() {
         <div className="practice-tips-visual">
           <img
             alt="A pixel-art robot offering one lightweight tip before the coder's next session"
-            src="/assets/practice-tip-next-session.png"
+            decoding="async"
+            height="1024"
+            loading="lazy"
+            src="/assets/practice-tip-next-session.webp"
+            width="1536"
           />
         </div>
       </div>
@@ -641,10 +694,10 @@ function InstallWindow({ onCopy }) {
         <pre><code>{INSTALL_COMMAND}</code></pre>
         <div className="install-actions">
           <button className="button button--primary" data-cuelume-press="press" onClick={onCopy} type="button">
-            <span>Copy command</span><img alt="" aria-hidden="true" className="button__arrow" src="/assets/button-arrow.png" />
+            <span>Copy command</span><img alt="" aria-hidden="true" className="button__arrow" height="96" src="/assets/button-arrow.png" width="96" />
           </button>
           <a className="button button--secondary" data-cuelume-hover="tick" data-cuelume-release="scan" href={LINKS.github} rel="noreferrer" target="_blank">
-            <span>Read the docs</span><img alt="" aria-hidden="true" className="button__arrow" src="/assets/button-arrow.png" />
+            <span>Read the docs</span><img alt="" aria-hidden="true" className="button__arrow" height="96" src="/assets/button-arrow.png" width="96" />
           </a>
         </div>
       </div>
