@@ -1520,7 +1520,7 @@ main {
   display: block;
   image-rendering: pixelated;
   margin: 0 auto;
-  max-width: 460px;
+  max-width: 100%;
   object-fit: contain;
   width: 100%;
 }
@@ -1561,7 +1561,7 @@ main {
 .install-layout {
   display: grid;
   gap: 28px;
-  grid-template-columns: minmax(0, 0.86fr) minmax(390px, 1.14fr);
+  grid-template-columns: repeat(2, minmax(0, 1fr));
   padding: 42px;
 }
 

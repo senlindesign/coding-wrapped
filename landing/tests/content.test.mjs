@@ -211,6 +211,14 @@ test("demo and information panels share one responsive alignment contract", asyn
   assert.match(styles, /\.practice-tips-window,\s*\.process-window,\s*\.install-window\s*\{[^}]*max-width:\s*var\(--layout-max\)[^}]*width:\s*100%/s);
 });
 
+test("process and install panels keep balanced desktop columns", async () => {
+  const styles = await readFile(new URL("../src/styles.css", import.meta.url), "utf8");
+  assert.match(styles, /\.process-layout\s*\{[^}]*grid-template-columns:\s*minmax\(0, 1fr\) minmax\(0, 1fr\)/s);
+  assert.match(styles, /\.process-layout > img\s*\{[^}]*max-width:\s*100%[^}]*width:\s*100%/s);
+  assert.match(styles, /\.install-layout\s*\{[^}]*grid-template-columns:\s*repeat\(2, minmax\(0, 1fr\)\)/s);
+  assert.doesNotMatch(styles, /\.install-layout\s*\{[^}]*0\.86fr[^}]*1\.14fr/s);
+});
+
 test("practice tips module explains provenance and links the source-of-truth library", async () => {
   const source = await readFile(new URL("../src/App.jsx", import.meta.url), "utf8");
   const styles = await readFile(new URL("../src/styles.css", import.meta.url), "utf8");
