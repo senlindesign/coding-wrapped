@@ -185,6 +185,22 @@ test("motion system smooths dock, view, deck, popover, and data transitions", as
   assert.match(styles, /@keyframes toast-lifecycle/);
 });
 
+test("intentional controls use quiet semantic Cuelume feedback", async () => {
+  const source = await readFile(new URL("../src/App.jsx", import.meta.url), "utf8");
+  const packageJson = JSON.parse(await readFile(new URL("../package.json", import.meta.url), "utf8"));
+  assert.equal(packageJson.dependencies.cuelume, "^0.2.2");
+  assert.match(source, /import \{ bind, play, setVolume \} from "cuelume"/);
+  assert.match(source, /setVolume\(0\.32\);\s*bind\(\);/s);
+  assert.match(source, /data-cuelume-toggle="pulse"/);
+  assert.match(source, /data-cuelume-hover="tick"/);
+  assert.match(source, /data-cuelume-release="scan"/);
+  assert.match(source, /play\("page"\)/);
+  assert.match(source, /play\("toggle"\)/);
+  assert.match(source, /play\(showCustomizer \? "droplet" : "bloom"\)/);
+  assert.match(source, /play\("success"\)[\s\S]*Install command copied/);
+  assert.match(source, /play\("error"\)[\s\S]*Select the command/);
+});
+
 test("demo and information panels share one responsive alignment contract", async () => {
   const styles = await readFile(new URL("../src/styles.css", import.meta.url), "utf8");
   assert.match(styles, /--layout-gutter:\s*clamp\(16px, 2vw, 32px\)/);

@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState } from "react";
+import { bind, play, setVolume } from "cuelume";
 import { INSTALL_COMMAND, INSIGHTS, LINKS, METRICS } from "./content.js";
 
 const AGENTS = [
@@ -124,10 +125,10 @@ function Hero({ onInstall }) {
           </p>
         </div>
         <div className="hero-actions">
-          <button className="button button--primary" onClick={onInstall} type="button">
+          <button className="button button--primary" data-cuelume-toggle="pulse" onClick={onInstall} type="button">
             <span>Install Skill</span><img alt="" aria-hidden="true" className="button__arrow" src="/assets/button-arrow.png" />
           </button>
-          <a className="button button--secondary" href={LINKS.github} rel="noreferrer" target="_blank">
+          <a className="button button--secondary" data-cuelume-hover="tick" data-cuelume-release="scan" href={LINKS.github} rel="noreferrer" target="_blank">
             <span>Go to GitHub</span><img alt="" aria-hidden="true" className="button__arrow" src="/assets/button-arrow.png" />
           </a>
         </div>
@@ -157,6 +158,8 @@ function Dock({ quiet = false }) {
         return (
           <a
             aria-label={item.label}
+            data-cuelume-hover="tick"
+            data-cuelume-release={item.external ? "scan" : "release"}
             href={item.href}
             key={item.label}
             rel={item.external ? "noreferrer" : undefined}
@@ -216,9 +219,13 @@ function InsightPanel({ activeIndex, onChange, onManualInteraction, reducedMotio
   const wheelResetTimer = useRef(null);
   const wheelLockedUntil = useRef(0);
   const [isDragging, setIsDragging] = useState(false);
-  const selectRelativeInsight = (offset) => {
+  const selectInsight = (nextIndex) => {
     onManualInteraction?.();
-    onChange((activeIndex + offset + INSIGHTS.length) % INSIGHTS.length);
+    play("page");
+    onChange(nextIndex);
+  };
+  const selectRelativeInsight = (offset) => {
+    selectInsight((activeIndex + offset + INSIGHTS.length) % INSIGHTS.length);
   };
 
   useEffect(() => {
@@ -300,10 +307,7 @@ function InsightPanel({ activeIndex, onChange, onManualInteraction, reducedMotio
                 aria-pressed={index === activeIndex}
                 className={index === activeIndex ? "is-active" : ""}
                 key={item.title}
-                onClick={() => {
-                  onManualInteraction?.();
-                  onChange(index);
-                }}
+                onClick={() => selectInsight(index)}
                 type="button"
               >
                 {String(index + 1).padStart(2, "0")}
@@ -376,6 +380,7 @@ function DataPanel({ onManualInteraction, reducedMotion }) {
   }, [reducedMotion, userControlled]);
 
   const toggleMetric = (metricIndex) => {
+    play("toggle");
     setUserControlled(true);
     onManualInteraction?.();
     setSelectedMetrics((current) => {
@@ -401,6 +406,7 @@ function DataPanel({ onManualInteraction, reducedMotion }) {
             aria-expanded={showCustomizer}
             className="metric-toggle"
             onClick={() => {
+              play(showCustomizer ? "droplet" : "bloom");
               setShowCustomizer((current) => !current);
               onManualInteraction?.();
             }}
@@ -519,6 +525,7 @@ function DemoWindow({ activeIndex, onChange, onUseData, onViewChange, onVisibili
   const pauseAutoplayBriefly = () => setManualHoldUntil(Date.now() + 12000);
 
   const chooseView = (nextView) => {
+    play("toggle");
     pauseAutoplayBriefly();
     onViewChange(nextView);
   };
@@ -534,7 +541,7 @@ function DemoWindow({ activeIndex, onChange, onUseData, onViewChange, onVisibili
           <strong>SEN'S CODING ADVENTURE LOG</strong>
           <span>See how you and AI actually get things made together.</span>
         </div>
-        <button onClick={onUseData} type="button">USE MY OWN DATA</button>
+        <button data-cuelume-toggle="pulse" onClick={onUseData} type="button">USE MY OWN DATA</button>
       </header>
       <div className="product-toolbar">
         <nav aria-label="Demo views">
@@ -589,7 +596,7 @@ function PracticeTipsWindow() {
           <p>
             Coding Wrapped matches patterns in your local aggregates with
             trusted practices, then suggests one lightweight next move for
-            your next coding session. <a className="practice-library-link" href={LINKS.practiceLibrary} rel="noreferrer" target="_blank">
+            your next coding session. <a className="practice-library-link" data-cuelume-hover="tick" data-cuelume-release="scan" href={LINKS.practiceLibrary} rel="noreferrer" target="_blank">
               View the practice library <span aria-hidden="true">→</span>
             </a>
           </p>
@@ -606,7 +613,7 @@ function PracticeTipsWindow() {
             <p>Add one sentence describing what done looks like and one thing that must not change.</p>
             <footer>
               <span>BASED ON</span>
-              <a href="https://learn.chatgpt.com/docs/prompting" rel="noreferrer" target="_blank">OpenAI · Prompting</a>
+              <a data-cuelume-hover="tick" data-cuelume-release="scan" href="https://learn.chatgpt.com/docs/prompting" rel="noreferrer" target="_blank">OpenAI · Prompting</a>
             </footer>
           </article>
         </div>
@@ -633,10 +640,10 @@ function InstallWindow({ onCopy }) {
         </div>
         <pre><code>{INSTALL_COMMAND}</code></pre>
         <div className="install-actions">
-          <button className="button button--primary" onClick={onCopy} type="button">
+          <button className="button button--primary" data-cuelume-press="press" onClick={onCopy} type="button">
             <span>Copy command</span><img alt="" aria-hidden="true" className="button__arrow" src="/assets/button-arrow.png" />
           </button>
-          <a className="button button--secondary" href={LINKS.github} rel="noreferrer" target="_blank">
+          <a className="button button--secondary" data-cuelume-hover="tick" data-cuelume-release="scan" href={LINKS.github} rel="noreferrer" target="_blank">
             <span>Read the docs</span><img alt="" aria-hidden="true" className="button__arrow" src="/assets/button-arrow.png" />
           </a>
         </div>
@@ -652,6 +659,11 @@ export function App() {
   const [demoInView, setDemoInView] = useState(false);
 
   useEffect(() => {
+    setVolume(0.32);
+    bind();
+  }, []);
+
+  useEffect(() => {
     if (!toast) return undefined;
     const timer = window.setTimeout(() => setToast(""), 2800);
     return () => window.clearTimeout(timer);
@@ -660,8 +672,10 @@ export function App() {
   const copyInstall = async () => {
     try {
       await navigator.clipboard.writeText(INSTALL_COMMAND);
+      play("success");
       setToast("Install command copied.");
     } catch {
+      play("error");
       setToast("Select the command in the install window to copy it.");
     }
   };
@@ -688,7 +702,7 @@ export function App() {
       </section>
       <footer className="page-footer">
         <div><strong>Coding Wrapped</strong><span className="pixel-slogan">Observe the way you build</span></div>
-        <a href={LINKS.github} rel="noreferrer" target="_blank">MIT · OPEN SOURCE</a>
+        <a data-cuelume-hover="tick" data-cuelume-release="scan" href={LINKS.github} rel="noreferrer" target="_blank">MIT · OPEN SOURCE</a>
       </footer>
       <Dock quiet={demoInView} />
       {toast && <div aria-live="polite" className="toast" key={toast} role="status">{toast}</div>}
