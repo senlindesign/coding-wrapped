@@ -154,18 +154,23 @@ test("preview restores complete overview, insight deck, and behavior controls", 
   assert.match(styles, /\.metric-card--tone-0/);
   assert.match(styles, /\.metric-card--tone-3/);
   assert.match(source, /USE MY OWN DATA/);
-  assert.match(source, /quiet=\{demoInView\}/);
-  assert.match(styles, /\.page-dock\.is-quiet/);
+  assert.match(source, /compact=\{isScrolling\}/);
+  assert.match(styles, /\.page-dock\.is-compact/);
   assert.doesNotMatch(styles, /\.demo-coach__progress/);
 });
 
-test("dock stays opaque and only collapses beside the desktop demo", async () => {
+test("dock stays opaque and only collapses while the desktop page is scrolling", async () => {
+  const source = await readFile(new URL("../src/App.jsx", import.meta.url), "utf8");
   const styles = await readFile(new URL("../src/styles.css", import.meta.url), "utf8");
+  assert.match(source, /function useScrollActivity\(idleDelay = 220\)/);
+  assert.match(source, /addEventListener\("scroll", handleScroll, \{ passive: true \}\)/);
+  assert.match(source, /setIsScrolling\(false\);[\s\S]*idleDelay/);
+  assert.doesNotMatch(source, /demoInView|onVisibilityChange/);
   assert.match(styles, /\.page-dock\s*\{[^}]*background:\s*var\(--paper\)/s);
-  assert.doesNotMatch(styles, /\.page-dock\.is-quiet\s*\{[^}]*opacity:/s);
-  assert.match(styles, /\.page-dock\.is-quiet\s*\{[^}]*translate3d\(calc\(50vw - 100% - 18px\)/s);
-  assert.doesNotMatch(styles, /\.page-dock\.is-quiet\s*\{[^}]*left:\s*auto/s);
-  assert.match(styles, /@media \(max-width: 820px\)[\s\S]*\.page-dock\.is-quiet\s*\{[^}]*translate3d\(-50%/s);
+  assert.doesNotMatch(styles, /\.page-dock\.is-compact\s*\{[^}]*opacity:/s);
+  assert.match(styles, /\.page-dock\.is-compact\s*\{[^}]*translate3d\(calc\(50vw - 100% - 18px\)/s);
+  assert.doesNotMatch(styles, /\.page-dock\.is-compact\s*\{[^}]*left:\s*auto/s);
+  assert.match(styles, /@media \(max-width: 820px\)[\s\S]*\.page-dock\.is-compact\s*\{[^}]*translate3d\(-50%/s);
 });
 
 test("motion system smooths dock, view, deck, popover, and data transitions", async () => {
@@ -216,6 +221,8 @@ test("process and install panels keep balanced desktop columns", async () => {
   const styles = await readFile(new URL("../src/styles.css", import.meta.url), "utf8");
   assert.match(styles, /\.process-layout\s*\{[^}]*grid-template-columns:\s*minmax\(0, 1fr\) minmax\(0, 1fr\)/s);
   assert.match(styles, /\.process-layout > img\s*\{[^}]*max-width:\s*100%[^}]*width:\s*100%/s);
+  assert.match(styles, /\.process-layout > img\s*\{[^}]*aspect-ratio:\s*3\s*\/\s*2[^}]*height:\s*auto[^}]*object-fit:\s*contain/s);
+  assert.doesNotMatch(styles, /\.process-layout > img\s*\{[^}]*object-fit:\s*cover/s);
   assert.match(styles, /\.install-layout\s*\{[^}]*grid-template-columns:\s*repeat\(2, minmax\(0, 1fr\)\)/s);
   assert.doesNotMatch(styles, /\.install-layout\s*\{[^}]*0\.86fr[^}]*1\.14fr/s);
 });

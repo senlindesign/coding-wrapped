@@ -1512,7 +1512,9 @@ main {
 }
 
 .process-layout > img {
+  aspect-ratio: 3 / 2;
   display: block;
+  height: auto;
   image-rendering: pixelated;
   margin: 0 auto;
   max-width: 100%;
@@ -1661,14 +1663,14 @@ main {
   z-index: 40;
 }
 
-.page-dock.is-quiet {
+.page-dock.is-compact {
   gap: 0;
   padding: 7px;
   transform: translate3d(calc(50vw - 100% - 18px), 0, 0);
 }
 
-.page-dock.is-quiet:hover,
-.page-dock.is-quiet:focus-within {
+.page-dock.is-compact:hover,
+.page-dock.is-compact:focus-within {
   gap: 9px;
 }
 
@@ -1685,15 +1687,15 @@ main {
   width: 58px;
 }
 
-.page-dock.is-quiet a:not(:first-child) {
+.page-dock.is-compact a:not(:first-child) {
   opacity: 0;
   overflow: hidden;
   pointer-events: none;
   width: 0;
 }
 
-.page-dock.is-quiet:hover a:not(:first-child),
-.page-dock.is-quiet:focus-within a:not(:first-child) {
+.page-dock.is-compact:hover a:not(:first-child),
+.page-dock.is-compact:focus-within a:not(:first-child) {
   opacity: 1;
   pointer-events: auto;
   width: 58px;
@@ -2015,15 +2017,15 @@ main {
     padding: 34px 16px 120px;
   }
 
-  .page-dock.is-quiet {
+  .page-dock.is-compact {
     gap: 8px;
     padding: 8px 10px;
     transform: translate3d(-50%, 0, 0);
   }
 
-  .page-dock.is-quiet a:not(:first-child),
-  .page-dock.is-quiet:hover a:not(:first-child),
-  .page-dock.is-quiet:focus-within a:not(:first-child) {
+  .page-dock.is-compact a:not(:first-child),
+  .page-dock.is-compact:hover a:not(:first-child),
+  .page-dock.is-compact:focus-within a:not(:first-child) {
     opacity: 1;
     pointer-events: auto;
     width: 58px;
@@ -2295,16 +2297,16 @@ main {
     width: 50px;
   }
 
-  .page-dock.is-quiet {
+  .page-dock.is-compact {
     bottom: 12px;
     gap: 8px;
     padding: 8px 9px;
     transform: translate3d(-50%, 0, 0);
   }
 
-  .page-dock.is-quiet a:not(:first-child),
-  .page-dock.is-quiet:hover a:not(:first-child),
-  .page-dock.is-quiet:focus-within a:not(:first-child) {
+  .page-dock.is-compact a:not(:first-child),
+  .page-dock.is-compact:hover a:not(:first-child),
+  .page-dock.is-compact:focus-within a:not(:first-child) {
     opacity: 1;
     pointer-events: auto;
     width: 50px;

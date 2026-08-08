@@ -55,6 +55,29 @@ function useReducedMotion() {
   return reducedMotion;
 }
 
+function useScrollActivity(idleDelay = 220) {
+  const [isScrolling, setIsScrolling] = useState(false);
+  const idleTimer = useRef(null);
+
+  useEffect(() => {
+    const handleScroll = () => {
+      setIsScrolling(true);
+      window.clearTimeout(idleTimer.current);
+      idleTimer.current = window.setTimeout(() => {
+        setIsScrolling(false);
+      }, idleDelay);
+    };
+
+    window.addEventListener("scroll", handleScroll, { passive: true });
+    return () => {
+      window.removeEventListener("scroll", handleScroll);
+      window.clearTimeout(idleTimer.current);
+    };
+  }, [idleDelay]);
+
+  return isScrolling;
+}
+
 function useScrollReveal() {
   const elementRef = useRef(null);
   const [revealed, setRevealed] = useState(false);
@@ -147,9 +170,9 @@ function Hero({ onInstall }) {
   );
 }
 
-function Dock({ quiet = false }) {
+function Dock({ compact = false }) {
   return (
-    <nav aria-label="Quick links" className={`page-dock ${quiet ? "is-quiet" : ""}`}>
+    <nav aria-label="Quick links" className={`page-dock ${compact ? "is-compact" : ""}`}>
       {DOCK_ITEMS.map((item) => {
         const content = (
           <>
@@ -494,7 +517,7 @@ function DataPanel({ isActive, onManualInteraction, reducedMotion }) {
   );
 }
 
-function DemoWindow({ activeIndex, onChange, onUseData, onViewChange, onVisibilityChange, view }) {
+function DemoWindow({ activeIndex, onChange, onUseData, onViewChange, view }) {
   const [revealed, setRevealed] = useState(false);
   const [isInView, setIsInView] = useState(false);
   const [manualHoldUntil, setManualHoldUntil] = useState(0);
@@ -508,15 +531,13 @@ function DemoWindow({ activeIndex, onChange, onUseData, onViewChange, onVisibili
     if (!element || !window.IntersectionObserver) {
       setRevealed(true);
       setIsInView(true);
-      onVisibilityChange?.(true);
-      return () => onVisibilityChange?.(false);
+      return undefined;
     }
 
     const observer = new window.IntersectionObserver(
       ([entry]) => {
         const nextIsInView = entry.isIntersecting && entry.intersectionRatio > 0.12;
         setIsInView(nextIsInView);
-        onVisibilityChange?.(nextIsInView);
         if (entry.isIntersecting) {
           setRevealed(true);
         }
@@ -525,10 +546,9 @@ function DemoWindow({ activeIndex, onChange, onUseData, onViewChange, onVisibili
     );
     observer.observe(element);
     return () => {
-      onVisibilityChange?.(false);
       observer.disconnect();
     };
-  }, [onVisibilityChange]);
+  }, []);
 
   useEffect(() => {
     if (!revealed || !isInView || reducedMotion) return undefined;
@@ -709,7 +729,7 @@ export function App() {
   const [activeIndex, setActiveIndex] = useState(0);
   const [view, setView] = useState("overview");
   const [toast, setToast] = useState("");
-  const [demoInView, setDemoInView] = useState(false);
+  const isScrolling = useScrollActivity();
 
   useEffect(() => {
     setVolume(0.32);
@@ -744,7 +764,6 @@ export function App() {
           onChange={setActiveIndex}
           onUseData={openInstall}
           onViewChange={setView}
-          onVisibilityChange={setDemoInView}
           view={view}
         />
       </section>
@@ -757,7 +776,7 @@ export function App() {
         <div><strong>Coding Wrapped</strong><span className="pixel-slogan">Observe the way you build</span></div>
         <a data-cuelume-hover="tick" data-cuelume-release="scan" href={LINKS.github} rel="noreferrer" target="_blank">MIT · OPEN SOURCE</a>
       </footer>
-      <Dock quiet={demoInView} />
+      <Dock compact={isScrolling} />
       {toast && <div aria-live="polite" className="toast" key={toast} role="status">{toast}</div>}
     </main>
   );
