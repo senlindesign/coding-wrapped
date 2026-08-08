@@ -732,7 +732,7 @@ export function App() {
   const isScrolling = useScrollActivity();
 
   useEffect(() => {
-    setVolume(0.32);
+    setVolume(0.4);
     bind();
   }, []);
 

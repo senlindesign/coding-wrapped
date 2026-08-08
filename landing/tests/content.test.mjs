@@ -195,7 +195,7 @@ test("intentional controls use quiet semantic Cuelume feedback", async () => {
   const packageJson = JSON.parse(await readFile(new URL("../package.json", import.meta.url), "utf8"));
   assert.equal(packageJson.dependencies.cuelume, "^0.2.2");
   assert.match(source, /import \{ bind, play, setVolume \} from "cuelume"/);
-  assert.match(source, /setVolume\(0\.32\);\s*bind\(\);/s);
+  assert.match(source, /setVolume\(0\.4\);\s*bind\(\);/s);
   assert.match(source, /className="button button--primary" data-cuelume-hover="tick" data-cuelume-toggle="pulse"[^>]*>\s*<span>Install Skill<\/span>/s);
   assert.match(source, /data-cuelume-toggle="pulse"/);
   assert.match(source, /data-cuelume-hover="tick"/);
