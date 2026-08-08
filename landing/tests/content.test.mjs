@@ -198,17 +198,19 @@ test("demo and information panels share one responsive alignment contract", asyn
 test("practice tips module explains provenance and links the source-of-truth library", async () => {
   const source = await readFile(new URL("../src/App.jsx", import.meta.url), "utf8");
   const styles = await readFile(new URL("../src/styles.css", import.meta.url), "utf8");
-  const image = await stat(new URL("../public/assets/practice-tip-flow.png", import.meta.url));
+  const image = await stat(new URL("../public/assets/practice-tip-next-session.png", import.meta.url));
   const tips = source.indexOf("<PracticeTipsWindow />");
   const process = source.indexOf("<ProcessWindow />");
   const install = source.indexOf("<InstallWindow onCopy={copyInstall} />");
   assert.ok(process > 0 && process < tips && tips < install);
-  assert.match(source, /PRACTICES, NOT PLATITUDES/);
+  assert.match(source, /USEFUL TIPS/);
+  assert.match(source, /Small tips for your next coding session\./);
   assert.match(source, /Official guidance/);
   assert.match(source, /Practitioner playbooks/);
   assert.match(source, /Expert conversations/);
   assert.match(source, /View the practice library/);
-  assert.match(styles, /\.practice-tips-window\s*\{[^}]*background:\s*#fff9ef/s);
+  assert.match(source, /next coding session\. <a className="practice-library-link"/);
+  assert.match(styles, /\.practice-tips-window\s*\{[^}]*background:\s*#fdf7eb/s);
   assert.match(styles, /\.practice-tips-layout\s*\{[^}]*grid-template-columns:\s*minmax\(0, 1\.08fr\) minmax\(360px, 0\.92fr\)/s);
   assert.doesNotMatch(styles, /\.practice-tips-visual\s*\{[^}]*border-right:/s);
   assert.ok(image.size > 0);

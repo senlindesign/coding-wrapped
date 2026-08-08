@@ -555,12 +555,14 @@ function PracticeTipsWindow() {
     <section className="practice-tips-window" aria-labelledby="practice-tips-title">
       <div className="practice-tips-layout">
         <div className="practice-tips-copy">
-          <p className="panel-kicker">PRACTICES, NOT PLATITUDES</p>
-          <h2 id="practice-tips-title">A useful tip should have somewhere to point back to.</h2>
+          <p className="panel-kicker">USEFUL TIPS</p>
+          <h2 id="practice-tips-title">Small tips for your next coding session.</h2>
           <p>
             Coding Wrapped matches patterns in your local aggregates with
-            practices from official agent guidance and experienced builders,
-            then gives you one small next move with its source attached.
+            trusted practices, then suggests one lightweight next move for
+            your next coding session. <a className="practice-library-link" href={LINKS.practiceLibrary} rel="noreferrer" target="_blank">
+              View the practice library <span aria-hidden="true">→</span>
+            </a>
           </p>
           <ul aria-label="Practice source types" className="practice-source-types">
             <li>Official guidance</li>
@@ -578,14 +580,11 @@ function PracticeTipsWindow() {
               <a href="https://learn.chatgpt.com/docs/prompting" rel="noreferrer" target="_blank">OpenAI · Prompting</a>
             </footer>
           </article>
-          <a className="practice-library-link" href={LINKS.practiceLibrary} rel="noreferrer" target="_blank">
-            View the practice library <span aria-hidden="true">→</span>
-          </a>
         </div>
         <div className="practice-tips-visual">
           <img
-            alt="Pixel-art sources and local behavior being sorted into one practical coding tip"
-            src="/assets/practice-tip-flow.png"
+            alt="A pixel-art robot offering one lightweight tip before the coder's next session"
+            src="/assets/practice-tip-next-session.png"
           />
         </div>
       </div>

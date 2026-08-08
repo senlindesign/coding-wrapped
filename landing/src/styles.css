@@ -1343,7 +1343,7 @@ main {
 }
 
 .practice-tips-window {
-  background: #fff9ef;
+  background: #fdf7eb;
   border: var(--line);
   box-shadow: 7px 7px 0 rgba(67, 67, 59, 0.34);
   overflow: hidden;
@@ -1358,17 +1358,17 @@ main {
 
 .practice-tips-visual {
   align-items: center;
-  background: #fff9ef;
+  background: #fdf7eb;
   display: flex;
   justify-content: center;
-  min-height: 480px;
-  padding: 20px 0 20px 32px;
+  min-height: 430px;
+  padding: 8px 0 8px 28px;
 }
 
 .practice-tips-visual img {
   display: block;
   image-rendering: pixelated;
-  max-height: 480px;
+  max-height: 430px;
   object-fit: contain;
   width: 100%;
 }
@@ -1381,7 +1381,7 @@ main {
 .practice-tips-copy > p:not(.panel-kicker) {
   font-size: 17px;
   line-height: 1.62;
-  margin: 24px 0;
+  margin: 20px 0;
   max-width: 740px;
 }
 
@@ -1459,12 +1459,13 @@ main {
 }
 
 .practice-library-link {
-  display: inline-flex;
+  display: inline;
   gap: 8px;
-  margin-top: 24px;
+  white-space: nowrap;
 }
 
 .practice-library-link span {
+  display: inline-block;
   transition: transform var(--motion-fast) var(--ease-standard);
 }
 
