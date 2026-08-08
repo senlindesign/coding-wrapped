@@ -211,9 +211,25 @@ test("practice tips module explains provenance and links the source-of-truth lib
   assert.match(source, /View the practice library/);
   assert.match(source, /next coding session\. <a className="practice-library-link"/);
   assert.match(styles, /\.practice-tips-window\s*\{[^}]*background:\s*#fdf7eb/s);
-  assert.match(styles, /\.practice-tips-layout\s*\{[^}]*grid-template-columns:\s*minmax\(0, 1\.08fr\) minmax\(360px, 0\.92fr\)/s);
+  assert.match(styles, /\.practice-tips-layout\s*\{[^}]*grid-template-columns:\s*minmax\(0, 1fr\) minmax\(0, 1fr\)/s);
+  assert.match(styles, /\.process-layout\s*\{[^}]*grid-template-columns:\s*minmax\(0, 1fr\) minmax\(0, 1fr\)/s);
   assert.doesNotMatch(styles, /\.practice-tips-visual\s*\{[^}]*border-right:/s);
+  assert.match(styles, /\.practice-source-types\s*\{[^}]*display:\s*grid[^}]*width:\s*100%/s);
+  assert.match(styles, /\.practice-tip-example\s*\{[^}]*width:\s*100%/s);
   assert.ok(image.size > 0);
+});
+
+test("information panels reveal smoothly as they enter the viewport", async () => {
+  const source = await readFile(new URL("../src/App.jsx", import.meta.url), "utf8");
+  const styles = await readFile(new URL("../src/styles.css", import.meta.url), "utf8");
+  assert.match(source, /function useScrollReveal/);
+  assert.match(source, /rootMargin: "0px 0px -8% 0px"/);
+  assert.match(source, /prefers-reduced-motion: reduce/);
+  assert.match(source, /process-window scroll-reveal/);
+  assert.match(source, /practice-tips-window scroll-reveal/);
+  assert.match(source, /install-window scroll-reveal/);
+  assert.match(styles, /\.scroll-reveal\s*\{[^}]*opacity:\s*0[^}]*translateY\(34px\)/s);
+  assert.match(styles, /\.scroll-reveal\.is-revealed\s*\{[^}]*opacity:\s*1/s);
 });
 
 test("install actions mirror the hero arrow feedback", async () => {

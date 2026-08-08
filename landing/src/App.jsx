@@ -54,6 +54,33 @@ function useReducedMotion() {
   return reducedMotion;
 }
 
+function useScrollReveal() {
+  const elementRef = useRef(null);
+  const [revealed, setRevealed] = useState(false);
+
+  useEffect(() => {
+    const element = elementRef.current;
+    const prefersReducedMotion = window.matchMedia?.("(prefers-reduced-motion: reduce)")?.matches;
+    if (!element || prefersReducedMotion || !window.IntersectionObserver) {
+      setRevealed(true);
+      return undefined;
+    }
+
+    const observer = new window.IntersectionObserver(
+      ([entry]) => {
+        if (!entry.isIntersecting) return;
+        setRevealed(true);
+        observer.disconnect();
+      },
+      { rootMargin: "0px 0px -8% 0px", threshold: 0.12 },
+    );
+    observer.observe(element);
+    return () => observer.disconnect();
+  }, []);
+
+  return { elementRef, revealed };
+}
+
 function WindowFrame({ children, className = "", id, title, controls = true }) {
   return (
     <section className={`window-frame ${className}`} id={id}>
@@ -527,8 +554,9 @@ function DemoWindow({ activeIndex, onChange, onUseData, onViewChange, onVisibili
 }
 
 function ProcessWindow() {
+  const { elementRef, revealed } = useScrollReveal();
   return (
-    <section className="process-window" aria-labelledby="how-it-works-title">
+    <section className={`process-window scroll-reveal ${revealed ? "is-revealed" : ""}`} aria-labelledby="how-it-works-title" ref={elementRef}>
       <div className="process-layout">
         <img
           alt="A pixel-art flow from scanning local coding logs, to wrapping safe data, to exploring finished insights"
@@ -551,8 +579,9 @@ function ProcessWindow() {
 }
 
 function PracticeTipsWindow() {
+  const { elementRef, revealed } = useScrollReveal();
   return (
-    <section className="practice-tips-window" aria-labelledby="practice-tips-title">
+    <section className={`practice-tips-window scroll-reveal ${revealed ? "is-revealed" : ""}`} aria-labelledby="practice-tips-title" ref={elementRef}>
       <div className="practice-tips-layout">
         <div className="practice-tips-copy">
           <p className="panel-kicker">USEFUL TIPS</p>
@@ -593,8 +622,9 @@ function PracticeTipsWindow() {
 }
 
 function InstallWindow({ onCopy }) {
+  const { elementRef, revealed } = useScrollReveal();
   return (
-    <section className="install-window" aria-labelledby="install-title">
+    <section className={`install-window scroll-reveal ${revealed ? "is-revealed" : ""}`} aria-labelledby="install-title" ref={elementRef}>
       <div className="install-layout">
         <div>
           <p className="panel-kicker">ONE COMMAND · CLAUDE CODE + CODEX</p>
