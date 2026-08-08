@@ -24,7 +24,7 @@ test("installation and repository destinations stay canonical", () => {
   assert.equal(LINKS.support, "https://buymeacoffee.com/senlin");
   assert.equal(
     LINKS.practiceLibrary,
-    "https://github.com/senlindesign/coding-wrapped/blob/main/skills/coding-wrapped/references/coding-best-practices.md",
+    "https://github.com/senlindesign/coding-wrapped/blob/accf079/skills/coding-wrapped/references/coding-best-practices.md",
   );
 });
 
@@ -201,14 +201,16 @@ test("practice tips module explains provenance and links the source-of-truth lib
   const image = await stat(new URL("../public/assets/practice-tip-flow.png", import.meta.url));
   const tips = source.indexOf("<PracticeTipsWindow />");
   const process = source.indexOf("<ProcessWindow />");
-  assert.ok(tips > 0 && tips < process);
+  const install = source.indexOf("<InstallWindow onCopy={copyInstall} />");
+  assert.ok(process > 0 && process < tips && tips < install);
   assert.match(source, /PRACTICES, NOT PLATITUDES/);
   assert.match(source, /Official guidance/);
   assert.match(source, /Practitioner playbooks/);
   assert.match(source, /Expert conversations/);
   assert.match(source, /View the practice library/);
-  assert.match(styles, /\.practice-tips-window\s*\{[^}]*background:\s*var\(--panel-cream\)/s);
-  assert.match(styles, /\.practice-tips-layout\s*\{[^}]*grid-template-columns:/s);
+  assert.match(styles, /\.practice-tips-window\s*\{[^}]*background:\s*#fff9ef/s);
+  assert.match(styles, /\.practice-tips-layout\s*\{[^}]*grid-template-columns:\s*minmax\(0, 1\.08fr\) minmax\(360px, 0\.92fr\)/s);
+  assert.doesNotMatch(styles, /\.practice-tips-visual\s*\{[^}]*border-right:/s);
   assert.ok(image.size > 0);
 });
 

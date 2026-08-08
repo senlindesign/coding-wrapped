@@ -1,7 +1,7 @@
 export const LINKS = {
   github: "https://github.com/senlindesign/coding-wrapped",
   practiceLibrary:
-    "https://github.com/senlindesign/coding-wrapped/blob/main/skills/coding-wrapped/references/coding-best-practices.md",
+    "https://github.com/senlindesign/coding-wrapped/blob/accf079/skills/coding-wrapped/references/coding-best-practices.md",
   profile: "https://www.linkedin.com/in/senlinbebop",
   support: "https://buymeacoffee.com/senlin",
 };

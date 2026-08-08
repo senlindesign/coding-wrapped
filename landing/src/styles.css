@@ -1343,25 +1343,26 @@ main {
 }
 
 .practice-tips-window {
-  background: var(--panel-cream);
+  background: #fff9ef;
   border: var(--line);
   box-shadow: 7px 7px 0 rgba(67, 67, 59, 0.34);
   overflow: hidden;
 }
 
 .practice-tips-layout {
+  align-items: center;
   display: grid;
-  grid-template-columns: minmax(360px, 0.92fr) minmax(0, 1.08fr);
+  grid-template-columns: minmax(0, 1.08fr) minmax(360px, 0.92fr);
+  padding: 42px;
 }
 
 .practice-tips-visual {
   align-items: center;
-  background: #f8e8c0;
-  border-right: var(--line);
+  background: #fff9ef;
   display: flex;
   justify-content: center;
-  min-height: 560px;
-  padding: 38px;
+  min-height: 480px;
+  padding: 20px 0 20px 32px;
 }
 
 .practice-tips-visual img {
@@ -1374,7 +1375,7 @@ main {
 
 .practice-tips-copy {
   align-self: center;
-  padding: 46px;
+  padding: 0 32px 0 0;
 }
 
 .practice-tips-copy > p:not(.panel-kicker) {
@@ -2017,10 +2018,8 @@ main {
   }
 
   .practice-tips-visual {
-    border-bottom: var(--line);
-    border-right: 0;
-    min-height: 360px;
-    padding: 28px;
+    min-height: 320px;
+    padding: 12px 0 0;
   }
 
   .practice-tips-visual img {
@@ -2030,6 +2029,10 @@ main {
   .practice-tips-copy,
   .process-layout,
   .install-layout { padding: 28px; }
+
+  .practice-tips-layout { padding: 0; }
+
+  .practice-tips-copy { padding-bottom: 0; }
 
   .process-layout > img {
     margin: 0 auto;

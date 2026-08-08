@@ -554,12 +554,6 @@ function PracticeTipsWindow() {
   return (
     <section className="practice-tips-window" aria-labelledby="practice-tips-title">
       <div className="practice-tips-layout">
-        <div className="practice-tips-visual">
-          <img
-            alt="Pixel-art sources and local behavior being sorted into one practical coding tip"
-            src="/assets/practice-tip-flow.png"
-          />
-        </div>
         <div className="practice-tips-copy">
           <p className="panel-kicker">PRACTICES, NOT PLATITUDES</p>
           <h2 id="practice-tips-title">A useful tip should have somewhere to point back to.</h2>
@@ -587,6 +581,12 @@ function PracticeTipsWindow() {
           <a className="practice-library-link" href={LINKS.practiceLibrary} rel="noreferrer" target="_blank">
             View the practice library <span aria-hidden="true">→</span>
           </a>
+        </div>
+        <div className="practice-tips-visual">
+          <img
+            alt="Pixel-art sources and local behavior being sorted into one practical coding tip"
+            src="/assets/practice-tip-flow.png"
+          />
         </div>
       </div>
     </section>
@@ -653,8 +653,8 @@ export function App() {
         />
       </section>
       <section className="information-stage">
-        <PracticeTipsWindow />
         <ProcessWindow />
+        <PracticeTipsWindow />
         <div id="install"><InstallWindow onCopy={copyInstall} /></div>
       </section>
       <footer className="page-footer">
