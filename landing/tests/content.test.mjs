@@ -343,6 +343,8 @@ test("information panels use the pale retro palette and the footer repeats the s
   assert.match(styles, /--blue-soft:\s*#cfe8e6/);
   assert.match(styles, /\.privacy-strip\s*\{[^}]*background:\s*var\(--pink-soft\)/s);
   assert.match(styles, /\.install-layout pre\s*\{[^}]*background:\s*var\(--blue-soft\)/s);
+  assert.match(styles, /@media \(max-width: 520px\)[\s\S]*\.install-layout pre\s*\{[^}]*margin-inline:\s*0[^}]*padding:\s*20px/s);
+  assert.doesNotMatch(styles, /@media \(max-width: 520px\)[\s\S]*\.install-layout pre\s*\{[^}]*margin-inline:\s*-20px/s);
   assert.match(styles, /\.install-actions \.button--primary\s*\{[^}]*background:\s*var\(--blue-soft\)/s);
   assert.match(styles, /\.install-actions \.button--secondary\s*\{[^}]*background:\s*#fffaf0;[^}]*color:\s*var\(--ink\)/s);
   assert.match(source, /<strong>Coding Wrapped<\/strong><span className="pixel-slogan">\{copy\.hero\.slogan\}<\/span>/);

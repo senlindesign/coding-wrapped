@@ -2481,7 +2481,7 @@ main {
   }
 
   .install-layout pre {
-    margin-inline: -20px;
+    margin-inline: 0;
     padding: 20px;
   }
 
