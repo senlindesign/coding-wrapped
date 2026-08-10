@@ -1,7 +1,7 @@
 import assert from "node:assert/strict";
 import { readFile, stat } from "node:fs/promises";
 import test from "node:test";
-import { INSTALL_COMMAND, INSIGHTS, LINKS, METRICS } from "../src/content.js";
+import { getLocalizedContent, INSTALL_COMMAND, INSIGHTS, LINKS, METRICS } from "../src/content.js";
 
 test("public demo contains exactly four distinct insights", () => {
   assert.equal(INSIGHTS.length, 4);
@@ -9,8 +9,20 @@ test("public demo contains exactly four distinct insights", () => {
   assert.equal(new Set(INSIGHTS.map((item) => item.theme)).size, 4);
 });
 
+test("landing supplies a complete Chinese view without changing the English default", async () => {
+  const source = await readFile(new URL("../src/App.jsx", import.meta.url), "utf8");
+  const chinese = getLocalizedContent("zh");
+  const english = getLocalizedContent("en");
+  assert.equal(english.ui.hero.slogan, "Observe the way you build");
+  assert.equal(chinese.insights.length, 4);
+  assert.equal(chinese.metrics.length, 8);
+  assert.match(source, /localStorage\.getItem\("coding-wrapped-locale"\) === "zh" \? "zh" : "en"/);
+  assert.match(source, /<LocaleToggle copy=\{copy\} locale=\{locale\} onChange=\{setLocale\} \/>/);
+  assert.match(source, /document\.documentElement\.lang = locale === "zh" \? "zh-CN" : "en"/);
+});
+
 test("demo content is synthetic and public-safe", () => {
-  const serialized = JSON.stringify({ INSIGHTS, METRICS });
+  const serialized = JSON.stringify({ INSIGHTS, METRICS, zh: getLocalizedContent("zh") });
   for (const forbidden of ["/Users/", "~/.claude", "~/.codex", "project name", "api_key"]) {
     assert.equal(serialized.includes(forbidden), false);
   }
@@ -48,10 +60,13 @@ test("landing uses the reading robot as its browser icon", async () => {
 });
 
 test("landing dock contains four pixel-style destinations", async () => {
-  const source = await readFile(new URL("../src/App.jsx", import.meta.url), "utf8");
+  const [source, content] = await Promise.all([
+    readFile(new URL("../src/App.jsx", import.meta.url), "utf8"),
+    readFile(new URL("../src/content.js", import.meta.url), "utf8"),
+  ]);
   assert.match(source, /function Dock/);
   for (const label of ["Coding Wrapped", "GitHub", "About Sen", "Support the project"]) {
-    assert.match(source, new RegExp(label));
+    assert.match(content, new RegExp(label));
   }
   assert.match(source, /href: LINKS\.profile, external: true/);
   assert.match(source, /href: LINKS\.support, external: true/);
@@ -61,13 +76,16 @@ test("landing dock contains four pixel-style destinations", async () => {
 });
 
 test("hero follows the product story, CTA, then support hierarchy", async () => {
-  const source = await readFile(new URL("../src/App.jsx", import.meta.url), "utf8");
+  const [source, content] = await Promise.all([
+    readFile(new URL("../src/App.jsx", import.meta.url), "utf8"),
+    readFile(new URL("../src/content.js", import.meta.url), "utf8"),
+  ]);
   const title = source.indexOf("<h1>Coding Wrapped</h1>");
-  const slogan = source.indexOf("Observe the way you ");
+  const slogan = source.indexOf("hero-lede__lead pixel-slogan");
   const actions = source.indexOf('className="hero-actions"');
   const support = source.indexOf('className="hero-support-wrap"');
   assert.ok(title < slogan && slogan < actions && actions < support);
-  assert.match(source, /One shot\. Nothing leaves your machine\./);
+  assert.match(content, /One shot\. Nothing leaves your machine\./);
   assert.doesNotMatch(source, /Your coding agents remember more than you think/);
   assert.doesNotMatch(source, /A LOCAL-FIRST AGENT SKILL/);
   await readFile(new URL("../public/assets/button-arrow.png", import.meta.url));
@@ -105,22 +123,22 @@ test("hero keeps the mascot standalone and avoids the retired metal badges", asy
   assert.doesNotMatch(styles, /agent-logo__metal/);
 });
 
-test("hero keeps its static title while preserving restrained mascot hover motion", async () => {
+test("hero keeps its static title and swaps the mascot pose on hover", async () => {
   const source = await readFile(new URL("../src/App.jsx", import.meta.url), "utf8");
   const styles = await readFile(new URL("../src/styles.css", import.meta.url), "utf8");
   assert.match(source, /<h1>Coding Wrapped<\/h1>/);
   assert.doesNotMatch(source, /AnimatedHeroTitle|hero-title__pixel/);
   assert.doesNotMatch(styles, /hero-title-pixel-scan/);
-  assert.match(styles, /\.hero-app-icon:hover/);
-  assert.match(styles, /rotate\(7deg\) scale\(1\.14\)/);
+  assert.match(styles, /\.hero-app-icon \{[\s\S]*filter: drop-shadow\(9px 11px 0 rgba\(52, 53, 48, 0\.2\)\);[\s\S]*transform: rotate\(7deg\) scale\(1\.14\);/);
+  assert.match(styles, /\.hero-app-icon:hover \{[\s\S]*filter: none;[\s\S]*transform: rotate\(0deg\) scale\(1\);/);
 });
 
 test("live preview rotates through three direct product views without tour chrome", async () => {
   const source = await readFile(new URL("../src/App.jsx", import.meta.url), "utf8");
   for (const view of ["overview", "insight", "data"]) {
-    assert.match(source, new RegExp(`id: "${view}"`));
+    assert.match(source, new RegExp(`"${view}"`));
   }
-  assert.match(source, /LIVE PREVIEW · LOCAL-FIRST/);
+  assert.match(source, /copy\.demo\.status/);
   assert.match(source, /setManualHoldUntil\(Date\.now\(\) \+ 12000\)/);
   assert.match(source, /prefers-reduced-motion: reduce/);
   assert.doesNotMatch(source, /INTERACTIVE DEMO|Tour \{|Next view|Resume|Pause/);
@@ -130,7 +148,7 @@ test("preview restores complete overview, insight deck, and behavior controls", 
   const source = await readFile(new URL("../src/App.jsx", import.meta.url), "utf8");
   const styles = await readFile(new URL("../src/styles.css", import.meta.url), "utf8");
   const overviewIllustration = await stat(new URL("../public/assets/illustrations/overview-calibration-loop.webp", import.meta.url));
-  assert.match(source, /OVERVIEW_PATTERNS/);
+  assert.match(source, /copy\.overview\.patterns/);
   assert.match(source, /overview-sources/);
   assert.match(source, /overview-calibration-loop\.webp/);
   assert.doesNotMatch(source, /A pixel-art person directing a fleet of coding agents/);
@@ -140,7 +158,7 @@ test("preview restores complete overview, insight deck, and behavior controls", 
   assert.match(source, /insight-card-preview--left/);
   assert.match(source, /insight-card-preview--right/);
   assert.match(source, /insight-story__headline/);
-  assert.match(source, /Use left and right arrow keys or swipe/);
+  assert.match(source, /copy\.insight\.label/);
   assert.match(source, /onPointerDown=\{handlePointerDown\}/);
   assert.match(source, /onPointerUp=\{handlePointerUp\}/);
   assert.match(source, /onWheel=\{handleWheel\}/);
@@ -148,12 +166,13 @@ test("preview restores complete overview, insight deck, and behavior controls", 
   assert.doesNotMatch(source, /handleTouchEnd|touchStartX/);
   assert.match(styles, /\.insight-card-preview--main\s*\{[^}]*aspect-ratio:\s*3\s*\/\s*2/s);
   assert.match(styles, /\.insight-image-stage\s*\{[^}]*touch-action:\s*pan-y/s);
-  assert.match(source, /Customize · \{selectedMetrics\.length\} \/ \{METRICS\.length\}/);
+  assert.match(source, /copy\.data\.customize.*selectedMetrics\.length.*metrics\.length/s);
   assert.match(source, /ACTIVITY_DAYS/);
   assert.equal(METRICS.length, 8);
+  assert.equal(getLocalizedContent("zh").metrics.length, 8);
   assert.match(styles, /\.metric-card--tone-0/);
   assert.match(styles, /\.metric-card--tone-3/);
-  assert.match(source, /USE MY OWN DATA/);
+  assert.match(source, /copy\.demo\.ownData/);
   assert.match(source, /compact=\{isScrolling\}/);
   assert.match(styles, /\.page-dock\.is-compact/);
   assert.doesNotMatch(styles, /\.demo-coach__progress/);
@@ -196,15 +215,15 @@ test("intentional controls use quiet semantic Cuelume feedback", async () => {
   assert.equal(packageJson.dependencies.cuelume, "^0.2.2");
   assert.match(source, /import \{ bind, play, setVolume \} from "cuelume"/);
   assert.match(source, /setVolume\(0\.4\);\s*bind\(\);/s);
-  assert.match(source, /className="button button--primary" data-cuelume-hover="tick" data-cuelume-toggle="pulse"[^>]*>\s*<span>Install Skill<\/span>/s);
+  assert.match(source, /className="button button--primary" data-cuelume-hover="tick" data-cuelume-toggle="pulse"/s);
   assert.match(source, /data-cuelume-toggle="pulse"/);
   assert.match(source, /data-cuelume-hover="tick"/);
   assert.match(source, /data-cuelume-release="scan"/);
   assert.match(source, /play\("page"\)/);
   assert.match(source, /play\("toggle"\)/);
   assert.match(source, /play\(showCustomizer \? "droplet" : "bloom"\)/);
-  assert.match(source, /play\("success"\)[\s\S]*Install command copied/);
-  assert.match(source, /play\("error"\)[\s\S]*Select the command/);
+  assert.match(source, /play\("success"\)[\s\S]*copy\.toast\.copied/);
+  assert.match(source, /play\("error"\)[\s\S]*copy\.toast\.fallback/);
 });
 
 test("demo and information panels share one responsive alignment contract", async () => {
@@ -231,17 +250,18 @@ test("practice tips module explains provenance and links the source-of-truth lib
   const source = await readFile(new URL("../src/App.jsx", import.meta.url), "utf8");
   const styles = await readFile(new URL("../src/styles.css", import.meta.url), "utf8");
   const image = await stat(new URL("../public/assets/practice-tip-next-session.webp", import.meta.url));
-  const tips = source.indexOf("<PracticeTipsWindow />");
-  const process = source.indexOf("<ProcessWindow />");
-  const install = source.indexOf("<InstallWindow onCopy={copyInstall} />");
+  const tips = source.indexOf("<PracticeTipsWindow copy={copy} />");
+  const process = source.indexOf("<ProcessWindow copy={copy} />");
+  const install = source.indexOf("<InstallWindow copy={copy} onCopy={copyInstall} />");
   assert.ok(process > 0 && process < tips && tips < install);
-  assert.match(source, /USEFUL TIPS/);
-  assert.match(source, /Small tips for your next coding session\./);
-  assert.match(source, /Official guidance/);
-  assert.match(source, /Practitioner playbooks/);
-  assert.match(source, /Expert conversations/);
-  assert.match(source, /View the practice library/);
-  assert.match(source, /next coding session\. <a className="practice-library-link"/);
+  const content = await readFile(new URL("../src/content.js", import.meta.url), "utf8");
+  assert.match(content, /kicker: "Useful tips"/);
+  assert.match(content, /Small tips for your next coding session\./);
+  assert.match(content, /Official guidance/);
+  assert.match(content, /Practitioner playbooks/);
+  assert.match(content, /Expert conversations/);
+  assert.match(content, /View the practice library/);
+  assert.match(source, /copy\.tips\.body.*practice-library-link/s);
   assert.match(styles, /\.practice-tips-window\s*\{[^}]*background:\s*#fdf7eb/s);
   assert.match(styles, /\.practice-tips-layout\s*\{[^}]*grid-template-columns:\s*minmax\(0, 1fr\) minmax\(0, 1fr\)/s);
   assert.match(styles, /\.process-layout\s*\{[^}]*grid-template-columns:\s*minmax\(0, 1fr\) minmax\(0, 1fr\)/s);
@@ -285,8 +305,8 @@ test("large below-fold images are lazy, async decoded, and dimensioned", async (
 test("install actions mirror the hero arrow feedback", async () => {
   const source = await readFile(new URL("../src/App.jsx", import.meta.url), "utf8");
   const styles = await readFile(new URL("../src/styles.css", import.meta.url), "utf8");
-  assert.match(source, /<span>Copy command<\/span><img[^>]*button__arrow/);
-  assert.match(source, /<span>Read the docs<\/span><img[^>]*button__arrow/);
+  assert.match(source, /<span>\{copy\.install\.copy\}<\/span><img[^>]*button__arrow/);
+  assert.match(source, /<span>\{copy\.install\.docs\}<\/span><img[^>]*button__arrow/);
   assert.match(styles, /\.button:hover \.button__arrow/);
   assert.match(styles, /\.information-stage\s*\{[^}]*gap:\s*30px/s);
   assert.match(styles, /\.process-window\s*\{[^}]*background:\s*var\(--panel-cream\);[^}]*border:\s*var\(--line\)/s);
@@ -302,30 +322,37 @@ test("information panels use the pale retro palette and the footer repeats the s
   assert.match(styles, /\.install-layout pre\s*\{[^}]*background:\s*var\(--blue-soft\)/s);
   assert.match(styles, /\.install-actions \.button--primary\s*\{[^}]*background:\s*var\(--blue-soft\)/s);
   assert.match(styles, /\.install-actions \.button--secondary\s*\{[^}]*background:\s*#fffaf0;[^}]*color:\s*var\(--ink\)/s);
-  assert.match(source, /<strong>Coding Wrapped<\/strong><span className="pixel-slogan">Observe the way you build<\/span>/);
+  assert.match(source, /<strong>Coding Wrapped<\/strong><span className="pixel-slogan">\{copy\.hero\.slogan\}<\/span>/);
   assert.match(styles, /\.page-footer\s*\{[^}]*padding:\s*18px 7vw;/s);
   assert.doesNotMatch(styles, /\.page-footer\s*\{[^}]*padding:[^;}]*78px/s);
   assert.match(styles, /@media \(max-width: 520px\)[\s\S]*\.page-footer\s*\{[^}]*padding:\s*18px 20px;/s);
 });
 
-test("the complete slogan drops its period and renders in a local pixel font", async () => {
-  const source = await readFile(new URL("../src/App.jsx", import.meta.url), "utf8");
-  const entry = await readFile(new URL("../src/main.jsx", import.meta.url), "utf8");
+test("the complete slogan is localized and renders in the right local pixel font", async () => {
+  const [source, content] = await Promise.all([
+    readFile(new URL("../src/App.jsx", import.meta.url), "utf8"),
+    readFile(new URL("../src/content.js", import.meta.url), "utf8"),
+  ]);
   const styles = await readFile(new URL("../src/styles.css", import.meta.url), "utf8");
   assert.equal((source.match(/pixel-slogan/g) ?? []).length, 2);
-  assert.match(source, /hero-lede__lead pixel-slogan">Observe the way you build<\/p>/);
-  assert.doesNotMatch(source, /Observe the way you build\./);
-  assert.match(entry, /@fontsource-variable\/pixelify-sans/);
-  assert.match(styles, /\.pixel-slogan\s*\{[^}]*font-family:\s*"Pixelify Sans Variable"/s);
+  assert.match(source, /hero-lede__lead pixel-slogan">\{copy\.hero\.slogan\}<\/p>/);
+  assert.match(content, /Observe the way you build/);
+  assert.match(content, /看看你如何构建/);
+  assert.match(source, /@fontsource\/tiny5\/latin-400\.css/);
+  assert.match(styles, /\.locale-en \.pixel-slogan\s*\{[^}]*font-family:\s*"Tiny5"[^}]*text-transform:\s*uppercase/s);
+  assert.match(styles, /\.locale-zh \.pixel-slogan\s*\{[^}]*"Fusion Pixel 12 Proportional"/s);
   assert.doesNotMatch(styles, /rainbow-build|rainbow-word/);
 });
 
 test("supported agent marks stay inline with the hero story", async () => {
-  const source = await readFile(new URL("../src/App.jsx", import.meta.url), "utf8");
-  assert.match(source, /Now works with/);
+  const [source, content] = await Promise.all([
+    readFile(new URL("../src/App.jsx", import.meta.url), "utf8"),
+    readFile(new URL("../src/content.js", import.meta.url), "utf8"),
+  ]);
+  assert.match(content, /Now works with/);
   assert.match(source, /function InlineAgent/);
-  assert.match(source, /Observe the way you /);
-  assert.match(source, /Turn local AI-coding history into revealing stories/);
+  assert.match(content, /Observe the way you /);
+  assert.match(content, /Turn local AI-coding history into revealing stories/);
   assert.doesNotMatch(source, /hero-agent-row/);
 });
 

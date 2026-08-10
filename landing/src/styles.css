@@ -6,6 +6,22 @@
   src: url("/assets/fonts/PlusJakartaSans-Variable.ttf") format("truetype");
 }
 
+@font-face {
+  font-display: swap;
+  font-family: "Noto Sans SC";
+  font-style: normal;
+  font-weight: 100 900;
+  src: url("/assets/fonts/NotoSansSC-Regular.woff2") format("woff2");
+}
+
+@font-face {
+  font-display: swap;
+  font-family: "Fusion Pixel 12 Proportional";
+  font-style: normal;
+  font-weight: 400;
+  src: url("/assets/fonts/FusionPixel12ProportionalZH-Hans.woff2") format("woff2");
+}
+
 :root {
   color: #30312d;
   background: #c7e9e5;
@@ -79,6 +95,67 @@ main {
   position: relative;
 }
 
+.locale-toggle {
+  align-items: center;
+  background: rgba(255, 250, 240, 0.9);
+  border: var(--line);
+  border-radius: 10px;
+  box-shadow: 4px 4px 0 rgba(52, 53, 48, 0.25);
+  display: inline-flex;
+  gap: 2px;
+  padding: 3px;
+  position: fixed;
+  right: var(--layout-gutter);
+  top: 20px;
+  z-index: 12;
+}
+
+.locale-toggle button {
+  background: transparent;
+  border: 0;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 13px;
+  font-weight: 800;
+  line-height: 1;
+  min-height: 34px;
+  min-width: 45px;
+  padding: 8px 9px;
+  transition: background var(--motion-fast) var(--ease-standard), color var(--motion-fast) var(--ease-standard), transform var(--motion-fast) var(--ease-standard);
+}
+
+.locale-toggle button[aria-pressed="true"] {
+  background: var(--cyan);
+  box-shadow: inset 0 -2px 0 rgba(52, 53, 48, 0.16);
+}
+
+.locale-toggle button:hover:not([aria-pressed="true"]) {
+  background: var(--paper-soft);
+  transform: translateY(-1px);
+}
+
+.locale-zh {
+  font-family: "Noto Sans SC", "Noto Sans CJK SC", system-ui, sans-serif;
+}
+
+.locale-zh .pixel-slogan {
+  font-family: "Fusion Pixel 12 Proportional", "Noto Sans SC", sans-serif;
+  font-size: clamp(22px, 2.25vw, 32px);
+  font-weight: 400;
+  letter-spacing: 0.08em;
+  line-height: 1.35;
+  text-transform: none;
+}
+
+.locale-en .pixel-slogan {
+  font-family: "Tiny5", monospace;
+  font-size: clamp(34px, 3.3vw, 48px);
+  font-weight: 400;
+  letter-spacing: 0.075em;
+  line-height: 1;
+  text-transform: uppercase;
+}
+
 .desktop-background {
   background-color: #c7e9e5;
   background-image: url("/assets/desktop-landscape.webp");
@@ -119,18 +196,20 @@ main {
 
 .hero-app-icon {
   display: block;
+  filter: drop-shadow(9px 11px 0 rgba(52, 53, 48, 0.2));
   height: 150px;
   image-rendering: pixelated;
   margin: 0 0 16px;
   object-fit: contain;
+  transform: rotate(7deg) scale(1.14);
   transform-origin: 50% 72%;
   transition: filter var(--motion-medium) var(--ease-standard), transform var(--motion-medium) var(--ease-spring);
   width: 150px;
 }
 
 .hero-app-icon:hover {
-  filter: drop-shadow(9px 11px 0 rgba(52, 53, 48, 0.2));
-  transform: rotate(7deg) scale(1.14);
+  filter: none;
+  transform: rotate(0deg) scale(1);
 }
 
 .eyebrow,
@@ -1856,6 +1935,17 @@ main {
 }
 
 @media (max-width: 820px) {
+  .locale-toggle {
+    right: 14px;
+    top: 14px;
+  }
+
+  .locale-toggle button {
+    font-size: 12px;
+    min-height: 32px;
+    min-width: 42px;
+  }
+
   .hero {
     min-height: 900px;
     padding: 54px 24px 120px;
@@ -2069,6 +2159,14 @@ main {
 }
 
 @media (max-width: 520px) {
+  .locale-en .pixel-slogan {
+    font-size: 30px;
+  }
+
+  .locale-zh .pixel-slogan {
+    font-size: 21px;
+  }
+
   .desktop-background {
     background-position: 48% top;
   }
@@ -2329,7 +2427,7 @@ main {
   }
 
   .hero-app-icon:hover {
-    transform: scale(1.08);
+    transform: none;
   }
 
   .scroll-reveal {

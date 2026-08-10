@@ -1,30 +1,14 @@
 import { useEffect, useRef, useState } from "react";
 import { bind, play, setVolume } from "cuelume";
-import { INSTALL_COMMAND, INSIGHTS, LINKS, METRICS } from "./content.js";
+import "@fontsource/tiny5/latin-400.css";
+import { getLocalizedContent, INSTALL_COMMAND, LINKS } from "./content.js";
 
 const AGENTS = [
   { name: "Codex", icon: "/assets/brand/codex.svg", slug: "codex" },
   { name: "Claude Code", icon: "/assets/brand/claudecode.svg", slug: "claude" },
 ];
 
-const DOCK_ITEMS = [
-  { label: "Coding Wrapped", icon: "/assets/coding-wrapped-app.webp", href: "#top" },
-  { label: "GitHub", icon: "/assets/dock/github.webp", href: LINKS.github, external: true },
-  { label: "About Sen", icon: "/assets/dock/sen-profile.webp", href: LINKS.profile, external: true },
-  { label: "Support the project", icon: "/assets/dock/support-coffee.webp", href: LINKS.support, external: true },
-];
-
-const DEMO_VIEWS = [
-  { id: "overview", label: "Coding overview" },
-  { id: "insight", label: "Insight deck" },
-  { id: "data", label: "Behavior data" },
-];
-
-const OVERVIEW_PATTERNS = [
-  { title: "Short prompts", copy: "Point, inspect, then adjust instead of writing the whole route upfront." },
-  { title: "Long runs", copy: "Stay inside one thread long enough for decisions to compound." },
-  { title: "Calibration", copy: "Use small corrections to keep a trusted agent loop moving." },
-];
+const DEMO_VIEW_IDS = ["overview", "insight", "data"];
 
 const METRIC_PRESETS = [
   [0, 1, 2, 3],
@@ -120,22 +104,31 @@ function WindowFrame({ children, className = "", id, title }) {
   );
 }
 
-function InlineAgent({ agent }) {
+function InlineAgent({ agent, label }) {
   return (
-    <span aria-label={`${agent.name} supported`} className={`inline-agent inline-agent--${agent.slug}`} tabIndex="0">
+    <span aria-label={`${agent.name} ${label}`} className={`inline-agent inline-agent--${agent.slug}`} tabIndex="0">
       <img alt="" decoding="async" height="32" src={agent.icon} width="32" />
       <strong>{agent.name}</strong>
-      <span className="inline-agent__tooltip" role="tooltip">{agent.name} supported</span>
+      <span className="inline-agent__tooltip" role="tooltip">{agent.name} {label}</span>
     </span>
   );
 }
 
-function Hero({ onInstall }) {
+function LocaleToggle({ copy, locale, onChange }) {
+  return (
+    <div aria-label={copy.languageLabel} className="locale-toggle" role="group">
+      <button aria-pressed={locale === "en"} onClick={() => onChange("en")} type="button">EN</button>
+      <button aria-pressed={locale === "zh"} onClick={() => onChange("zh")} type="button">中文</button>
+    </div>
+  );
+}
+
+function Hero({ copy, onInstall }) {
   return (
     <section className="hero" id="top">
       <div className="hero-content">
         <img
-          alt="Coding Wrapped — a pixel robot reading its coding log"
+          alt={copy.hero.mascotAlt}
           className="hero-app-icon"
           fetchPriority="high"
           height="512"
@@ -144,25 +137,22 @@ function Hero({ onInstall }) {
         />
         <h1>Coding Wrapped</h1>
         <div className="hero-lede">
-          <p className="hero-lede__lead pixel-slogan">Observe the way you build</p>
-          <p className="hero-lede__body">
-            Turn local AI-coding history into revealing stories and practical
-            next steps. One shot. Nothing leaves your machine.
-          </p>
+          <p className="hero-lede__lead pixel-slogan">{copy.hero.slogan}</p>
+          <p className="hero-lede__body">{copy.hero.body}</p>
         </div>
         <div className="hero-actions">
           <button className="button button--primary" data-cuelume-hover="tick" data-cuelume-toggle="pulse" onClick={onInstall} type="button">
-            <span>Install Skill</span><img alt="" aria-hidden="true" className="button__arrow" height="96" src="/assets/button-arrow.png" width="96" />
+            <span>{copy.hero.install}</span><img alt="" aria-hidden="true" className="button__arrow" height="96" src="/assets/button-arrow.png" width="96" />
           </button>
           <a className="button button--secondary" data-cuelume-hover="tick" data-cuelume-release="scan" href={LINKS.github} rel="noreferrer" target="_blank">
-            <span>Go to GitHub</span><img alt="" aria-hidden="true" className="button__arrow" height="96" src="/assets/button-arrow.png" width="96" />
+            <span>{copy.hero.github}</span><img alt="" aria-hidden="true" className="button__arrow" height="96" src="/assets/button-arrow.png" width="96" />
           </a>
         </div>
         <div className="hero-support-wrap">
           <div aria-hidden="true" className="hero-divider" />
-          <div className="hero-support" aria-label="Supported coding agents">
-            <span>Now works with</span>
-            {AGENTS.map((agent) => <InlineAgent agent={agent} key={agent.name} />)}
+          <div className="hero-support" aria-label={copy.hero.supportedAgents}>
+            <span>{copy.hero.nowWorks}</span>
+            {AGENTS.map((agent) => <InlineAgent agent={agent} key={agent.name} label={copy.agentSupported} />)}
           </div>
         </div>
       </div>
@@ -170,10 +160,16 @@ function Hero({ onInstall }) {
   );
 }
 
-function Dock({ compact = false }) {
+function Dock({ compact = false, copy }) {
+  const dockItems = [
+    { label: copy.dock[0], icon: "/assets/coding-wrapped-app.webp", href: "#top" },
+    { label: copy.dock[1], icon: "/assets/dock/github.webp", href: LINKS.github, external: true },
+    { label: copy.dock[2], icon: "/assets/dock/sen-profile.webp", href: LINKS.profile, external: true },
+    { label: copy.dock[3], icon: "/assets/dock/support-coffee.webp", href: LINKS.support, external: true },
+  ];
   return (
-    <nav aria-label="Quick links" className={`page-dock ${compact ? "is-compact" : ""}`}>
-      {DOCK_ITEMS.map((item) => {
+    <nav aria-label={copy.dock[0]} className={`page-dock ${compact ? "is-compact" : ""}`}>
+      {dockItems.map((item) => {
         const content = (
           <>
             <img
@@ -205,19 +201,15 @@ function Dock({ compact = false }) {
   );
 }
 
-function OverviewPanel() {
+function OverviewPanel({ copy }) {
   return (
     <div className="demo-overview">
       <div className="overview-copy">
-        <p className="panel-kicker">YOUR CODING OVERVIEW</p>
-        <h3>You steer by correction, not by specification.</h3>
-        <p>
-          Across 23 sessions, your short prompts kept work moving while the
-          agent carried the implementation detail. Your clearest pattern is a
-          fast loop: point, inspect, adjust, continue.
-        </p>
-        <div className="overview-patterns" aria-label="Three coding patterns">
-          {OVERVIEW_PATTERNS.map((pattern, index) => (
+        <p className="panel-kicker">{copy.overview.kicker}</p>
+        <h3>{copy.overview.title}</h3>
+        <p>{copy.overview.body}</p>
+        <div className="overview-patterns" aria-label={copy.overview.patternsLabel}>
+          {copy.overview.patterns.map((pattern, index) => (
             <article key={pattern.title} style={{ "--pattern-delay": `${index * 180}ms` }}>
               <span>{String(index + 1).padStart(2, "0")}</span>
               <div><strong>{pattern.title}</strong><p>{pattern.copy}</p></div>
@@ -225,30 +217,30 @@ function OverviewPanel() {
           ))}
         </div>
         <div className="overview-sources">
-          <span>Sources</span>
-          <div><strong>Codex</strong><small>18 sessions</small></div>
-          <div><strong>Claude Code</strong><small>5 sessions</small></div>
+          <span>{copy.overview.sources}</span>
+          <div><strong>Codex</strong><small>{copy.overview.sessions[0]}</small></div>
+          <div><strong>Claude Code</strong><small>{copy.overview.sessions[1]}</small></div>
         </div>
       </div>
       <div className="overview-visual">
         <img
-          alt="A pixel-art person making a small correction while one coding agent moves work through a feedback loop"
+          alt={copy.overview.privacy}
           decoding="async"
           height="1024"
           loading="lazy"
           src="/assets/illustrations/overview-calibration-loop.webp"
           width="1536"
         />
-        <span>Local aggregates only · no transcript leaves your machine</span>
+        <span>{copy.overview.privacy}</span>
       </div>
     </div>
   );
 }
 
-function InsightPanel({ activeIndex, isActive, onChange, onManualInteraction, reducedMotion }) {
-  const insight = INSIGHTS[activeIndex];
-  const previousIndex = (activeIndex - 1 + INSIGHTS.length) % INSIGHTS.length;
-  const nextIndex = (activeIndex + 1) % INSIGHTS.length;
+function InsightPanel({ activeIndex, copy, insights, isActive, onChange, onManualInteraction, reducedMotion }) {
+  const insight = insights[activeIndex];
+  const previousIndex = (activeIndex - 1 + insights.length) % insights.length;
+  const nextIndex = (activeIndex + 1) % insights.length;
   const pointerStartX = useRef(null);
   const pointerId = useRef(null);
   const wheelDistance = useRef(0);
@@ -261,13 +253,13 @@ function InsightPanel({ activeIndex, isActive, onChange, onManualInteraction, re
     onChange(nextIndex);
   };
   const selectRelativeInsight = (offset) => {
-    selectInsight((activeIndex + offset + INSIGHTS.length) % INSIGHTS.length);
+    selectInsight((activeIndex + offset + insights.length) % insights.length);
   };
 
   useEffect(() => {
     if (reducedMotion || !isActive) return undefined;
     const timer = window.setTimeout(() => {
-      onChange((activeIndex + 1) % INSIGHTS.length);
+      onChange((activeIndex + 1) % insights.length);
     }, 5200);
     return () => window.clearTimeout(timer);
   }, [activeIndex, isActive, onChange, reducedMotion]);
@@ -325,21 +317,21 @@ function InsightPanel({ activeIndex, isActive, onChange, onManualInteraction, re
 
   return (
     <div
-      aria-label="Insight stories. Use left and right arrow keys or swipe to change the story."
+      aria-label={copy.insight.label}
       className={`insight-panel insight-panel--${insight.theme}`}
       onKeyDown={handleKeyDown}
       tabIndex={0}
     >
       <header className="insight-deck-toolbar">
         <div>
-          <p className="panel-kicker">CURRENT INSIGHT {String(activeIndex + 1).padStart(2, "0")} / 04</p>
-          <span>BUILT FROM LOCAL DEMO DATA · AUTO PLAY</span>
+          <p className="panel-kicker">{copy.insight.current} {String(activeIndex + 1).padStart(2, "0")} / 04</p>
+          <span>{copy.insight.built}</span>
         </div>
         <div className="insight-deck-actions">
-          <div className="insight-pagination" aria-label="Choose an insight">
-            {INSIGHTS.map((item, index) => (
+          <div className="insight-pagination" aria-label={copy.insight.choose}>
+            {insights.map((item, index) => (
               <button
-                aria-label={`Show insight ${index + 1}: ${item.title}`}
+                aria-label={`${copy.insight.show} ${index + 1}: ${item.title}`}
                 aria-pressed={index === activeIndex}
                 className={index === activeIndex ? "is-active" : ""}
                 key={item.title}
@@ -350,12 +342,12 @@ function InsightPanel({ activeIndex, isActive, onChange, onManualInteraction, re
               </button>
             ))}
           </div>
-          <button onClick={() => selectRelativeInsight(-1)} type="button">PREV</button>
-          <button onClick={() => selectRelativeInsight(1)} type="button">NEXT</button>
+          <button onClick={() => selectRelativeInsight(-1)} type="button">{copy.insight.previous}</button>
+          <button onClick={() => selectRelativeInsight(1)} type="button">{copy.insight.next}</button>
         </div>
       </header>
       <div
-        aria-label="An illustrated insight card stack. Drag or swipe horizontally to change insight."
+        aria-label={copy.insight.imageLabel}
         className={`insight-image-stage${isDragging ? " is-dragging" : ""}`}
         onDragStart={(event) => event.preventDefault()}
         onPointerCancel={resetPointerGesture}
@@ -369,9 +361,9 @@ function InsightPanel({ activeIndex, isActive, onChange, onManualInteraction, re
             decoding="async"
             draggable="false"
             height="512"
-            key={INSIGHTS[previousIndex].image}
+            key={insights[previousIndex].image}
             loading="lazy"
-            src={INSIGHTS[previousIndex].image}
+            src={insights[previousIndex].image}
             width="768"
           />
         </figure>
@@ -393,13 +385,13 @@ function InsightPanel({ activeIndex, isActive, onChange, onManualInteraction, re
             decoding="async"
             draggable="false"
             height="512"
-            key={INSIGHTS[nextIndex].image}
+            key={insights[nextIndex].image}
             loading="lazy"
-            src={INSIGHTS[nextIndex].image}
+            src={insights[nextIndex].image}
             width="768"
           />
         </figure>
-        <span className="insight-swipe-hint">SWIPE OR USE ARROW KEYS</span>
+        <span className="insight-swipe-hint">{copy.insight.swipe}</span>
       </div>
       <article className="insight-copy" aria-live="polite">
         <div className="insight-story" key={insight.title}>
@@ -408,26 +400,26 @@ function InsightPanel({ activeIndex, isActive, onChange, onManualInteraction, re
             <p>{insight.summary}</p>
           </div>
           <dl>
-            <div><dt>You did</dt><dd>{insight.youDid}</dd></div>
-            <div><dt>Agent did</dt><dd>{insight.agentDid}</dd></div>
-            <div><dt>Your style</dt><dd>{insight.yourStyle}</dd></div>
+            <div><dt>{copy.insight.did[0]}</dt><dd>{insight.youDid}</dd></div>
+            <div><dt>{copy.insight.did[1]}</dt><dd>{insight.agentDid}</dd></div>
+            <div><dt>{copy.insight.did[2]}</dt><dd>{insight.yourStyle}</dd></div>
           </dl>
-          <div className="light-tip"><strong>Light tip</strong><span>{insight.tip}</span></div>
+          <div className="light-tip"><strong>{copy.insight.tip}</strong><span>{insight.tip}</span></div>
         </div>
       </article>
     </div>
   );
 }
 
-function ActivityGrid() {
+function ActivityGrid({ label }) {
   return (
-    <div aria-label="30 day activity grid" className="activity-grid">
+    <div aria-label={label} className="activity-grid">
       {ACTIVITY_DAYS.map((level, index) => <i className={`is-level-${level}`} key={index} />)}
     </div>
   );
 }
 
-function DataPanel({ isActive, onManualInteraction, reducedMotion }) {
+function DataPanel({ copy, isActive, metrics, onManualInteraction, reducedMotion }) {
   const [selectedMetrics, setSelectedMetrics] = useState(METRIC_PRESETS[0]);
   const [showCustomizer, setShowCustomizer] = useState(false);
   const [userControlled, setUserControlled] = useState(false);
@@ -454,15 +446,15 @@ function DataPanel({ isActive, onManualInteraction, reducedMotion }) {
     });
   };
 
-  const visibleMetrics = METRICS.filter((_, index) => selectedMetrics.includes(index));
+  const visibleMetrics = metrics.filter((_, index) => selectedMetrics.includes(index));
 
   return (
     <div className="data-panel">
       <div className="data-panel__header">
         <div className="data-panel__intro">
-          <p className="panel-kicker">YOUR CODING BEHAVIOR</p>
-          <h3>Choose the facts that explain the pattern.</h3>
-          <p>All blocks are safe aggregates. Select up to eight for the view you want to keep.</p>
+          <p className="panel-kicker">{copy.data.kicker}</p>
+          <h3>{copy.data.title}</h3>
+          <p>{copy.data.body}</p>
         </div>
         <div className="data-customize">
           <button
@@ -475,11 +467,11 @@ function DataPanel({ isActive, onManualInteraction, reducedMotion }) {
             }}
             type="button"
           >
-            Customize · {selectedMetrics.length} / {METRICS.length}
+            {copy.data.customize} · {selectedMetrics.length} / {metrics.length}
           </button>
           {showCustomizer && (
-            <div className="metric-customizer" aria-label="Choose visible metrics">
-              {METRICS.map((metric, index) => (
+            <div className="metric-customizer" aria-label={copy.data.visible}>
+              {metrics.map((metric, index) => (
                 <button
                   aria-pressed={selectedMetrics.includes(index)}
                   className={selectedMetrics.includes(index) ? "is-selected" : ""}
@@ -487,7 +479,7 @@ function DataPanel({ isActive, onManualInteraction, reducedMotion }) {
                   onClick={() => toggleMetric(index)}
                   type="button"
                 >
-                  <span>{metric.label}</span><b>{selectedMetrics.includes(index) ? "On" : "Off"}</b>
+                  <span>{metric.label}</span><b>{selectedMetrics.includes(index) ? copy.data.on : copy.data.off}</b>
                 </button>
               ))}
             </div>
@@ -496,7 +488,7 @@ function DataPanel({ isActive, onManualInteraction, reducedMotion }) {
       </div>
       <div className="metric-grid" aria-live="polite">
         {visibleMetrics.map((metric, visibleIndex) => {
-          const metricIndex = METRICS.indexOf(metric);
+          const metricIndex = metrics.indexOf(metric);
           return (
           <article
             className={`metric-card metric-card--tone-${metricIndex % 4} ${metric.kind === "activity" ? "metric-card--activity" : ""}`}
@@ -507,24 +499,24 @@ function DataPanel({ isActive, onManualInteraction, reducedMotion }) {
             <div className="metric-card__main">
               <span>{metric.label}</span><strong>{metric.value}</strong><small>{metric.note}</small>
             </div>
-            {metric.kind === "activity" && <ActivityGrid />}
+            {metric.kind === "activity" && <ActivityGrid label={copy.data.activity} />}
           </article>
           );
         })}
       </div>
-      <p className="data-source-note">Factual layer · derived locally from session aggregates</p>
+      <p className="data-source-note">{copy.data.source}</p>
     </div>
   );
 }
 
-function DemoWindow({ activeIndex, onChange, onUseData, onViewChange, view }) {
+function DemoWindow({ activeIndex, copy, insights, metrics, onChange, onUseData, onViewChange, view }) {
   const [revealed, setRevealed] = useState(false);
   const [isInView, setIsInView] = useState(false);
   const [manualHoldUntil, setManualHoldUntil] = useState(0);
   const [renderedView, setRenderedView] = useState(view);
   const [contentPhase, setContentPhase] = useState("is-active");
   const reducedMotion = useReducedMotion();
-  const activeViewIndex = DEMO_VIEWS.findIndex((item) => item.id === view);
+  const activeViewIndex = DEMO_VIEW_IDS.findIndex((item) => item === view);
 
   useEffect(() => {
     const element = document.querySelector("#demo-window");
@@ -559,8 +551,8 @@ function DemoWindow({ activeIndex, onChange, onUseData, onViewChange, view }) {
         setManualHoldUntil(0);
         return;
       }
-      const nextIndex = (activeViewIndex + 1) % DEMO_VIEWS.length;
-      onViewChange(DEMO_VIEWS[nextIndex].id);
+      const nextIndex = (activeViewIndex + 1) % DEMO_VIEW_IDS.length;
+      onViewChange(DEMO_VIEW_IDS[nextIndex]);
     }, isHolding ? manualHoldUntil - now : 6400);
     return () => window.clearTimeout(timer);
   }, [activeViewIndex, isInView, manualHoldUntil, onViewChange, reducedMotion, revealed]);
@@ -596,42 +588,42 @@ function DemoWindow({ activeIndex, onChange, onUseData, onViewChange, view }) {
   };
 
   return (
-    <WindowFrame className={`product-window ${revealed ? "is-visible" : ""}`} id="demo-window" title="LIVE DEMO · 127.0.0.1 / coding-wrapped">
+    <WindowFrame className={`product-window ${revealed ? "is-visible" : ""}`} id="demo-window" title={copy.demo.title}>
       <header className="dashboard-header">
         <div className="dashboard-brand">
           <img alt="" decoding="async" height="256" src="/assets/coding-wrapped-app.webp" width="256" />
-          <div><strong>CODING WRAPPED</strong><span>PERSONAL / LOCAL</span></div>
+          <div><strong>{copy.demo.brand}</strong><span>{copy.demo.locality}</span></div>
         </div>
         <div className="dashboard-title">
-          <strong>SEN'S CODING ADVENTURE LOG</strong>
-          <span>See how you and AI actually get things made together.</span>
+          <strong>{copy.demo.adventure}</strong>
+          <span>{copy.demo.subtitle}</span>
         </div>
-        <button data-cuelume-toggle="pulse" onClick={onUseData} type="button">USE MY OWN DATA</button>
+        <button data-cuelume-toggle="pulse" onClick={onUseData} type="button">{copy.demo.ownData}</button>
       </header>
       <div className="product-toolbar">
-        <nav aria-label="Demo views">
-          {DEMO_VIEWS.map((item) => (
-            <button aria-pressed={view === item.id} className={view === item.id ? "is-active" : ""} key={item.id} onClick={() => chooseView(item.id)} type="button">{item.label}</button>
+        <nav aria-label={copy.demo.viewLabel}>
+          {DEMO_VIEW_IDS.map((item, index) => (
+            <button aria-pressed={view === item} className={view === item ? "is-active" : ""} key={item} onClick={() => chooseView(item)} type="button">{copy.demo.views[index]}</button>
           ))}
         </nav>
-        <span className="demo-status"><i aria-hidden="true" /> LIVE PREVIEW · LOCAL-FIRST</span>
+        <span className="demo-status"><i aria-hidden="true" /> {copy.demo.status}</span>
       </div>
       <div className={`product-content ${contentPhase}`} data-view={renderedView}>
-        {renderedView === "overview" && <OverviewPanel />}
-        {renderedView === "insight" && <InsightPanel activeIndex={activeIndex} isActive={isInView} onChange={onChange} onManualInteraction={pauseAutoplayBriefly} reducedMotion={reducedMotion} />}
-        {renderedView === "data" && <DataPanel isActive={isInView} onManualInteraction={pauseAutoplayBriefly} reducedMotion={reducedMotion} />}
+        {renderedView === "overview" && <OverviewPanel copy={copy} />}
+        {renderedView === "insight" && <InsightPanel activeIndex={activeIndex} copy={copy} insights={insights} isActive={isInView} onChange={onChange} onManualInteraction={pauseAutoplayBriefly} reducedMotion={reducedMotion} />}
+        {renderedView === "data" && <DataPanel copy={copy} isActive={isInView} metrics={metrics} onManualInteraction={pauseAutoplayBriefly} reducedMotion={reducedMotion} />}
       </div>
     </WindowFrame>
   );
 }
 
-function ProcessWindow() {
+function ProcessWindow({ copy }) {
   const { elementRef, revealed } = useScrollReveal();
   return (
     <section className={`process-window scroll-reveal ${revealed ? "is-revealed" : ""}`} aria-labelledby="how-it-works-title" ref={elementRef}>
       <div className="process-layout">
         <img
-          alt="A pixel-art flow from scanning local coding logs, to wrapping safe data, to exploring finished insights"
+          alt={copy.process.alt}
           className="process-illustration"
           decoding="async"
           height="1024"
@@ -640,55 +632,49 @@ function ProcessWindow() {
           width="1536"
         />
         <div>
-          <p className="panel-kicker">THREE SMALL STEPS</p>
-          <h2 id="how-it-works-title">From local traces to a story you recognize.</h2>
+          <p className="panel-kicker">{copy.process.kicker}</p>
+          <h2 id="how-it-works-title">{copy.process.title}</h2>
           <ol>
-            <li><strong>Scan</strong><span>Read standard Claude Code and Codex session folders locally.</span></li>
-            <li><strong>Wrap</strong><span>Turn safe aggregates into an overview and four distinct insights.</span></li>
-            <li><strong>Explore</strong><span>Open a private localhost dashboard, refresh facts, or export intentionally.</span></li>
+            {copy.process.rows.map(([title, detail]) => <li key={title}><strong>{title}</strong><span>{detail}</span></li>)}
           </ol>
         </div>
       </div>
-      <footer className="privacy-strip">Raw conversations, source code, project names, local paths and secrets stay out of the website.</footer>
+      <footer className="privacy-strip">{copy.process.privacy}</footer>
     </section>
   );
 }
 
-function PracticeTipsWindow() {
+function PracticeTipsWindow({ copy }) {
   const { elementRef, revealed } = useScrollReveal();
   return (
     <section className={`practice-tips-window scroll-reveal ${revealed ? "is-revealed" : ""}`} aria-labelledby="practice-tips-title" ref={elementRef}>
       <div className="practice-tips-layout">
         <div className="practice-tips-copy">
-          <p className="panel-kicker">USEFUL TIPS</p>
-          <h2 id="practice-tips-title">Small tips for your next coding session.</h2>
+          <p className="panel-kicker">{copy.tips.kicker}</p>
+          <h2 id="practice-tips-title">{copy.tips.title}</h2>
           <p>
-            Coding Wrapped matches patterns in your local aggregates with
-            trusted practices, then suggests one lightweight next move for
-            your next coding session. <a className="practice-library-link" data-cuelume-hover="tick" data-cuelume-release="scan" href={LINKS.practiceLibrary} rel="noreferrer" target="_blank">
-              View the practice library <span aria-hidden="true">→</span>
+            {copy.tips.body} <a className="practice-library-link" data-cuelume-hover="tick" data-cuelume-release="scan" href={LINKS.practiceLibrary} rel="noreferrer" target="_blank">
+              {copy.tips.library} <span aria-hidden="true">→</span>
             </a>
           </p>
           <ul aria-label="Practice source types" className="practice-source-types">
-            <li>Official guidance</li>
-            <li>Practitioner playbooks</li>
-            <li>Expert conversations</li>
+            {copy.tips.sourceTypes.map((sourceType) => <li key={sourceType}>{sourceType}</li>)}
           </ul>
           <article className="practice-tip-example">
             <header>
-              <span>LIGHT TIP</span>
-              <small>MATCHED TO · SHORT PROMPTS</small>
+              <span>{copy.tips.lightTip}</span>
+              <small>{copy.tips.matched}</small>
             </header>
-            <p>Add one sentence describing what done looks like and one thing that must not change.</p>
+            <p>{copy.tips.example}</p>
             <footer>
-              <span>BASED ON</span>
-              <a data-cuelume-hover="tick" data-cuelume-release="scan" href="https://learn.chatgpt.com/docs/prompting" rel="noreferrer" target="_blank">OpenAI · Prompting</a>
+              <span>{copy.tips.basedOn}</span>
+              <a data-cuelume-hover="tick" data-cuelume-release="scan" href="https://learn.chatgpt.com/docs/prompting" rel="noreferrer" target="_blank">{copy.tips.source}</a>
             </footer>
           </article>
         </div>
         <div className="practice-tips-visual">
           <img
-            alt="A pixel-art robot offering one lightweight tip before the coder's next session"
+            alt={copy.tips.alt}
             decoding="async"
             height="1024"
             loading="lazy"
@@ -701,23 +687,23 @@ function PracticeTipsWindow() {
   );
 }
 
-function InstallWindow({ onCopy }) {
+function InstallWindow({ copy, onCopy }) {
   const { elementRef, revealed } = useScrollReveal();
   return (
     <section className={`install-window scroll-reveal ${revealed ? "is-revealed" : ""}`} aria-labelledby="install-title" ref={elementRef}>
       <div className="install-layout">
         <div>
-          <p className="panel-kicker">ONE COMMAND · CLAUDE CODE + CODEX</p>
-          <h2 id="install-title">Give your coding history a plot.</h2>
-          <p>Install the same open Agent Skill on both platforms. No separate product and no cloud account.</p>
+          <p className="panel-kicker">{copy.install.kicker}</p>
+          <h2 id="install-title">{copy.install.title}</h2>
+          <p>{copy.install.body}</p>
         </div>
         <pre><code>{INSTALL_COMMAND}</code></pre>
         <div className="install-actions">
           <button className="button button--primary" data-cuelume-press="press" onClick={onCopy} type="button">
-            <span>Copy command</span><img alt="" aria-hidden="true" className="button__arrow" height="96" src="/assets/button-arrow.png" width="96" />
+            <span>{copy.install.copy}</span><img alt="" aria-hidden="true" className="button__arrow" height="96" src="/assets/button-arrow.png" width="96" />
           </button>
           <a className="button button--secondary" data-cuelume-hover="tick" data-cuelume-release="scan" href={LINKS.github} rel="noreferrer" target="_blank">
-            <span>Read the docs</span><img alt="" aria-hidden="true" className="button__arrow" height="96" src="/assets/button-arrow.png" width="96" />
+            <span>{copy.install.docs}</span><img alt="" aria-hidden="true" className="button__arrow" height="96" src="/assets/button-arrow.png" width="96" />
           </a>
         </div>
       </div>
@@ -726,10 +712,27 @@ function InstallWindow({ onCopy }) {
 }
 
 export function App() {
+  const [locale, setLocale] = useState(() => {
+    try {
+      return window.localStorage.getItem("coding-wrapped-locale") === "zh" ? "zh" : "en";
+    } catch {
+      return "en";
+    }
+  });
   const [activeIndex, setActiveIndex] = useState(0);
   const [view, setView] = useState("overview");
   const [toast, setToast] = useState("");
   const isScrolling = useScrollActivity();
+  const { insights, metrics, ui: copy } = getLocalizedContent(locale);
+
+  useEffect(() => {
+    document.documentElement.lang = locale === "zh" ? "zh-CN" : "en";
+    try {
+      window.localStorage.setItem("coding-wrapped-locale", locale);
+    } catch {
+      // Storage is optional; English remains the first-visit default.
+    }
+  }, [locale]);
 
   useEffect(() => {
     setVolume(0.4);
@@ -746,21 +749,25 @@ export function App() {
     try {
       await navigator.clipboard.writeText(INSTALL_COMMAND);
       play("success");
-      setToast("Install command copied.");
+      setToast(copy.toast.copied);
     } catch {
       play("error");
-      setToast("Select the command in the install window to copy it.");
+      setToast(copy.toast.fallback);
     }
   };
 
   const openInstall = () => document.querySelector("#install")?.scrollIntoView({ behavior: "smooth" });
   return (
-    <main>
+    <main className={`site locale-${locale}`}>
       <div aria-hidden="true" className="desktop-background" />
-      <Hero onInstall={openInstall} />
+      <LocaleToggle copy={copy} locale={locale} onChange={setLocale} />
+      <Hero copy={copy} onInstall={openInstall} />
       <section className="demo-stage" id="demo">
         <DemoWindow
           activeIndex={activeIndex}
+          copy={copy}
+          insights={insights}
+          metrics={metrics}
           onChange={setActiveIndex}
           onUseData={openInstall}
           onViewChange={setView}
@@ -768,15 +775,15 @@ export function App() {
         />
       </section>
       <section className="information-stage">
-        <ProcessWindow />
-        <PracticeTipsWindow />
-        <div id="install"><InstallWindow onCopy={copyInstall} /></div>
+        <ProcessWindow copy={copy} />
+        <PracticeTipsWindow copy={copy} />
+        <div id="install"><InstallWindow copy={copy} onCopy={copyInstall} /></div>
       </section>
       <footer className="page-footer">
-        <div><strong>Coding Wrapped</strong><span className="pixel-slogan">Observe the way you build</span></div>
-        <a data-cuelume-hover="tick" data-cuelume-release="scan" href={LINKS.github} rel="noreferrer" target="_blank">MIT · OPEN SOURCE</a>
+        <div><strong>Coding Wrapped</strong><span className="pixel-slogan">{copy.hero.slogan}</span></div>
+        <a data-cuelume-hover="tick" data-cuelume-release="scan" href={LINKS.github} rel="noreferrer" target="_blank">{copy.footer.license}</a>
       </footer>
-      <Dock compact={isScrolling} />
+      <Dock compact={isScrolling} copy={copy} />
       {toast && <div aria-live="polite" className="toast" key={toast} role="status">{toast}</div>}
     </main>
   );
