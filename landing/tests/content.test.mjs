@@ -340,9 +340,11 @@ test("the complete slogan is localized and renders in the right local pixel font
   assert.match(content, /看见你与 AI 共创的轨迹/);
   assert.match(source, /@fontsource\/tiny5\/latin-400\.css/);
   assert.match(styles, /\.locale-en \.pixel-slogan\s*\{[^}]*font-family:\s*"Tiny5"[^}]*text-transform:\s*uppercase/s);
+  assert.match(styles, /\.locale-en \.pixel-slogan\s*\{[^}]*font-size:\s*clamp\(30px,\s*2\.9vw,\s*42px\)/s);
   assert.match(styles, /\.locale-zh \.pixel-slogan\s*\{[^}]*"Fusion Pixel 12 Proportional"[^}]*"Plus Jakarta Sans"/s);
   assert.match(styles, /\.locale-zh\s*\{[^}]*font-family:\s*"Plus Jakarta Sans",\s*"Noto Sans SC"/s);
   assert.match(styles, /\.locale-zh \.page-footer \.pixel-slogan\s*\{[^}]*font-size:\s*14px/s);
+  assert.match(styles, /\.locale-en \.page-footer \.pixel-slogan\s*\{[^}]*font-size:\s*16px/s);
   assert.match(styles, /\.dashboard-title strong\s*\{[^}]*font-weight:\s*800/s);
   assert.doesNotMatch(styles, /rainbow-build|rainbow-word/);
 });
