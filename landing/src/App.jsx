@@ -628,20 +628,16 @@ function ProcessWindow({ copy }) {
     <section className={`process-window scroll-reveal ${revealed ? "is-revealed" : ""}`} aria-labelledby="how-it-works-title" ref={elementRef}>
       <div className="process-layout">
         <div className="process-story" aria-label={copy.process.alt} role="img">
-          <img
-            alt=""
-            aria-hidden="true"
-            className="process-illustration"
-            decoding="async"
-            height="1024"
-            loading="lazy"
-            src="/assets/how-it-works-flow-v2.webp"
-            width="1536"
-          />
-          <span aria-hidden="true" className="process-story__beat process-story__beat--scan" />
-          <span aria-hidden="true" className="process-story__beat process-story__beat--wrap" />
-          <span aria-hidden="true" className="process-story__beat process-story__beat--explore" />
-          <span aria-hidden="true" className="process-story__cursor" />
+          <span aria-hidden="true" className="story-sprite story-sprite--process">
+            <img
+              alt=""
+              decoding="async"
+              height="1024"
+              loading="lazy"
+              src="/assets/how-it-works-story-sprite.webp"
+              width="1536"
+            />
+          </span>
         </div>
         <div>
           <p className="panel-kicker">{copy.process.kicker}</p>
@@ -685,18 +681,16 @@ function PracticeTipsWindow({ copy }) {
           </article>
         </div>
         <div className="practice-tips-visual" aria-label={copy.tips.alt} role="img">
-          <img
-            alt=""
-            aria-hidden="true"
-            decoding="async"
-            height="1024"
-            loading="lazy"
-            src="/assets/practice-tip-next-session.webp"
-            width="1536"
-          />
-          <span aria-hidden="true" className="tips-story__signal" />
-          <span aria-hidden="true" className="tips-story__card" />
-          <span aria-hidden="true" className="tips-story__spark" />
+          <span aria-hidden="true" className="story-sprite story-sprite--tips">
+            <img
+              alt=""
+              decoding="async"
+              height="1024"
+              loading="lazy"
+              src="/assets/practice-tips-story-sprite.webp"
+              width="1536"
+            />
+          </span>
         </div>
       </div>
     </section>

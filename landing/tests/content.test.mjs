@@ -98,28 +98,26 @@ test("hero CTA labels stay centered before the hover arrow appears", async () =>
   assert.match(styles, /\.button__arrow\s*\{[^}]*position:\s*absolute/s);
 });
 
-test("how it works uses an optimized dedicated three-step illustration", async () => {
+test("how it works uses a dedicated character sprite sequence", async () => {
   const source = await readFile(new URL("../src/App.jsx", import.meta.url), "utf8");
-  assert.match(source, /how-it-works-flow-v2\.webp/);
+  assert.match(source, /how-it-works-story-sprite\.webp/);
   assert.doesNotMatch(source, /Coding Wrapped app icon showing a robot reading a notebook/);
-  await readFile(new URL("../public/assets/how-it-works-flow-v2.webp", import.meta.url));
+  await readFile(new URL("../public/assets/how-it-works-story-sprite.webp", import.meta.url));
 });
 
-test("supporting illustrations use restrained stepped story animations", async () => {
+test("supporting illustrations use real six-frame character sprite stories", async () => {
   const source = await readFile(new URL("../src/App.jsx", import.meta.url), "utf8");
   const styles = await readFile(new URL("../src/styles.css", import.meta.url), "utf8");
   assert.match(source, /className="process-story"/);
-  assert.match(source, /process-story__beat--scan/);
-  assert.match(source, /process-story__beat--wrap/);
-  assert.match(source, /process-story__beat--explore/);
-  assert.match(source, /tips-story__signal/);
-  assert.match(source, /tips-story__card/);
-  assert.match(source, /tips-story__spark/);
-  assert.match(styles, /animation: process-story-image 6\.4s steps\(1, end\) infinite/);
-  assert.match(styles, /animation: tips-story-character 5\.8s steps\(1, end\) infinite/);
-  assert.match(styles, /@keyframes process-story-cursor/);
-  assert.match(styles, /@keyframes tips-story-card/);
-  assert.match(styles, /@media \(prefers-reduced-motion: reduce\)[\s\S]*\.process-illustration,[\s\S]*\.tips-story__spark[\s\S]*animation: none/);
+  assert.match(source, /story-sprite story-sprite--process/);
+  assert.match(source, /story-sprite story-sprite--tips/);
+  assert.match(source, /practice-tips-story-sprite\.webp/);
+  assert.doesNotMatch(source, /process-story__beat|process-story__cursor|tips-story__signal|tips-story__card|tips-story__spark/);
+  assert.match(styles, /animation: process-character-story 7\.8s steps\(1, end\) infinite/);
+  assert.match(styles, /animation: tips-character-story 7\.2s steps\(1, end\) infinite/);
+  assert.match(styles, /translate3d\(-66\.6667%, -50%, 0\)/);
+  assert.match(styles, /@media \(prefers-reduced-motion: reduce\)[\s\S]*\.story-sprite img[\s\S]*animation: none/);
+  assert.doesNotMatch(styles, /@keyframes process-story-cursor|@keyframes tips-story-card/);
 });
 
 test("supported agents use their official color artwork", async () => {
@@ -264,9 +262,9 @@ test("demo and information panels share one responsive alignment contract", asyn
 test("process and install panels keep balanced desktop columns", async () => {
   const styles = await readFile(new URL("../src/styles.css", import.meta.url), "utf8");
   assert.match(styles, /\.process-layout\s*\{[^}]*grid-template-columns:\s*minmax\(0, 1fr\) minmax\(0, 1fr\)/s);
-  assert.match(styles, /\.process-story\s*\{[^}]*aspect-ratio:\s*3\s*\/\s*2[^}]*max-width:\s*100%[^}]*width:\s*100%/s);
-  assert.match(styles, /\.process-illustration\s*\{[^}]*max-width:\s*100%[^}]*object-fit:\s*contain[^}]*width:\s*100%/s);
-  assert.doesNotMatch(styles, /\.process-illustration\s*\{[^}]*object-fit:\s*cover/s);
+  assert.match(styles, /\.process-story\s*\{[^}]*max-width:\s*100%[^}]*width:\s*100%/s);
+  assert.match(styles, /\.story-sprite\s*\{[^}]*aspect-ratio:\s*1[^}]*overflow:\s*hidden[^}]*width:\s*min\(100%, 480px\)/s);
+  assert.match(styles, /\.story-sprite img\s*\{[^}]*height:\s*200%[^}]*width:\s*300%/s);
   assert.match(styles, /\.install-layout\s*\{[^}]*grid-template-columns:\s*repeat\(2, minmax\(0, 1fr\)\)/s);
   assert.doesNotMatch(styles, /\.install-layout\s*\{[^}]*0\.86fr[^}]*1\.14fr/s);
 });
@@ -274,7 +272,7 @@ test("process and install panels keep balanced desktop columns", async () => {
 test("practice tips module explains provenance and links the source-of-truth library", async () => {
   const source = await readFile(new URL("../src/App.jsx", import.meta.url), "utf8");
   const styles = await readFile(new URL("../src/styles.css", import.meta.url), "utf8");
-  const image = await stat(new URL("../public/assets/practice-tip-next-session.webp", import.meta.url));
+  const image = await stat(new URL("../public/assets/practice-tips-story-sprite.webp", import.meta.url));
   const tips = source.indexOf("<PracticeTipsWindow copy={copy} />");
   const process = source.indexOf("<ProcessWindow copy={copy} />");
   const install = source.indexOf("<InstallWindow copy={copy} onCopy={copyInstall} />");
@@ -321,8 +319,8 @@ test("expensive demo updates pause when the preview leaves the viewport", async 
 test("large below-fold images are lazy, async decoded, and dimensioned", async () => {
   const source = await readFile(new URL("../src/App.jsx", import.meta.url), "utf8");
   assert.match(source, /overview-calibration-loop\.webp[\s\S]*width="1536"/);
-  assert.match(source, /loading="lazy"[\s\S]*how-it-works-flow-v2\.webp/);
-  assert.match(source, /loading="lazy"[\s\S]*practice-tip-next-session\.webp/);
+  assert.match(source, /loading="lazy"[\s\S]*how-it-works-story-sprite\.webp/);
+  assert.match(source, /loading="lazy"[\s\S]*practice-tips-story-sprite\.webp/);
   assert.match(source, /loading="lazy"[^>]*src=\{insight\.image\}/);
   assert.match(source, /decoding="async"/);
 });
