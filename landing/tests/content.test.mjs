@@ -123,14 +123,22 @@ test("hero keeps the mascot standalone and avoids the retired metal badges", asy
   assert.doesNotMatch(styles, /agent-logo__metal/);
 });
 
-test("hero keeps its static title and swaps the mascot pose on hover", async () => {
+test("hero keeps its static title and gives the mascot a restrained pixel loop", async () => {
   const source = await readFile(new URL("../src/App.jsx", import.meta.url), "utf8");
   const styles = await readFile(new URL("../src/styles.css", import.meta.url), "utf8");
   assert.match(source, /<h1>Coding Wrapped<\/h1>/);
   assert.doesNotMatch(source, /AnimatedHeroTitle|hero-title__pixel/);
   assert.doesNotMatch(styles, /hero-title-pixel-scan/);
-  assert.match(styles, /\.hero-app-icon \{[\s\S]*filter: drop-shadow\(9px 11px 0 rgba\(52, 53, 48, 0\.2\)\);[\s\S]*transform: rotate\(7deg\) scale\(1\.14\);/);
-  assert.match(styles, /\.hero-app-icon:hover \{[\s\S]*filter: none;[\s\S]*transform: rotate\(0deg\) scale\(1\);/);
+  assert.match(source, /className="hero-mascot"/);
+  assert.match(source, /hero-mascot__eye--left/);
+  assert.match(source, /hero-mascot__spark/);
+  assert.match(styles, /\.hero-mascot \{[\s\S]*filter: drop-shadow\(9px 11px 0 rgba\(52, 53, 48, 0\.2\)\);[\s\S]*transform: rotate\(7deg\) scale\(1\.14\);/);
+  assert.match(styles, /\.hero-mascot:hover \{[\s\S]*filter: none;[\s\S]*transform: rotate\(0deg\) scale\(1\);/);
+  assert.match(styles, /@keyframes mascot-reading-loop/);
+  assert.match(styles, /animation: mascot-reading-loop 4\.8s steps\(1, end\) infinite/);
+  assert.match(styles, /@keyframes mascot-blink/);
+  assert.match(styles, /@keyframes mascot-spark/);
+  assert.match(styles, /prefers-reduced-motion: reduce[\s\S]*\.hero-app-icon,[\s\S]*\.hero-mascot__spark \{[\s\S]*animation: none;/);
 });
 
 test("live preview rotates through three direct product views without tour chrome", async () => {

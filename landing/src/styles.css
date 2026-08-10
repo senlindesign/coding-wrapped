@@ -196,22 +196,88 @@ main {
   z-index: 2;
 }
 
-.hero-app-icon {
-  display: block;
+.hero-mascot {
   filter: drop-shadow(9px 11px 0 rgba(52, 53, 48, 0.2));
   height: 150px;
-  image-rendering: pixelated;
   margin: 0 0 16px;
-  object-fit: contain;
+  position: relative;
   transform: rotate(7deg) scale(1.14);
   transform-origin: 50% 72%;
   transition: filter var(--motion-medium) var(--ease-standard), transform var(--motion-medium) var(--ease-spring);
   width: 150px;
 }
 
-.hero-app-icon:hover {
+.hero-mascot:hover {
   filter: none;
   transform: rotate(0deg) scale(1);
+}
+
+.hero-app-icon {
+  animation: mascot-reading-loop 4.8s steps(1, end) infinite;
+  display: block;
+  height: 100%;
+  image-rendering: pixelated;
+  object-fit: contain;
+  transform-origin: 50% 72%;
+  width: 100%;
+}
+
+.hero-mascot__eye {
+  animation: mascot-blink 4.8s steps(1, end) infinite;
+  background: #17140f;
+  height: 7.2%;
+  opacity: 0;
+  position: absolute;
+  top: 37.4%;
+  width: 5.6%;
+}
+
+.hero-mascot__eye::after {
+  background: #ff9708;
+  content: "";
+  height: 2px;
+  left: 0;
+  position: absolute;
+  right: 0;
+  top: calc(50% - 1px);
+}
+
+.hero-mascot__eye--left {
+  left: 40.7%;
+}
+
+.hero-mascot__eye--right {
+  left: 51.2%;
+}
+
+.hero-mascot__spark {
+  animation: mascot-spark 4.8s steps(1, end) infinite;
+  background: #ff8b00;
+  box-shadow: -5px 0 0 #ff8b00, 5px 0 0 #ff8b00, 0 -5px 0 #ff8b00, 0 5px 0 #ff8b00;
+  height: 4px;
+  left: 23.4%;
+  opacity: 0;
+  position: absolute;
+  top: 22.5%;
+  width: 4px;
+}
+
+@keyframes mascot-reading-loop {
+  0%, 15%, 28%, 54%, 70%, 100% { transform: translate(0, 0); }
+  18%, 21% { transform: translate(0, -2px); }
+  24% { transform: translate(1px, -1px); }
+  57%, 60% { transform: translate(0, 1px); }
+  63% { transform: translate(-1px, 0); }
+}
+
+@keyframes mascot-blink {
+  0%, 43%, 48%, 100% { opacity: 0; }
+  44%, 47% { opacity: 1; }
+}
+
+@keyframes mascot-spark {
+  0%, 8%, 14%, 66%, 72%, 100% { opacity: 0; transform: scale(0.6); }
+  9%, 12%, 67%, 70% { opacity: 1; transform: scale(1); }
 }
 
 .eyebrow,
@@ -1894,7 +1960,7 @@ main {
     padding: 22px 24px 194px;
   }
 
-  .hero-app-icon {
+  .hero-mascot {
     height: 128px;
     margin-bottom: 28px;
     width: 128px;
@@ -2203,7 +2269,7 @@ main {
     transform: translateY(0) scale(0.985);
   }
 
-  .hero-app-icon {
+  .hero-mascot {
     height: 120px;
     margin-bottom: 14px;
     width: 120px;
@@ -2452,8 +2518,14 @@ main {
     transition-duration: 0.01ms !important;
   }
 
-  .hero-app-icon:hover {
+  .hero-mascot:hover {
     transform: none;
+  }
+
+  .hero-app-icon,
+  .hero-mascot__eye,
+  .hero-mascot__spark {
+    animation: none;
   }
 
   .scroll-reveal {

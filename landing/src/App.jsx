@@ -127,14 +127,19 @@ function Hero({ copy, onInstall }) {
   return (
     <section className="hero" id="top">
       <div className="hero-content">
-        <img
-          alt={copy.hero.mascotAlt}
-          className="hero-app-icon"
-          fetchPriority="high"
-          height="512"
-          src="/assets/coding-wrapped-mascot.webp"
-          width="512"
-        />
+        <div className="hero-mascot">
+          <img
+            alt={copy.hero.mascotAlt}
+            className="hero-app-icon"
+            fetchPriority="high"
+            height="512"
+            src="/assets/coding-wrapped-mascot.webp"
+            width="512"
+          />
+          <span aria-hidden="true" className="hero-mascot__eye hero-mascot__eye--left" />
+          <span aria-hidden="true" className="hero-mascot__eye hero-mascot__eye--right" />
+          <span aria-hidden="true" className="hero-mascot__spark" />
+        </div>
         <h1>Coding Wrapped</h1>
         <div className="hero-lede">
           <p className="hero-lede__lead pixel-slogan">{copy.hero.slogan}</p>
