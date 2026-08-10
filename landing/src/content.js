@@ -255,7 +255,7 @@ const ZH_UI = {
   agentSupported: "已支持",
   hero: {
     mascotAlt: "Coding Wrapped：一个正在阅读编程日志的像素机器人",
-    slogan: "看看你如何构建",
+    slogan: "看见你与 AI 共创的轨迹",
     body: "把本地 AI 编程记录变成有意思的故事和下一步建议。一次运行，数据不离开你的电脑。",
     install: "安装 Skill",
     github: "前往 GitHub",

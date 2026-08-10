@@ -337,10 +337,13 @@ test("the complete slogan is localized and renders in the right local pixel font
   assert.equal((source.match(/pixel-slogan/g) ?? []).length, 2);
   assert.match(source, /hero-lede__lead pixel-slogan">\{copy\.hero\.slogan\}<\/p>/);
   assert.match(content, /Observe the way you build/);
-  assert.match(content, /看看你如何构建/);
+  assert.match(content, /看见你与 AI 共创的轨迹/);
   assert.match(source, /@fontsource\/tiny5\/latin-400\.css/);
   assert.match(styles, /\.locale-en \.pixel-slogan\s*\{[^}]*font-family:\s*"Tiny5"[^}]*text-transform:\s*uppercase/s);
-  assert.match(styles, /\.locale-zh \.pixel-slogan\s*\{[^}]*"Fusion Pixel 12 Proportional"/s);
+  assert.match(styles, /\.locale-zh \.pixel-slogan\s*\{[^}]*"Fusion Pixel 12 Proportional"[^}]*"Plus Jakarta Sans"/s);
+  assert.match(styles, /\.locale-zh\s*\{[^}]*font-family:\s*"Plus Jakarta Sans",\s*"Noto Sans SC"/s);
+  assert.match(styles, /\.locale-zh \.page-footer \.pixel-slogan\s*\{[^}]*font-size:\s*14px/s);
+  assert.match(styles, /\.dashboard-title strong\s*\{[^}]*font-weight:\s*800/s);
   assert.doesNotMatch(styles, /rainbow-build|rainbow-word/);
 });
 

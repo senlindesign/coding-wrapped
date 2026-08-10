@@ -10,7 +10,7 @@
   font-display: swap;
   font-family: "Noto Sans SC";
   font-style: normal;
-  font-weight: 100 900;
+  font-weight: 400;
   src: url("/assets/fonts/NotoSansSC-Regular.woff2") format("woff2");
 }
 
@@ -20,6 +20,7 @@
   font-style: normal;
   font-weight: 400;
   src: url("/assets/fonts/FusionPixel12ProportionalZH-Hans.woff2") format("woff2");
+  unicode-range: U+3000-303F, U+3400-4DBF, U+4E00-9FFF, U+F900-FAFF;
 }
 
 :root {
@@ -135,15 +136,16 @@ main {
 }
 
 .locale-zh {
-  font-family: "Noto Sans SC", "Noto Sans CJK SC", system-ui, sans-serif;
+  font-family: "Plus Jakarta Sans", "Noto Sans SC", "Noto Sans CJK SC", system-ui, sans-serif;
+  font-synthesis: weight;
 }
 
 .locale-zh .pixel-slogan {
-  font-family: "Fusion Pixel 12 Proportional", "Noto Sans SC", sans-serif;
-  font-size: clamp(22px, 2.25vw, 32px);
+  font-family: "Fusion Pixel 12 Proportional", "Plus Jakarta Sans", "Noto Sans SC", sans-serif;
+  font-size: clamp(32px, 3.2vw, 44px);
   font-weight: 400;
-  letter-spacing: 0.08em;
-  line-height: 1.35;
+  letter-spacing: 0.055em;
+  line-height: 1.25;
   text-transform: none;
 }
 
@@ -534,7 +536,12 @@ main {
 
 .dashboard-title strong {
   font-size: clamp(22px, 2.2vw, 34px);
+  font-weight: 800;
   letter-spacing: -0.045em;
+}
+
+.locale-zh .dashboard-title strong {
+  letter-spacing: -0.01em;
 }
 
 .dashboard-header > button {
@@ -1705,8 +1712,14 @@ main {
 
 .page-footer span {
   color: #d6d0c3;
-  font-size: 13px;
+  font-size: 14px;
+  line-height: 1.2;
   margin-top: 4px;
+}
+
+.locale-zh .page-footer .pixel-slogan {
+  font-size: 14px;
+  letter-spacing: 0.035em;
 }
 
 .pixel-slogan {
@@ -2164,7 +2177,7 @@ main {
   }
 
   .locale-zh .pixel-slogan {
-    font-size: 21px;
+    font-size: 28px;
   }
 
   .desktop-background {
@@ -2377,6 +2390,10 @@ main {
   .page-footer {
     grid-template-columns: 1fr;
     padding: 18px 20px;
+  }
+
+  .locale-zh .page-footer .pixel-slogan {
+    font-size: 13px;
   }
 
   .page-footer > a {
