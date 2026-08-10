@@ -627,15 +627,22 @@ function ProcessWindow({ copy }) {
   return (
     <section className={`process-window scroll-reveal ${revealed ? "is-revealed" : ""}`} aria-labelledby="how-it-works-title" ref={elementRef}>
       <div className="process-layout">
-        <img
-          alt={copy.process.alt}
-          className="process-illustration"
-          decoding="async"
-          height="1024"
-          loading="lazy"
-          src="/assets/how-it-works-flow-v2.webp"
-          width="1536"
-        />
+        <div className="process-story" aria-label={copy.process.alt} role="img">
+          <img
+            alt=""
+            aria-hidden="true"
+            className="process-illustration"
+            decoding="async"
+            height="1024"
+            loading="lazy"
+            src="/assets/how-it-works-flow-v2.webp"
+            width="1536"
+          />
+          <span aria-hidden="true" className="process-story__beat process-story__beat--scan" />
+          <span aria-hidden="true" className="process-story__beat process-story__beat--wrap" />
+          <span aria-hidden="true" className="process-story__beat process-story__beat--explore" />
+          <span aria-hidden="true" className="process-story__cursor" />
+        </div>
         <div>
           <p className="panel-kicker">{copy.process.kicker}</p>
           <h2 id="how-it-works-title">{copy.process.title}</h2>
@@ -677,15 +684,19 @@ function PracticeTipsWindow({ copy }) {
             </footer>
           </article>
         </div>
-        <div className="practice-tips-visual">
+        <div className="practice-tips-visual" aria-label={copy.tips.alt} role="img">
           <img
-            alt={copy.tips.alt}
+            alt=""
+            aria-hidden="true"
             decoding="async"
             height="1024"
             loading="lazy"
             src="/assets/practice-tip-next-session.webp"
             width="1536"
           />
+          <span aria-hidden="true" className="tips-story__signal" />
+          <span aria-hidden="true" className="tips-story__card" />
+          <span aria-hidden="true" className="tips-story__spark" />
         </div>
       </div>
     </section>

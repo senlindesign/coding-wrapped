@@ -105,6 +105,23 @@ test("how it works uses an optimized dedicated three-step illustration", async (
   await readFile(new URL("../public/assets/how-it-works-flow-v2.webp", import.meta.url));
 });
 
+test("supporting illustrations use restrained stepped story animations", async () => {
+  const source = await readFile(new URL("../src/App.jsx", import.meta.url), "utf8");
+  const styles = await readFile(new URL("../src/styles.css", import.meta.url), "utf8");
+  assert.match(source, /className="process-story"/);
+  assert.match(source, /process-story__beat--scan/);
+  assert.match(source, /process-story__beat--wrap/);
+  assert.match(source, /process-story__beat--explore/);
+  assert.match(source, /tips-story__signal/);
+  assert.match(source, /tips-story__card/);
+  assert.match(source, /tips-story__spark/);
+  assert.match(styles, /animation: process-story-image 6\.4s steps\(1, end\) infinite/);
+  assert.match(styles, /animation: tips-story-character 5\.8s steps\(1, end\) infinite/);
+  assert.match(styles, /@keyframes process-story-cursor/);
+  assert.match(styles, /@keyframes tips-story-card/);
+  assert.match(styles, /@media \(prefers-reduced-motion: reduce\)[\s\S]*\.process-illustration,[\s\S]*\.tips-story__spark[\s\S]*animation: none/);
+});
+
 test("supported agents use their official color artwork", async () => {
   const [codex, claude] = await Promise.all([
     readFile(new URL("../public/assets/brand/codex.svg", import.meta.url), "utf8"),
@@ -138,7 +155,7 @@ test("hero keeps its static title and gives the mascot a restrained pixel loop",
   assert.match(styles, /animation: mascot-reading-loop 4\.8s steps\(1, end\) infinite/);
   assert.match(styles, /@keyframes mascot-blink/);
   assert.match(styles, /@keyframes mascot-spark/);
-  assert.match(styles, /prefers-reduced-motion: reduce[\s\S]*\.hero-app-icon,[\s\S]*\.hero-mascot__spark \{[\s\S]*animation: none;/);
+  assert.match(styles, /prefers-reduced-motion: reduce[\s\S]*\.hero-app-icon,[\s\S]*\.hero-mascot__spark,[\s\S]*\{[\s\S]*animation: none;/);
 });
 
 test("live preview rotates through three direct product views without tour chrome", async () => {
@@ -247,9 +264,9 @@ test("demo and information panels share one responsive alignment contract", asyn
 test("process and install panels keep balanced desktop columns", async () => {
   const styles = await readFile(new URL("../src/styles.css", import.meta.url), "utf8");
   assert.match(styles, /\.process-layout\s*\{[^}]*grid-template-columns:\s*minmax\(0, 1fr\) minmax\(0, 1fr\)/s);
-  assert.match(styles, /\.process-layout > img\s*\{[^}]*max-width:\s*100%[^}]*width:\s*100%/s);
-  assert.match(styles, /\.process-layout > img\s*\{[^}]*aspect-ratio:\s*3\s*\/\s*2[^}]*height:\s*auto[^}]*object-fit:\s*contain/s);
-  assert.doesNotMatch(styles, /\.process-layout > img\s*\{[^}]*object-fit:\s*cover/s);
+  assert.match(styles, /\.process-story\s*\{[^}]*aspect-ratio:\s*3\s*\/\s*2[^}]*max-width:\s*100%[^}]*width:\s*100%/s);
+  assert.match(styles, /\.process-illustration\s*\{[^}]*max-width:\s*100%[^}]*object-fit:\s*contain[^}]*width:\s*100%/s);
+  assert.doesNotMatch(styles, /\.process-illustration\s*\{[^}]*object-fit:\s*cover/s);
   assert.match(styles, /\.install-layout\s*\{[^}]*grid-template-columns:\s*repeat\(2, minmax\(0, 1fr\)\)/s);
   assert.doesNotMatch(styles, /\.install-layout\s*\{[^}]*0\.86fr[^}]*1\.14fr/s);
 });
