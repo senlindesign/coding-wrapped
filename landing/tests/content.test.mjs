@@ -100,9 +100,9 @@ test("hero CTA labels stay centered before the hover arrow appears", async () =>
 
 test("how it works uses a dedicated character sprite sequence", async () => {
   const source = await readFile(new URL("../src/App.jsx", import.meta.url), "utf8");
-  assert.match(source, /how-it-works-story-sprite-v5\.webp/);
+  assert.match(source, /how-it-works-story-sprite-v6\.webp/);
   assert.doesNotMatch(source, /Coding Wrapped app icon showing a robot reading a notebook/);
-  await readFile(new URL("../public/assets/how-it-works-story-sprite-v5.webp", import.meta.url));
+  await readFile(new URL("../public/assets/how-it-works-story-sprite-v6.webp", import.meta.url));
 });
 
 test("supporting illustrations use real six-frame character sprite stories", async () => {
@@ -111,7 +111,7 @@ test("supporting illustrations use real six-frame character sprite stories", asy
   assert.match(source, /className="process-story"/);
   assert.match(source, /story-sprite story-sprite--process/);
   assert.match(source, /story-sprite story-sprite--tips/);
-  assert.match(source, /practice-tips-story-sprite-v3\.webp/);
+  assert.match(source, /practice-tips-story-sprite-v4\.webp/);
   assert.doesNotMatch(source, /process-story__beat|process-story__cursor|tips-story__signal|tips-story__card|tips-story__spark/);
   assert.match(styles, /animation: process-character-story 7\.8s steps\(1, end\) infinite/);
   assert.match(styles, /animation: tips-character-story 7\.2s steps\(1, end\) infinite/);
@@ -272,7 +272,7 @@ test("process and install panels keep balanced desktop columns", async () => {
 test("practice tips module explains provenance and links the source-of-truth library", async () => {
   const source = await readFile(new URL("../src/App.jsx", import.meta.url), "utf8");
   const styles = await readFile(new URL("../src/styles.css", import.meta.url), "utf8");
-  const image = await stat(new URL("../public/assets/practice-tips-story-sprite-v3.webp", import.meta.url));
+  const image = await stat(new URL("../public/assets/practice-tips-story-sprite-v4.webp", import.meta.url));
   const tips = source.indexOf("<PracticeTipsWindow copy={copy} />");
   const process = source.indexOf("<ProcessWindow copy={copy} />");
   const install = source.indexOf("<InstallWindow copy={copy} onCopy={copyInstall} />");
@@ -319,8 +319,8 @@ test("expensive demo updates pause when the preview leaves the viewport", async 
 test("large below-fold images are lazy, async decoded, and dimensioned", async () => {
   const source = await readFile(new URL("../src/App.jsx", import.meta.url), "utf8");
   assert.match(source, /overview-calibration-loop\.webp[\s\S]*width="1536"/);
-  assert.match(source, /loading="lazy"[\s\S]*how-it-works-story-sprite-v5\.webp/);
-  assert.match(source, /loading="lazy"[\s\S]*practice-tips-story-sprite-v3\.webp/);
+  assert.match(source, /loading="lazy"[\s\S]*how-it-works-story-sprite-v6\.webp/);
+  assert.match(source, /loading="lazy"[\s\S]*practice-tips-story-sprite-v4\.webp/);
   assert.match(source, /loading="lazy"[^>]*src=\{insight\.image\}/);
   assert.match(source, /decoding="async"/);
 });
