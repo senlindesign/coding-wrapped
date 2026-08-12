@@ -634,7 +634,7 @@ function ProcessWindow({ copy }) {
               decoding="async"
               height="1024"
               loading="lazy"
-              src="/assets/how-it-works-story-sprite.webp?v=2"
+              src="/assets/how-it-works-story-sprite-v5.webp"
               width="1536"
             />
           </span>
@@ -687,7 +687,7 @@ function PracticeTipsWindow({ copy }) {
               decoding="async"
               height="1024"
               loading="lazy"
-              src="/assets/practice-tips-story-sprite.webp?v=2"
+              src="/assets/practice-tips-story-sprite-v3.webp"
               width="1536"
             />
           </span>
