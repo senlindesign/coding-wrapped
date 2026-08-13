@@ -365,7 +365,7 @@ test("the complete slogan is localized and renders in the right local pixel font
   assert.equal((source.match(/pixel-slogan/g) ?? []).length, 2);
   assert.match(source, /hero-lede__lead pixel-slogan">\{copy\.hero\.slogan\}<\/p>/);
   assert.match(content, /Observe the way you build/);
-  assert.match(content, /看见你和 AI 是怎么一起做事的/);
+  assert.match(content, /你和 AI 的默契，有迹可循/);
   assert.match(source, /@fontsource\/tiny5\/latin-400\.css/);
   assert.match(styles, /\.locale-en \.pixel-slogan\s*\{[^}]*font-family:\s*"Tiny5"[^}]*text-transform:\s*uppercase/s);
   assert.match(styles, /\.locale-en \.pixel-slogan\s*\{[^}]*font-size:\s*clamp\(30px,\s*2\.9vw,\s*42px\)/s);
