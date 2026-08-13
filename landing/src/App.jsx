@@ -665,7 +665,7 @@ function PracticeTipsWindow({ copy }) {
               {copy.tips.library} <span aria-hidden="true">→</span>
             </a>
           </p>
-          <ul aria-label="Practice source types" className="practice-source-types">
+          <ul aria-label={copy.tips.sourceTypesLabel} className="practice-source-types">
             {copy.tips.sourceTypes.map((sourceType) => <li key={sourceType}>{sourceType}</li>)}
           </ul>
           <article className="practice-tip-example">
