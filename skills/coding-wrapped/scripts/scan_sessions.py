@@ -22,7 +22,8 @@ CODEX_ROOT = Path.home() / ".codex" / "sessions"
 
 SYSTEM_BLOCKS = re.compile(
     r"<(environment_context|recommended_plugins|skills_instructions|system-reminder|"
-    r"local-command-caveat|command-message|command-name|task-notification|video)>.*?</\1>",
+    r"local-command-caveat|local-command-stdout|local-command-stderr|bash-input|"
+    r"bash-stdout|bash-stderr|command-message|command-name|task-notification|video)>.*?</\1>",
     re.IGNORECASE | re.DOTALL,
 )
 IMAGE_BLOCKS = re.compile(r"<image\b.*?</image>", re.IGNORECASE | re.DOTALL)
@@ -36,6 +37,9 @@ SECRETS = re.compile(
     re.IGNORECASE,
 )
 CODE_FENCES = re.compile(r"```.*?```", re.DOTALL)
+CLAUDE_INTERRUPT = re.compile(r"^\[Request interrupted by user")
+# Claude Code marks rows it injects on the user's behalf; none of them is a prompt.
+CLAUDE_NON_PROMPT_FLAGS = ("isMeta", "isCompactSummary", "isVisibleInTranscriptOnly")
 
 PHRASES = {
     "continue / 继续": re.compile(r"\bcontinue\b|继续", re.IGNORECASE),
@@ -101,22 +105,79 @@ def codex_user_text(payload: dict) -> str:
     return clean_user_text(" ".join(parts))
 
 
+# Known built-in tool names from Claude Code and Codex. Planning and to-do
+# tools are bookkeeping, so they stay in "other" instead of looking like edits
+# or subagents.
+TOOL_CATEGORIES = {
+    "read": "read",
+    "notebookread": "read",
+    "ls": "read",
+    "webfetch": "read",
+    "view_image": "read",
+    "write": "edit",
+    "edit": "edit",
+    "multiedit": "edit",
+    "notebookedit": "edit",
+    "apply_patch": "edit",
+    "grep": "search",
+    "glob": "search",
+    "toolsearch": "search",
+    "websearch": "search",
+    "web_search": "search",
+    "bash": "shell",
+    "bashoutput": "shell",
+    "killshell": "shell",
+    "killbash": "shell",
+    "shell": "shell",
+    "local_shell": "shell",
+    "exec_command": "shell",
+    "write_stdin": "shell",
+    "task": "subagent",
+    "agent": "subagent",
+    "spawn_agent": "subagent",
+    "todowrite": "other",
+    "todoread": "other",
+    "exitplanmode": "other",
+    "enterplanmode": "other",
+    "update_plan": "other",
+    "taskcreate": "other",
+    "taskupdate": "other",
+    "tasklist": "other",
+    "taskget": "other",
+    "taskstop": "other",
+    "taskoutput": "other",
+}
+BROWSER_WORDS = {"browser", "chrome", "playwright", "puppeteer"}
+# Checked in order against whole words, so "merge" never matches "rg".
+TOOL_WORD_CATEGORIES = (
+    ("test", {"test", "tests", "pytest", "jest", "vitest"}),
+    ("other", {"todo", "todos", "plan"}),
+    ("subagent", {"subagent", "spawn", "delegate"}),
+    ("search", {"search", "grep", "glob", "find", "rg", "query"}),
+    ("edit", {"edit", "write", "patch", "create", "update", "insert", "replace"}),
+    ("read", {"read", "open", "view", "get", "list", "fetch"}),
+    ("shell", {"bash", "shell", "exec", "command", "terminal"}),
+)
+
+
+def tool_words(name: str) -> set[str]:
+    spaced = re.sub(r"([a-z0-9])([A-Z])", r"\1 \2", name)
+    return {word for word in re.split(r"[^a-z0-9]+", spaced.lower()) if word}
+
+
 def tool_category(name: str) -> str:
     lowered = name.lower()
-    if any(token in lowered for token in ("test", "pytest", "jest", "vitest")):
-        return "test"
-    if any(token in lowered for token in ("read", "open", "view")):
-        return "read"
-    if any(token in lowered for token in ("edit", "write", "patch")):
-        return "edit"
-    if any(token in lowered for token in ("search", "grep", "find", "rg")):
-        return "search"
-    if any(token in lowered for token in ("bash", "shell", "exec", "command")):
-        return "shell"
-    if any(token in lowered for token in ("agent", "task", "spawn")):
-        return "subagent"
-    if any(token in lowered for token in ("browser", "web", "chrome")):
+    if lowered in TOOL_CATEGORIES:
+        return TOOL_CATEGORIES[lowered]
+    words = tool_words(name)
+    if words & BROWSER_WORDS:
         return "browser"
+    if lowered.startswith("mcp__"):
+        # mcp__<server>__<tool>: classify by the tool, not the server name.
+        words = tool_words(name.rsplit("__", 1)[-1])
+    for category, keywords in TOOL_WORD_CATEGORIES:
+        if words & keywords:
+            return category
     return "other"
 
 
@@ -140,7 +201,36 @@ def iter_jsonl(path: Path):
         return
 
 
-def analyze_claude(path: Path, cutoff: datetime) -> dict:
+def is_claude_prompt_row(row: dict) -> bool:
+    if any(row.get(flag) for flag in CLAUDE_NON_PROMPT_FLAGS):
+        return False
+    # Tool results are logged as user rows but come from the agent's tools.
+    return "toolUseResult" not in row
+
+
+def claude_usage(usage: object) -> Counter:
+    counts = Counter()
+    if not isinstance(usage, dict):
+        return counts
+    counts["input_tokens"] = int(usage.get("input_tokens") or 0)
+    counts["cached_input_tokens"] = int(usage.get("cache_read_input_tokens") or 0)
+    counts["cache_write_input_tokens"] = int(usage.get("cache_creation_input_tokens") or 0)
+    counts["output_tokens"] = int(usage.get("output_tokens") or 0)
+    counts["total_tokens"] = sum(counts.values())
+    return counts
+
+
+def new_claude_seen() -> dict[str, set]:
+    """IDs already counted, shared across files so resumed copies count once."""
+    return {"responses": set(), "tools": set(), "prompts": set()}
+
+
+def analyze_claude(
+    path: Path,
+    cutoff: datetime,
+    seen: Optional[dict[str, set]] = None,
+) -> dict:
+    seen = seen if seen is not None else new_claude_seen()
     users = []
     events = []
     tools = Counter()
@@ -149,6 +239,10 @@ def analyze_claude(path: Path, cutoff: datetime) -> dict:
     is_subagent = False
     project_key = None
     token_usage = Counter()
+    # Claude Code writes one row per content block, and every row of the same
+    # API response repeats its model and usage. Count each response once.
+    responses: dict[str, dict] = {}
+    has_prompts = False
 
     for row in iter_jsonl(path):
         timestamp = parse_timestamp(row.get("timestamp"))
@@ -160,42 +254,57 @@ def analyze_claude(path: Path, cutoff: datetime) -> dict:
         if row.get("isSidechain") is True or row.get("agentId") or row.get("agent_id"):
             is_subagent = True
         if row_type == "user" and timestamp and timestamp >= cutoff:
-            text = claude_user_text((row.get("message") or {}).get("content"))
-            if text:
-                users.append((timestamp, text))
             if row.get("permissionMode") == "plan":
                 plan_mode = True
+            if not is_claude_prompt_row(row):
+                continue
+            text = claude_user_text((row.get("message") or {}).get("content"))
+            if not text or CLAUDE_INTERRUPT.match(text):
+                continue
+            # A resumed copy still marks this file as a session, but each
+            # prompt is counted only in the first file that contains it.
+            has_prompts = True
+            row_id = row.get("uuid")
+            if row_id not in seen["prompts"]:
+                users.append((timestamp, text))
+                if isinstance(row_id, str):
+                    seen["prompts"].add(row_id)
         elif row_type == "assistant" and timestamp and timestamp >= cutoff:
             message = row.get("message") or {}
+            response_id = message.get("id") or row.get("requestId") or row.get("uuid")
+            response = responses.setdefault(
+                str(response_id) if response_id else f"{path}#row-{len(responses)}",
+                {"model": None, "usage": Counter()},
+            )
             model = message.get("model")
             if isinstance(model, str) and model and model != "<synthetic>":
-                models[model] += 1
-            usage = message.get("usage") or {}
-            if isinstance(usage, dict):
-                input_tokens = int(usage.get("input_tokens") or 0)
-                cached_tokens = int(usage.get("cache_read_input_tokens") or 0)
-                cache_write_tokens = int(usage.get("cache_creation_input_tokens") or 0)
-                output_tokens = int(usage.get("output_tokens") or 0)
-                token_usage["input_tokens"] += input_tokens
-                token_usage["cached_input_tokens"] += cached_tokens
-                token_usage["cache_write_input_tokens"] += cache_write_tokens
-                token_usage["output_tokens"] += output_tokens
-                token_usage["total_tokens"] += (
-                    input_tokens
-                    + cached_tokens
-                    + cache_write_tokens
-                    + output_tokens
-                )
+                response["model"] = model
+            # Keep the largest value seen for each field of this response.
+            response["usage"] |= claude_usage(message.get("usage"))
             content = message.get("content")
             if isinstance(content, list):
                 for item in content:
                     if isinstance(item, dict) and item.get("type") == "tool_use":
+                        tool_id = item.get("id")
+                        if tool_id in seen["tools"]:
+                            continue
+                        if isinstance(tool_id, str):
+                            seen["tools"].add(tool_id)
                         name = str(item.get("name", "other"))
                         tools[tool_category(name)] += 1
+
+    for response_id, response in responses.items():
+        if response_id in seen["responses"]:
+            continue
+        seen["responses"].add(response_id)
+        if response["model"]:
+            models[response["model"]] += 1
+        token_usage.update(response["usage"])
 
     return {
         "source": "claude-code",
         "users": users,
+        "has_prompts": has_prompts,
         "events": events,
         "tools": tools,
         "models": models,
@@ -261,6 +370,7 @@ def analyze_codex(path: Path, cutoff: datetime) -> dict:
     return {
         "source": "codex",
         "users": users,
+        "has_prompts": bool(users),
         "events": events,
         "tools": tools,
         "models": models,
@@ -302,18 +412,19 @@ def build_metrics(
     subagent_sessions = Counter()
     source_status = {}
 
+    claude_seen = new_claude_seen()
     for source, root, analyzer in (
-        ("claude-code", claude_root, analyze_claude),
+        ("claude-code", claude_root, lambda path, since: analyze_claude(path, since, claude_seen)),
         ("codex", codex_root, analyze_codex),
     ):
-        paths = list(root.rglob("*.jsonl")) if root.is_dir() else []
+        paths = sorted(root.rglob("*.jsonl")) if root.is_dir() else []
         source_status[source] = {
             "directory_found": root.is_dir(),
             "session_files": len(paths),
         }
         for path in paths:
             result = analyzer(path, cutoff)
-            if result["users"]:
+            if result["has_prompts"]:
                 all_results.append(result)
                 if result["is_subagent"]:
                     subagent_sessions[result["source"]] += 1

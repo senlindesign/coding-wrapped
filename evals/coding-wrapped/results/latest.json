@@ -1,8 +1,8 @@
 {
   "schema_version": "1.0.0",
-  "generated_at": "2026-08-07T23:48:34.520905+00:00",
+  "generated_at": "2026-10-19T19:35:58.682332+00:00",
   "skill_root": "skills/coding-wrapped",
-  "passed": 17,
+  "passed": 19,
   "failed": 0,
   "activation_model_eval": {
     "status": "not-run",
@@ -56,7 +56,7 @@
       "name": "Progressive disclosure and reference depth",
       "status": "pass",
       "details": {
-        "skill_lines": 228,
+        "skill_lines": 230,
         "direct_references": [
           "references/privacy-policy.md",
           "references/coding-best-practices.md",
@@ -98,6 +98,24 @@
           "claude-code",
           "codex"
         ]
+      }
+    },
+    {
+      "category": "function",
+      "name": "Claude Code rows count once and stay out of prompts",
+      "status": "pass",
+      "details": {
+        "user_messages": 2,
+        "responses": 3,
+        "total_tokens": 3450
+      }
+    },
+    {
+      "category": "function",
+      "name": "Claude Code and Codex tool names map to stable categories",
+      "status": "pass",
+      "details": {
+        "names": 17
       }
     },
     {
@@ -179,7 +197,7 @@
       "name": "Overview compactness, watermark, and source validation",
       "status": "pass",
       "details": {
-        "batch_id": "overview-20260807234832472344",
+        "batch_id": "overview-20261019193557555277",
         "summary_sentences": 2,
         "summary_fact_range": {
           "min": 2,
