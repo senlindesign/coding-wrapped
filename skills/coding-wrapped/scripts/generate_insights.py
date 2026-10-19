@@ -133,11 +133,57 @@ def validate_localized_copy(copy: Any) -> None:
             raise ValueError("Each behavior row needs a label and body")
 
 
+def resolve_metric(metrics: dict[str, Any], metric_id: str) -> Any:
+    """Resolve a dotted metric ID; phrase counts resolve by phrase label word."""
+    if metric_id.startswith("prompts.phrase_counts."):
+        word = metric_id.removeprefix("prompts.phrase_counts.").lower()
+        for phrase in metrics.get("prompts", {}).get("phrase_counts", []):
+            labels = [part.strip().lower() for part in phrase.get("phrase", "").split("/")]
+            if word in labels:
+                return phrase.get("messages")
+        raise KeyError(metric_id)
+    value: Any = metrics
+    for part in metric_id.split("."):
+        if not isinstance(value, dict) or part not in value:
+            raise KeyError(metric_id)
+        value = value[part]
+    return value
+
+
+def validate_evidence(evidence: Any, metrics: dict[str, Any]) -> None:
+    """Every card must point at real metrics, and repeated numbers must match."""
+    metric_ids = evidence.get("metric_ids") if isinstance(evidence, dict) else None
+    if not isinstance(metric_ids, list) or not metric_ids:
+        raise ValueError("Each insight needs evidence.metric_ids")
+    resolved = {}
+    for metric_id in metric_ids:
+        if not isinstance(metric_id, str):
+            raise ValueError("Evidence metric IDs must be strings")
+        try:
+            resolved[metric_id.rsplit(".", 1)[-1]] = resolve_metric(metrics, metric_id)
+        except KeyError:
+            raise ValueError(f"Unknown evidence metric: {metric_id}") from None
+    values = evidence.get("values") or {}
+    if not isinstance(values, dict):
+        raise ValueError("Evidence values must be an object")
+    for key, claimed in values.items():
+        actual = resolved.get(key)
+        if (
+            isinstance(claimed, (int, float))
+            and isinstance(actual, (int, float))
+            and abs(claimed - actual) > 0.5
+        ):
+            raise ValueError(
+                f"Evidence value {key}={claimed} does not match the metric ({actual})"
+            )
+
+
 def validate_batch(
     payload: Any,
     allowed_sources: set[str],
     locale: str,
     practices: dict[str, dict[str, Any]],
+    metrics: dict[str, Any],
 ) -> list[dict[str, Any]]:
     insights = payload.get("insights") if isinstance(payload, dict) else None
     if not isinstance(insights, list) or len(insights) != 4:
@@ -145,6 +191,7 @@ def validate_batch(
 
     seen_ids: set[str] = set()
     seen_compositions: set[str] = set()
+    seen_themes: set[str] = set()
     center_hub_count = 0
     validated = []
     for item in insights:
@@ -158,8 +205,9 @@ def validate_batch(
         ):
             raise ValueError("Insight IDs must be unique lower-case slugs")
         theme = item.get("theme")
-        if theme not in THEMES:
-            raise ValueError("Each insight must use one approved theme")
+        if theme not in THEMES or theme in seen_themes:
+            raise ValueError("The four insights must use warm, blue, pink, and green once each")
+        seen_themes.add(theme)
         composition = item.get("composition")
         if not isinstance(composition, str) or not composition.strip():
             raise ValueError("Each insight needs a composition name")
@@ -183,6 +231,7 @@ def validate_batch(
         ):
             raise ValueError("Every source ID must exist in sources.json")
         validate_localized_copy((item.get("copy") or {}).get(locale))
+        validate_evidence(item.get("evidence"), metrics)
         seen_ids.add(insight_id)
         seen_compositions.add(composition)
         validated.append(item)
@@ -192,14 +241,15 @@ def validate_batch(
     return validated
 
 
-def resolve_source_image(item: dict[str, Any], index: int) -> Path:
+def resolve_source_image(item: dict[str, Any]) -> Path:
     supplied = item.get("image_source")
     if isinstance(supplied, str) and supplied.strip():
         candidate = Path(supplied).expanduser().resolve()
         if not candidate.is_file():
             raise ValueError(f"Image source does not exist: {candidate}")
         return candidate
-    return SOURCE_ILLUSTRATIONS_ROOT / SEED_ILLUSTRATIONS[index]
+    # Without a generated image, use the bundled reference for the card's theme.
+    return SOURCE_ILLUSTRATIONS_ROOT / THEME_REFERENCE_IMAGES[item["theme"]]
 
 
 def validate_illustration_image(path: Path) -> None:
@@ -229,13 +279,14 @@ def persist_batch(home: Path, payload: dict[str, Any]) -> dict[str, Any]:
         if isinstance(source, dict) and isinstance(source.get("id"), str)
     }
     practices = practice_map(load_catalog())
-    insights = validate_batch(payload, allowed_sources, locale, practices)
+    metrics = sanitize_metrics(read_json(paths["metrics"] / "dashboard-30d.json"))
+    insights = validate_batch(payload, allowed_sources, locale, practices, metrics)
     state = read_json(paths["insights"])
     created_at = datetime.now(timezone.utc).isoformat()
     batch_id = f"batch-{datetime.now(timezone.utc).strftime('%Y%m%d%H%M%S%f')}"
     source_images = [
-        resolve_source_image(item, index)
-        for index, item in enumerate(insights)
+        resolve_source_image(item)
+        for item in insights
     ]
     for source_image in source_images:
         validate_illustration_image(source_image)

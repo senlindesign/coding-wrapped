@@ -139,6 +139,20 @@
   line-height: 1.65;
 }
 
+.rpg-generate-prompt {
+  margin: 18px 0 0;
+  padding: 14px 16px;
+  border: 2px dashed var(--rpg-line);
+  border-radius: 10px;
+  background: #fffaf0;
+  font-family: inherit;
+  font-size: 16px;
+  font-weight: 720;
+  line-height: 1.5;
+  white-space: pre-wrap;
+  user-select: all;
+}
+
 .rpg-generation-facts {
   margin-top: 22px;
   display: grid;

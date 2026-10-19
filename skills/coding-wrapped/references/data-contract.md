@@ -53,11 +53,12 @@ GET  /api/insights
 GET  /api/overview
 GET  /api/sources
 GET  /api/metrics?range=7d|30d|all
-POST /api/insights/generate
 POST /api/overview/auto-refresh
 POST /api/refresh?range=7d|30d|all
 ```
 
-`POST /api/refresh` changes facts only. `POST /api/insights/generate` accepts
-exactly four records. Generated images use `/generated-images/<batch>/<file>`.
+`POST /api/refresh` changes facts only. New insights are written only by the
+agent through `generate_insights.py persist`; the Dashboard's Generate button
+copies that request for the user and picks up new batches when the page regains
+focus. Generated images use `/generated-images/<batch>/<file>`.
 All endpoints bind to the local server; they are not a hosted API.

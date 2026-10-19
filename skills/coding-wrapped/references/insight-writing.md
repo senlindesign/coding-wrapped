@@ -32,7 +32,10 @@ Each insight contains:
 - `you_did`, `agent_did`, and `your_style`;
 - one light suggestion;
 - one allow-listed `tip_practice_id`;
-- evidence metric IDs and values;
+- evidence: `{"metric_ids": [...], "values": {...}}`. Each ID is a dotted
+  path in the brief's `metrics` (for example `coverage.sessions`, or
+  `prompts.phrase_counts.continue` for a phrase). A value keyed by the ID's last
+  segment must equal that metric; persistence rejects invented numbers;
 - allow-listed source IDs;
 - one illustration description and accessible alt text.
 

@@ -88,9 +88,11 @@ sentences: select two or three representative facts instead of replaying every
 metric, then state the behavior they reveal. Aim for roughly two desktop lines
 (45–75 Chinese characters or 18–34 English words). Save the result as:
 
-Read [references/coding-best-practices.md](references/coding-best-practices.md)
-when writing recommendations. Choose only from the brief's
-`tip_context.candidate_practices`. Match the practice to an observed behavior
+Choose recommendations only from the brief's
+`tip_context.candidate_practices`; each entry already carries its localized
+action and sources, so do not load the full catalog. Open
+[references/coding-best-practices.md](references/coding-best-practices.md) only
+to check one practice's sourcing. Match the practice to an observed behavior
 signal and use its localized action as the factual basis. Do not invent a
 generic recommendation when no candidate fits.
 
@@ -131,9 +133,9 @@ python3 "$SKILL_DIR/scripts/generate_insights.py" brief \
 ```
 
 Read [references/insight-writing.md](references/insight-writing.md) and
-[references/visual-system.md](references/visual-system.md). Read
-[references/coding-best-practices.md](references/coding-best-practices.md) when
-writing each Light Tip. Choose the four most personal and visually expressive
+[references/visual-system.md](references/visual-system.md). Take each Light
+Tip from the brief's `tip_context.candidate_practices`, as for the Overview.
+Choose the four most personal and visually expressive
 findings, not merely the four largest values. Use exactly one allow-listed
 `tip_practice_id` per insight; persistence derives its source links from the
 catalog. A tip must match an observed aggregate behavior signal.
@@ -153,8 +155,9 @@ When an image-generation tool is available:
    it is pixel art.
 5. Pass each approved absolute PNG path as `image_source`.
 
-When no image-generation tool is available, omit `image_source`; the
-persistence script uses the four approved fallback illustrations. Do not block
+When no image-generation tool is available (Claude Code has none built in),
+omit `image_source`; the persistence script uses the bundled illustration for
+each card's theme. Do not block
 the site on image generation.
 
 Write a batch matching the requested locale and persist it:
@@ -196,8 +199,9 @@ Use the local browser to confirm:
 After generation, give the user the URL and explain only these controls:
 
 - **Scan data** refreshes factual aggregates and does not regenerate insights.
-- **Generate insights** uses model allowance, usually takes 1–3 minutes, and
-  always adds four.
+- **Generate insights** copies a request to paste back into the agent. The
+  agent writes four new insights (1–3 minutes, uses model allowance), and the
+  open Dashboard picks them up when it regains focus.
 - **Insight deck** supports click, arrow keys, mouse drag, and horizontal swipe.
 - **Customize** chooses which factual metric blocks are shown.
 - **Export** creates a portable local archive:

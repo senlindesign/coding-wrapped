@@ -8,7 +8,7 @@
 
 @font-face {
   font-family: "Noto Sans SC";
-  src: url("/fonts/NotoSansSC-Variable.ttf") format("truetype");
+  src: url("/fonts/NotoSansSC-Subset.woff2") format("woff2");
   font-style: normal;
   font-weight: 100 900;
   font-display: block;
@@ -24,7 +24,7 @@
 
 @font-face {
   font-family: "Plus Jakarta Sans";
-  src: url("/fonts/PlusJakartaSans-Variable.ttf") format("truetype");
+  src: url("/fonts/PlusJakartaSans-Variable.woff2") format("woff2");
   font-style: normal;
   font-weight: 200 800;
   font-display: block;

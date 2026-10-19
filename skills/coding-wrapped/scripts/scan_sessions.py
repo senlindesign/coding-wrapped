@@ -23,7 +23,8 @@ CODEX_ROOT = Path.home() / ".codex" / "sessions"
 SYSTEM_BLOCKS = re.compile(
     r"<(environment_context|recommended_plugins|skills_instructions|system-reminder|"
     r"local-command-caveat|local-command-stdout|local-command-stderr|bash-input|"
-    r"bash-stdout|bash-stderr|command-message|command-name|task-notification|video)>.*?</\1>",
+    r"bash-stdout|bash-stderr|command-message|command-name|task-notification|video|"
+    r"in-app-browser-context|user_instructions|INSTRUCTIONS)\b[^>]*>.*?</\1>",
     re.IGNORECASE | re.DOTALL,
 )
 IMAGE_BLOCKS = re.compile(r"<image\b.*?</image>", re.IGNORECASE | re.DOTALL)
@@ -37,6 +38,16 @@ SECRETS = re.compile(
     re.IGNORECASE,
 )
 CODE_FENCES = re.compile(r"```.*?```", re.DOTALL)
+RETAINED_INSTRUCTIONS = re.compile(
+    r">>> RETAINED USER INSTRUCTIONS START.*?>>> RETAINED USER INSTRUCTIONS END",
+    re.DOTALL,
+)
+# Codex IDE context puts the typed request after one of these headings.
+CODEX_REQUEST_MARKERS = ("## My request for Codex:", "## My request:")
+# Rows Codex sends in the user role that the user never typed.
+CODEX_INJECTED_PREFIXES = re.compile(
+    r"^(?:# AGENTS\.md instructions|\{|\[\d+\] user:|The following is the Codex agent history)"
+)
 CLAUDE_INTERRUPT = re.compile(r"^\[Request interrupted by user")
 # Claude Code marks rows it injects on the user's behalf; none of them is a prompt.
 CLAUDE_NON_PROMPT_FLAGS = ("isMeta", "isCompactSummary", "isVisibleInTranscriptOnly")
@@ -68,8 +79,11 @@ def parse_timestamp(value: object) -> Optional[datetime]:
 def clean_user_text(text: object) -> str:
     if not isinstance(text, str):
         return ""
-    if "## My request for Codex:" in text:
-        text = text.split("## My request for Codex:", 1)[1]
+    for marker in CODEX_REQUEST_MARKERS:
+        if marker in text:
+            text = text.rsplit(marker, 1)[1]
+            break
+    text = RETAINED_INSTRUCTIONS.sub(" ", text)
     text = SYSTEM_BLOCKS.sub(" ", text)
     text = IMAGE_BLOCKS.sub(" ", text)
     text = CODE_FENCES.sub(" [code] ", text)
@@ -101,7 +115,9 @@ def codex_user_text(payload: dict) -> str:
     parts = []
     for item in content:
         if isinstance(item, dict) and item.get("type") in {"input_text", "text"}:
-            parts.append(str(item.get("text", "")))
+            text = str(item.get("text", ""))
+            if not CODEX_INJECTED_PREFIXES.match(clean_user_text(text)):
+                parts.append(text)
     return clean_user_text(" ".join(parts))
 
 
@@ -423,6 +439,12 @@ def build_metrics(
             "session_files": len(paths),
         }
         for path in paths:
+            # A file last written before the cutoff cannot hold in-range rows.
+            try:
+                if datetime.fromtimestamp(path.stat().st_mtime, timezone.utc) < cutoff:
+                    continue
+            except OSError:
+                continue
             result = analyzer(path, cutoff)
             if result["has_prompts"]:
                 all_results.append(result)

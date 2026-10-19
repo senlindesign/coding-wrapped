@@ -357,16 +357,19 @@ const dashboardCopy = {
     generateInsight: "生成新洞察",
     generatingInsight: "生成中…",
     insightGenerator: "洞察生成器",
-    generateDialogTitle: "生成 4 条新洞察？",
-    generateDialogBody: "会分析新增记录，并一次向卡组追加 4 条新洞察。",
-    tokenCostTitle: "TOKEN",
-    tokenCostCopy: "会使用你连接的模型额度",
+    generateDialogTitle: "让你的 Agent 写 4 条新洞察",
+    generateDialogBody:
+      "新洞察由你的 Claude Code 或 Codex 根据最新汇总数据来写。复制下面这句话，粘贴到新的对话里。",
+    generatePrompt: "用 Coding Wrapped 为我这个月生成四条新洞察。",
+    whereTitle: "在哪",
+    whereCopy: "Claude Code 或 Codex",
     waitTitle: "等待",
-    waitCopy: "通常约 1–3 分钟",
-    cancelGeneration: "先不生成",
-    confirmGeneration: "使用 Token 生成 4 条",
-    generationComplete: "已新增 4 条洞察",
-    generationFailed: "生成失败，请稍后再试",
+    waitCopy: "约 1–3 分钟，会使用模型额度",
+    cancelGeneration: "关闭",
+    confirmGeneration: "复制指令",
+    generationComplete: "已复制，回到 Agent 粘贴即可",
+    generationFailed: "复制失败，请手动选中上面的指令",
+    insightsAdded: "已新增 4 条洞察",
     swipeInsight: "左右滑动切换洞察",
     periodStats: "本期数据",
     periodStatsNote: "时间范围只影响下面的事实数据",
@@ -494,17 +497,19 @@ const dashboardCopy = {
     generateInsight: "GENERATE INSIGHTS",
     generatingInsight: "GENERATING…",
     insightGenerator: "INSIGHT GENERATOR",
-    generateDialogTitle: "Generate 4 new insights?",
+    generateDialogTitle: "Ask your agent for 4 new insights",
     generateDialogBody:
-      "We’ll analyze new records and add 4 new insights to your deck.",
-    tokenCostTitle: "TOKEN",
-    tokenCostCopy: "Uses your connected model allowance",
+      "Your Claude Code or Codex agent writes new insights from your latest aggregates. Copy this line into a new conversation.",
+    generatePrompt: "Generate four new Coding Wrapped insights for this month.",
+    whereTitle: "WHERE",
+    whereCopy: "Claude Code or Codex",
     waitTitle: "WAIT",
-    waitCopy: "Usually takes about 1–3 minutes",
-    cancelGeneration: "NOT NOW",
-    confirmGeneration: "USE TOKENS · GENERATE 4",
-    generationComplete: "4 NEW INSIGHTS ADDED",
-    generationFailed: "GENERATION FAILED · TRY AGAIN",
+    waitCopy: "About 1–3 minutes · uses model allowance",
+    cancelGeneration: "CLOSE",
+    confirmGeneration: "COPY PROMPT",
+    generationComplete: "COPIED · PASTE IT INTO YOUR AGENT",
+    generationFailed: "COPY FAILED · SELECT THE PROMPT ABOVE",
+    insightsAdded: "4 NEW INSIGHTS ADDED",
     swipeInsight: "SWIPE TO CHANGE INSIGHT",
     periodStats: "THIS PERIOD",
     periodStatsNote: "THE RANGE ONLY CHANGES THE FACTUAL DATA BELOW",
@@ -770,150 +775,6 @@ function insightCardsFromMetrics(metrics, lang) {
   ];
 }
 
-function generatedInsightFromMetrics(metrics, lang, sequence) {
-  const coverage = metrics?.coverage ?? {};
-  const rhythm = metrics?.rhythm ?? {};
-  const behavior = metrics?.behavior ?? {};
-  const toolEntries = Object.entries(behavior.tool_categories ?? {}).sort(
-    (a, b) => b[1] - a[1],
-  );
-  const [topTool = "shell", topToolCount = 0] = toolEntries[0] ?? [];
-  const startHour = String(rhythm.most_common_start_hour ?? 0).padStart(2, "0");
-  const weekday =
-    dashboardCopy[lang].weekday[rhythm.most_common_start_weekday] ??
-    rhythm.most_common_start_weekday ??
-    "—";
-  const variant = sequence % 4;
-
-  const zhVariants = [
-    {
-      id: `generated-start-window-${sequence}`,
-      theme: "blue",
-      profileTitle: "晚间启动器",
-      title: `${startHour}:00，是你的开工暗号`,
-      subtitle: `你最常在 ${startHour}:00 附近开启新会话，共出现 ${rhythm.sessions_started_in_that_hour ?? 0} 次。`,
-      rows: [
-        ["你怎么做", "到了熟悉的时间，就更容易把问题交给 AI。"],
-        ["AI 怎么做", "从一张空白上下文开始，迅速接住当天的第一条线。"],
-        ["你的风格", "你有一个稳定的启动窗口，晚间更容易进入建造状态。"],
-      ],
-      tip: "在高频开工时间前留一张“今晚只完成什么”的便签。",
-      image: "/assets/night-runner-blue.png",
-      imageAlt: "夜晚，一位使用者和机器人沿发光路线开始工作",
-    },
-    {
-      id: `generated-weekday-${sequence}`,
-      theme: "warm",
-      profileTitle: "星期节奏捕手",
-      title: `${weekday}，你的高频开工日`,
-      subtitle: `${weekday}开启了 ${rhythm.sessions_started_that_weekday ?? 0} 个主会话，是这段时间最常出现的开工日。`,
-      rows: [
-        ["你怎么做", "在固定的星期节奏里，更容易启动新的工作线。"],
-        ["AI 怎么做", "在这些高频日承接更多新任务，再分派给子智能体。"],
-        ["你的风格", "你的创造力不是随机出现，它已经形成了一点周期。"],
-      ],
-      tip: "把需要深度展开的任务提前放到这个高频日。",
-      image: "/assets/agent-orchestra-warm.png",
-      imageAlt: "像素指挥者在固定节奏下启动一支 AI 乐团",
-    },
-    {
-      id: `generated-tool-${sequence}`,
-      theme: "pink",
-      profileTitle: "工具链驾驶员",
-      title: `${topToolCount} 次 ${dashboardCopy.zh.toolNames[topTool] ?? topTool}`,
-      subtitle: `在所有智能体动作里，${dashboardCopy.zh.toolNames[topTool] ?? topTool}是最常使用的工具类型。`,
-      rows: [
-        ["你怎么做", "把目标交出去，让 AI 直接进入可执行的工作环境。"],
-        ["AI 怎么做", "频繁调用工具，把讨论转成读取、修改和验证。"],
-        ["你的风格", "你更看重事情真的发生，而不是只停在建议里。"],
-      ],
-      tip: "高频工具动作后补一个结果检查，能让执行链更可靠。",
-      image: "/assets/prompt-machine-pink.png",
-      imageAlt: "像素机器把一条指令转换成连续的工具动作",
-    },
-    {
-      id: `generated-message-volume-${sequence}`,
-      theme: "green",
-      profileTitle: "持续校准者",
-      title: `${coverage.user_messages ?? 0} 条消息，慢慢调到对`,
-      subtitle: `你在这个周期发出了 ${coverage.user_messages ?? 0} 条消息，让工作在多轮校准中持续向前。`,
-      rows: [
-        ["你怎么做", "先推动一小步，再根据结果继续修正方向。"],
-        ["AI 怎么做", "保留已有上下文，在每轮反馈后继续推进。"],
-        ["你的风格", "你把协作当成连续调参，而不是一次性交付。"],
-      ],
-      tip: "每三轮停一次，用一句话重申目标和当前差距。",
-      image: "/assets/continue-steps-green.png",
-      imageAlt: "一位使用者和机器人沿像素台阶逐步校准方向",
-    },
-  ];
-
-  const enVariants = [
-    {
-      id: `generated-start-window-${sequence}`,
-      theme: "blue",
-      profileTitle: "EVENING STARTER",
-      title: `${startHour}:00 is your start signal`,
-      subtitle: `You most often opened a new session around ${startHour}:00, with ${rhythm.sessions_started_in_that_hour ?? 0} starts in this period.`,
-      rows: [
-        ["You did", "Reached a familiar hour and handed the first problem to AI."],
-        ["Agent did", "Started from a clean context and picked up the day’s first thread."],
-        ["Your style", "You have a reliable window for getting into build mode."],
-      ],
-      tip: "Before that window, leave one note describing tonight’s finish line.",
-      image: "/assets/night-runner-blue.png",
-      imageAlt: "A person and robot beginning a glowing route at night",
-    },
-    {
-      id: `generated-weekday-${sequence}`,
-      theme: "warm",
-      profileTitle: "WEEKLY RHYTHM FINDER",
-      title: `${weekday} is your launch day`,
-      subtitle: `You opened ${rhythm.sessions_started_that_weekday ?? 0} main sessions on ${weekday}, your most common start day in this period.`,
-      rows: [
-        ["You did", "Started new workstreams inside a recurring weekly rhythm."],
-        ["Agent did", "Picked up more new tasks and delegated them across agents."],
-        ["Your style", "Your creative momentum already has a little calendar shape."],
-      ],
-      tip: "Reserve this day for work that benefits from deeper expansion.",
-      image: "/assets/agent-orchestra-warm.png",
-      imageAlt: "A pixel conductor starting an AI orchestra on a steady rhythm",
-    },
-    {
-      id: `generated-tool-${sequence}`,
-      theme: "pink",
-      profileTitle: "TOOLCHAIN DRIVER",
-      title: `${topToolCount} ${dashboardCopy.en.toolNames[topTool] ?? topTool} actions`,
-      subtitle: `${dashboardCopy.en.toolNames[topTool] ?? topTool} was the most common tool category across all agent actions.`,
-      rows: [
-        ["You did", "Set the goal and let AI enter an executable environment."],
-        ["Agent did", "Used tools repeatedly to turn discussion into working changes."],
-        ["Your style", "You care more about things happening than advice staying abstract."],
-      ],
-      tip: "Pair frequent tool runs with a visible result check.",
-      image: "/assets/prompt-machine-pink.png",
-      imageAlt: "A pixel machine turning one instruction into a chain of tool actions",
-    },
-    {
-      id: `generated-message-volume-${sequence}`,
-      theme: "green",
-      profileTitle: "STEADY CALIBRATOR",
-      title: `${coverage.user_messages ?? 0} messages, tuned over time`,
-      subtitle: `You sent ${coverage.user_messages ?? 0} messages this period, keeping the work moving through repeated calibration.`,
-      rows: [
-        ["You did", "Moved one step, inspected the result, and adjusted direction."],
-        ["Agent did", "Kept the existing context and advanced after each correction."],
-        ["Your style", "You treat collaboration like continuous tuning, not one-shot delivery."],
-      ],
-      tip: "Every three rounds, restate the goal and the remaining gap in one line.",
-      image: "/assets/continue-steps-green.png",
-      imageAlt: "A person and robot calibrating their direction across pixel steps",
-    },
-  ];
-
-  return (lang === "zh" ? zhVariants : enVariants)[variant];
-}
-
 function localizedInsightsFromStore(insightState, lang) {
   if (!Array.isArray(insightState?.insights)) return [];
 
@@ -942,66 +803,6 @@ function localizedInsightsFromStore(insightState, lang) {
       };
     })
     .filter(Boolean);
-}
-
-function persistableInsightCopy(card) {
-  return {
-    profile_title: card.profileTitle,
-    title: card.title,
-    subtitle: card.subtitle,
-    rows: card.rows.map(([label, body], index) => ({
-      key: ["you_did", "agent_did", "your_style"][index],
-      label,
-      body,
-    })),
-    tip: card.tip,
-    image_alt: card.imageAlt,
-  };
-}
-
-function buildPersistableInsightBatch(metrics, sequenceStart) {
-  const practiceIdsByVariant = [
-    "explicit-agent-state",
-    "executable-verification-loop",
-    "define-outcome-boundaries",
-    "evidence-before-done",
-  ];
-  const sourceIdsByVariant = [
-    ["lenny-autonomous-coding-agents", "anthropic-claude-code-subagents"],
-    ["anthropic-claude-code-best-practices"],
-    ["openai-prompting"],
-    ["anthropic-claude-code-best-practices"],
-  ];
-  const compositionsByVariant = [
-    "horizontal-night-route",
-    "tiered-orchestra",
-    "vertical-cutaway-machine",
-    "diagonal-platform-journey",
-  ];
-
-  return Array.from({ length: 4 }, (_, index) => {
-    const sequence = sequenceStart + index;
-    const variant = sequence % 4;
-    const zhCard = generatedInsightFromMetrics(metrics, "zh", sequence);
-    const enCard = generatedInsightFromMetrics(metrics, "en", sequence);
-
-    return {
-      id: zhCard.id,
-      theme: zhCard.theme,
-      composition: compositionsByVariant[variant],
-      image_source: zhCard.image,
-      tip_practice_id: practiceIdsByVariant[variant],
-      source_ids: sourceIdsByVariant[variant],
-      evidence: {
-        sequence,
-        snapshot_generated_at: metrics?.analysis?.generated_at ?? null,
-      },
-      copy: {
-        zh: persistableInsightCopy(zhCard),
-        en: persistableInsightCopy(enCard),
-      },
-    };
-  });
 }
 
 function buildActivityCalendar(metrics, range) {
@@ -1558,50 +1359,60 @@ function DashboardRpg() {
     }
   };
 
-  const confirmGenerateInsight = async () => {
-    setGenerateDialogOpen(false);
-    setGenerationNotice("");
-    setInsightStatus("generating");
+  const showNotice = (notice) => {
+    setGenerationNotice(notice);
+    window.setTimeout(() => setGenerationNotice(""), 3200);
+  };
 
+  // New insights come from the agent workflow, not the browser. Copy the
+  // request so the person can paste it into Claude Code or Codex.
+  const copyGeneratePrompt = async () => {
     try {
-      const response = await fetch("/api/metrics?range=30d", {
-        cache: "no-store",
-      });
-      if (!response.ok) throw new Error("Insight snapshot unavailable");
-      const nextMetrics = await response.json();
-      const currentCount = storedInsightData?.insights?.length ?? 0;
-      const nextBatch = buildPersistableInsightBatch(
-        nextMetrics,
-        Math.max(0, currentCount - 4),
-      );
-
-      await new Promise((resolve) => window.setTimeout(resolve, 900));
-      const saveResponse = await fetch("/api/insights/generate", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          source_snapshot: `dashboard-30d@${nextMetrics?.analysis?.generated_at ?? "unknown"}`,
-          insights: nextBatch,
-        }),
-      });
-      if (!saveResponse.ok) throw new Error("Insight batch save failed");
-      const nextInsightData = await saveResponse.json();
-
-      setInsightMetrics(nextMetrics);
-      setStoredInsightData(nextInsightData);
-      setActiveInsight(currentCount);
+      await navigator.clipboard.writeText(copy.generatePrompt);
       setGenerateDialogOpen(false);
-      setInsightStatus("ready");
-      setGenerationNotice("complete");
-      window.setTimeout(() => setGenerationNotice(""), 3200);
+      showNotice("complete");
     } catch {
-      setGenerateDialogOpen(false);
-      setInsightStatus("error");
-      setGenerationNotice("error");
+      showNotice("error");
     }
   };
+
+  // When the agent persists a batch, pick it up as soon as the person returns.
+  useEffect(() => {
+    const refreshInsights = async () => {
+      // Until the first load finishes, every stored card would look new.
+      if (document.visibilityState !== "visible" || !storedInsightData) return;
+      try {
+        const response = await fetch("/api/insights", { cache: "no-store" });
+        if (!response.ok) return;
+        const nextInsights = await response.json();
+        // The first real batch replaces the seed, so compare batches, not counts.
+        const latestBatch = (data) => data?.batches?.at(-1)?.id ?? null;
+        const nextBatchId = latestBatch(nextInsights);
+        if (!nextBatchId || nextBatchId === latestBatch(storedInsightData)) return;
+        const firstNew = Math.max(
+          0,
+          (nextInsights.insights ?? []).findIndex(
+            (record) => record.batch_id === nextBatchId,
+          ),
+        );
+        const metricsResponse = await fetch("/api/metrics?range=30d", {
+          cache: "no-store",
+        });
+        if (metricsResponse.ok) setInsightMetrics(await metricsResponse.json());
+        setStoredInsightData(nextInsights);
+        setActiveInsight(firstNew);
+        showNotice("added");
+      } catch {
+        // A missed refresh is harmless; the next focus retries.
+      }
+    };
+    window.addEventListener("focus", refreshInsights);
+    document.addEventListener("visibilitychange", refreshInsights);
+    return () => {
+      window.removeEventListener("focus", refreshInsights);
+      document.removeEventListener("visibilitychange", refreshInsights);
+    };
+  }, [storedInsightData]);
 
   useEffect(() => {
     loadSnapshot(range);
@@ -2176,10 +1987,11 @@ function DashboardRpg() {
             <p id="generate-dialog-description">
               {copy.generateDialogBody}
             </p>
+            <pre className="rpg-generate-prompt">{copy.generatePrompt}</pre>
 
             <div className="rpg-generation-facts">
               {[
-                [copy.tokenCostTitle, copy.tokenCostCopy],
+                [copy.whereTitle, copy.whereCopy],
                 [copy.waitTitle, copy.waitCopy],
               ].map(([label, value]) => (
                 <div key={label}>
@@ -2202,7 +2014,7 @@ function DashboardRpg() {
                 autoFocus
                 onClick={(event) => {
                   event.stopPropagation();
-                  confirmGenerateInsight();
+                  copyGeneratePrompt();
                 }}
               >
                 {copy.confirmGeneration}
@@ -2219,7 +2031,9 @@ function DashboardRpg() {
         >
           {generationNotice === "complete"
             ? copy.generationComplete
-            : copy.generationFailed}
+            : generationNotice === "added"
+              ? copy.insightsAdded
+              : copy.generationFailed}
         </div>
       ) : null}
     </main>

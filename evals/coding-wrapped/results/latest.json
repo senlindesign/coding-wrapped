@@ -1,8 +1,8 @@
 {
   "schema_version": "1.0.0",
-  "generated_at": "2026-10-19T19:35:58.682332+00:00",
+  "generated_at": "2026-10-19T19:50:19.112078+00:00",
   "skill_root": "skills/coding-wrapped",
-  "passed": 19,
+  "passed": 20,
   "failed": 0,
   "activation_model_eval": {
     "status": "not-run",
@@ -56,13 +56,12 @@
       "name": "Progressive disclosure and reference depth",
       "status": "pass",
       "details": {
-        "skill_lines": 230,
+        "skill_lines": 234,
         "direct_references": [
           "references/privacy-policy.md",
           "references/coding-best-practices.md",
           "references/insight-writing.md",
-          "references/visual-system.md",
-          "references/coding-best-practices.md"
+          "references/visual-system.md"
         ]
       }
     },
@@ -116,6 +115,15 @@
       "status": "pass",
       "details": {
         "names": 17
+      }
+    },
+    {
+      "category": "function",
+      "name": "Codex injected context stays out of prompts",
+      "status": "pass",
+      "details": {
+        "user_messages": 3,
+        "median_characters": 7
       }
     },
     {
@@ -176,19 +184,22 @@
       "name": "Four-at-a-time replacement and append persistence",
       "status": "pass",
       "details": {
-        "batches": 2,
-        "insights": 8
+        "batches": 3,
+        "insights": 12
       }
     },
     {
       "category": "validation",
-      "name": "Rejects invalid count, composition, source, and illustration canvas",
+      "name": "Rejects invalid count, composition, theme, evidence, source, and illustration canvas",
       "status": "pass",
       "details": [
         "Insight batches must contain exactly four items",
         "All four insights must use different compositions",
         "Insight source IDs must match its tip practice",
         "Every insight needs an allow-listed tip_practice_id",
+        "The four insights must use warm, blue, pink, and green once each",
+        "Unknown evidence metric: coverage.invented",
+        "Evidence value sessions=42 does not match the metric (2)",
         "Insight illustrations must be exactly 1536 × 1024; received 1024 × 1024"
       ]
     },
@@ -197,7 +208,7 @@
       "name": "Overview compactness, watermark, and source validation",
       "status": "pass",
       "details": {
-        "batch_id": "overview-20261019193557555277",
+        "batch_id": "overview-20261019195017857454",
         "summary_sentences": 2,
         "summary_fact_range": {
           "min": 2,
@@ -211,7 +222,7 @@
       "status": "pass",
       "details": {
         "archive": "coding-wrapped-eval.zip",
-        "files": 48
+        "files": 53
       }
     },
     {

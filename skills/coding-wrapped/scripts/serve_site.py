@@ -20,8 +20,6 @@ from typing import Any
 from common import (
     FRONTEND_ROOT,
     RANGE_DAYS,
-    SEED_ILLUSTRATIONS,
-    SOURCE_ILLUSTRATIONS_ROOT,
     detect_timezone_name,
     ensure_state,
     read_json,
@@ -29,7 +27,6 @@ from common import (
     sanitize_metrics,
     write_json_atomic,
 )
-from generate_insights import persist_batch
 
 
 MAX_REQUEST_BYTES = 1_000_000
@@ -175,7 +172,8 @@ class CodingWrappedHandler(BaseHTTPRequestHandler):
             return
         candidate = FRONTEND_ROOT / relative
         if candidate.is_file():
-            self.send_file(candidate)
+            # index.html names the hashed bundle, so it must never go stale.
+            self.send_file(candidate, cache=relative.name != "index.html")
             return
         self.send_file(FRONTEND_ROOT / "index.html", cache=False)
 
@@ -229,27 +227,6 @@ class CodingWrappedHandler(BaseHTTPRequestHandler):
                 }
                 write_json_atomic(self.app.paths["overview"], overview)
                 self.send_json({"overview": overview, "update": update})
-                return
-
-            if route == "/api/insights/generate":
-                payload = self.request_json()
-                normalized = []
-                for index, item in enumerate(payload.get("insights", [])):
-                    next_item = dict(item)
-                    source = next_item.pop("image_source", "")
-                    filename = Path(source).name if isinstance(source, str) else ""
-                    if filename not in SEED_ILLUSTRATIONS:
-                        filename = SEED_ILLUSTRATIONS[index % 4]
-                    next_item["image_source"] = str(
-                        SOURCE_ILLUSTRATIONS_ROOT / filename
-                    )
-                    normalized.append(next_item)
-                payload["insights"] = normalized
-                result = persist_batch(self.app.home, payload)
-                self.send_json(
-                    read_json(self.app.paths["insights"]),
-                    HTTPStatus.CREATED,
-                )
                 return
 
             self.send_error(HTTPStatus.NOT_FOUND)

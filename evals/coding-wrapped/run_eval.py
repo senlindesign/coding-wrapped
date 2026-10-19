@@ -274,6 +274,8 @@ def valid_insight_payload(skill_root: Path, suffix: str) -> dict[str, Any]:
         item.pop("image", None)
         item.pop("batch_id", None)
         item.pop("created_at", None)
+        # Ground the seed copy in metrics every synthetic fixture contains.
+        item["evidence"] = {"metric_ids": ["coverage.sessions"], "values": {}}
     return {
         "source_snapshot": "dashboard-30d-eval",
         "generator": "eval-suite",
@@ -675,6 +677,46 @@ def main() -> None:
 
         evaluation.check("function", "Claude Code and Codex tool names map to stable categories", tool_categories)
 
+        def codex_prompt_accuracy() -> dict[str, Any]:
+            fixture = temp / "codex-accuracy" / "sessions"
+
+            def user(minutes_ago: int, text: str) -> dict[str, Any]:
+                return {
+                    "type": "response_item",
+                    "timestamp": iso(minutes_ago),
+                    "payload": {
+                        "type": "message",
+                        "role": "user",
+                        "content": [{"type": "input_text", "text": text}],
+                    },
+                }
+
+            write_jsonl(
+                fixture / "main" / "session.jsonl",
+                [
+                    {"type": "session_meta", "timestamp": iso(100), "payload": {"cwd": "/Users/alice/CodexAccuracy"}},
+                    user(99, "# AGENTS.md instructions for /Users/alice\n<INSTRUCTIONS>" + "rule " * 300 + "</INSTRUCTIONS>"),
+                    user(98, "<environment_context><cwd>/Users/alice</cwd></environment_context>"),
+                    user(97, "# Files mentioned by the user:\n## notes.md: /Users/alice/notes.md\n" + "context " * 200 + "\n## My request:\nfix it"),
+                    user(96, ">>> RETAINED USER INSTRUCTIONS START\n" + "keep " * 200 + "\n>>> RETAINED USER INSTRUCTIONS END\nship it"),
+                    user(95, '<in-app-browser-context source="app">' + "dom " * 200 + "</in-app-browser-context> check this"),
+                    user(94, '{"command": ["/bin/zsh", "-lc", "ls"]}'),
+                    user(93, "[3] user: fix it"),
+                    user(92, "The following is the Codex agent history. " + "turn " * 300),
+                ],
+            )
+            metrics = scan_module.build_metrics(
+                30,
+                "UTC",
+                claude_root=temp / "codex-accuracy" / "no-claude",
+                codex_root=fixture,
+            )
+            require(metrics["coverage"]["user_messages"] == 3, f"only typed requests count: {metrics['coverage']}")
+            require(metrics["prompts"]["median_characters"] <= 10, f"injected context inflated prompts: {metrics['prompts']}")
+            return {"user_messages": 3, "median_characters": metrics["prompts"]["median_characters"]}
+
+        evaluation.check("function", "Codex injected context stays out of prompts", codex_prompt_accuracy)
+
         def source_degradation() -> dict[str, Any]:
             missing = temp / "missing"
             empty = scan_module.build_metrics(
@@ -840,7 +882,16 @@ def main() -> None:
             require(len(state["batches"]) == 2, "seed should be replaced, then a second batch appended")
             require(len(state["insights"]) == 8, "insights should survive and append")
             require(all(item["image"].startswith("/generated-images/") for item in state["insights"]), "image URLs must stay local")
-            return {"batches": 2, "insights": 8}
+            # Reverse the theme order: fallback art must follow the theme, not the position.
+            reordered = valid_insight_payload(skill_root, "three")
+            reordered["insights"].reverse()
+            third = insight_module.persist_batch(home, reordered)
+            image_root = common.state_paths(home)["images"] / third["batch_id"]
+            for item in reordered["insights"]:
+                reference = common.SOURCE_ILLUSTRATIONS_ROOT / insight_module.THEME_REFERENCE_IMAGES[item["theme"]]
+                persisted = next(image_root.glob(f"*-{item['id']}.png"))
+                require(persisted.read_bytes() == reference.read_bytes(), f"fallback art must match theme {item['theme']}")
+            return {"batches": 3, "insights": 12}
 
         evaluation.check("persistence", "Four-at-a-time replacement and append persistence", insight_persistence)
 
@@ -848,31 +899,55 @@ def main() -> None:
             sources = common.read_json(common.state_paths(home)["sources"])
             allowed = {item["id"] for item in sources["sources"]}
             practices = practice_module.practice_map()
+            metrics = common.sanitize_metrics(
+                common.read_json(common.state_paths(home)["metrics"] / "dashboard-30d.json")
+            )
             one = valid_insight_payload(skill_root, "invalid-one")
             one["insights"] = one["insights"][:1]
             count_error = expect_value_error(
-                lambda: insight_module.validate_batch(one, allowed, "zh", practices),
+                lambda: insight_module.validate_batch(one, allowed, "zh", practices, metrics),
                 "exactly four",
             )
             duplicate = valid_insight_payload(skill_root, "invalid-duplicate")
             duplicate["insights"][1]["composition"] = duplicate["insights"][0]["composition"]
             composition_error = expect_value_error(
-                lambda: insight_module.validate_batch(duplicate, allowed, "zh", practices),
+                lambda: insight_module.validate_batch(duplicate, allowed, "zh", practices, metrics),
                 "different compositions",
             )
             unknown = valid_insight_payload(skill_root, "invalid-source")
             unknown["insights"][0]["source_ids"] = ["not-allow-listed"]
             source_error = expect_value_error(
-                lambda: insight_module.validate_batch(unknown, allowed, "zh", practices),
+                lambda: insight_module.validate_batch(unknown, allowed, "zh", practices, metrics),
                 "must match",
             )
             unknown_practice = valid_insight_payload(skill_root, "invalid-practice")
             unknown_practice["insights"][0]["tip_practice_id"] = "not-allow-listed"
             practice_error = expect_value_error(
                 lambda: insight_module.validate_batch(
-                    unknown_practice, allowed, "zh", practices
+                    unknown_practice, allowed, "zh", practices, metrics
                 ),
                 "practice",
+            )
+            repeated_theme = valid_insight_payload(skill_root, "invalid-theme")
+            repeated_theme["insights"][1]["theme"] = repeated_theme["insights"][0]["theme"]
+            theme_error = expect_value_error(
+                lambda: insight_module.validate_batch(repeated_theme, allowed, "zh", practices, metrics),
+                "once each",
+            )
+            unknown_metric = valid_insight_payload(skill_root, "invalid-metric")
+            unknown_metric["insights"][0]["evidence"] = {"metric_ids": ["coverage.invented"], "values": {}}
+            metric_error = expect_value_error(
+                lambda: insight_module.validate_batch(unknown_metric, allowed, "zh", practices, metrics),
+                "Unknown evidence metric",
+            )
+            wrong_value = valid_insight_payload(skill_root, "invalid-value")
+            wrong_value["insights"][0]["evidence"] = {
+                "metric_ids": ["coverage.sessions"],
+                "values": {"sessions": metrics["coverage"]["sessions"] + 40},
+            }
+            value_error = expect_value_error(
+                lambda: insight_module.validate_batch(wrong_value, allowed, "zh", practices, metrics),
+                "does not match",
             )
             wrong_size = home / "wrong-size.png"
             wrong_size.write_bytes(
@@ -898,12 +973,15 @@ def main() -> None:
                 composition_error,
                 source_error,
                 practice_error,
+                theme_error,
+                metric_error,
+                value_error,
                 image_error,
             ]
 
         evaluation.check(
             "validation",
-            "Rejects invalid count, composition, source, and illustration canvas",
+            "Rejects invalid count, composition, theme, evidence, source, and illustration canvas",
             invalid_batches,
         )
 
