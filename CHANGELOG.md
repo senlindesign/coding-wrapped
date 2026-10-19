@@ -1,6 +1,6 @@
 # Changelog
 
-## Unreleased
+## 0.2.0 — 2026-10-19
 
 - Counted Claude Code facts accurately: injected rows (meta, compact
   summaries, local command output, interrupts, tool results) no longer count

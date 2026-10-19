@@ -188,8 +188,8 @@ make landing-test
 `landing/`，Build command 使用 `npm run build`，Deploy command 使用
 `npm run deploy`。
 
-外部链接统一配置在 `landing/src/content.js`。在提供经过确认的 Buy Me a
-Coffee 地址之前，支持按钮会保持为说明状态，不会链接到错误的收款页面。
+外部链接统一配置在 `landing/src/content.js`。支持按钮链接到已确认的 Buy Me a
+Coffee 页面：https://buymeacoffee.com/senlin。
 
 ## License
 

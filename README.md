@@ -205,8 +205,7 @@ Workers Builds should use `landing/` as its root directory, `npm run build` as
 the build command, and `npm run deploy` as the deploy command.
 
 External destinations are configured in `landing/src/content.js`. The support
-button intentionally remains inactive until a verified Buy Me a Coffee URL is
-provided.
+button links to the verified Buy Me a Coffee page, https://buymeacoffee.com/senlin.
 
 ## License
 
